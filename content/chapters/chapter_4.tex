@@ -1,0 +1,2227 @@
+\documentclass[../../main.tex]{subfiles}
+\externaldocument{chapter_3}
+
+\begin{document}
+\stopborder
+
+\chapter{Phân tích và thiết kế hệ thống}
+\section{Sơ đồ phân cấp chức năng}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_phan_ra_chuc_nang.png}
+  \caption{Sơ đồ phân cấp chức năng}\label{fig:functional_hierarchy_diagram}
+\end{figure}
+
+\section{Sơ đồ phân rã chức năng mức đỉnh}
+
+\subsection{Quản lý định danh và truy cập}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/dinh_danh_truy_cap.png}
+  \caption{Sơ đồ phân ra chức năng Quản lý định danh và truy cập}\label{fig:functional_decomposition_diagram_of_user_authentication}
+\end{figure}
+
+\textbf{Mô tả tổng quan chức năng:}
+
+Phân hệ \textit{Quản lý định danh và truy cập} giữ vai trò trung tâm trong kiến trúc hệ thống, chịu trách nhiệm xác thực người dùng, phân quyền truy cập và kiểm soát an toàn đối với các tài nguyên nghiệp vụ. Mọi yêu cầu thao tác trên hệ thống (truy cập chức năng, xem hoặc chỉnh sửa dữ liệu) đều phải đi qua lớp kiểm soát này trước khi được thực thi. Phân hệ đồng thời quản lý vòng đời phiên làm việc của người dùng và ghi nhận các sự kiện bảo mật quan trọng, từ đó hỗ trợ nâng cao tính toàn vẹn, tính bảo mật và khả năng truy vết của hệ thống.
+
+\textbf{Các module thành phần:}
+\begin{itemize}
+  \item \textbf{Quản lý xác thực:} Chịu trách nhiệm kiểm tra và xác minh danh tính người dùng thông qua cặp thông tin định danh (email/mật khẩu) hoặc các cơ chế xác thực tăng cường (ví dụ: mã OTP gửi qua email). Sau khi xác thực thành công, hệ thống khởi tạo phiên làm việc (session token) gắn với người dùng và lưu trữ trạng thái đăng nhập. Module này đồng thời cung cấp các chức năng hỗ trợ như: đăng ký tài khoản mới, kích hoạt tài khoản qua email, khôi phục mật khẩu, giới hạn số lần đăng nhập thất bại, và tự động chấm dứt phiên khi hết thời gian hiệu lực nhằm giảm thiểu rủi ro bảo mật.
+
+  \item \textbf{Quản lý Phân quyền (RBAC):} Module triển khai hệ thống kiểm soát truy cập dựa trên vai trò, cho phép quản trị viên định nghĩa các vai trò như Kế toán viên, Kế toán trưởng, Kiểm toán viên. Mỗi vai trò được gán các quyền hạn cụ thể (Xem, Tạo mới, Chỉnh sửa, Xóa, Phê duyệt, Khóa sổ). Người dùng được gán vào vai trò phù hợp và tự động kế thừa toàn bộ quyền hạn của vai trò đó, đảm bảo nguyên tắc "least privilege".
+
+  \item \textbf{Quản lý Tổ chức:} Module quản lý cấu trúc phân cấp doanh nghiệp (công ty → chi nhánh → phòng ban) và thông tin bộ phận. Cho phép gán người dùng vào đơn vị tổ chức cụ thể và định nghĩa phạm vi dữ liệu mà mỗi đơn vị được truy cập. Hỗ trợ cấu trúc đa chi nhánh, đa công ty và tạo báo cáo tài chính theo từng đơn vị tổ chức.
+
+  \item \textbf{Quản lý kỳ kế toán:} Module nghiệp vụ cốt lõi xử lý toàn bộ quy trình kế toán từ ghi chép đến báo cáo. Người dùng có thể nhập/sửa/xóa chứng từ gốc (hóa đơn, phiếu thu/chi), hệ thống tự động định khoản theo nghiệp vụ hoặc hỗ trợ định khoản thủ công. Module quản lý các sổ sách (sổ cái, sổ chi tiết, sổ nhật ký), cho phép khóa sổ kỳ kế toán để chốt số liệu cuối tháng/quý/năm. Hệ thống tự động tổng hợp và lập các báo cáo tài chính theo mẫu (Bảng cân đối kế toán, Báo cáo kết quả kinh doanh, Báo cáo lưu chuyển tiền tệ) và hỗ trợ kê khai thuế.
+
+  \item \textbf{Nhật ký Kiểm toán (Audit Trail):} Module ghi nhận toàn bộ lịch sử thay đổi dữ liệu trong hệ thống một cách bất biến, bao gồm người thực hiện, thời gian chính xác, loại thao tác, và nội dung thay đổi (trước/sau). Mọi nghiệp vụ tạo mới, chỉnh sửa, xóa, hoặc phê duyệt đều được log chi tiết kèm lý do thay đổi và địa chỉ IP. Module cung cấp khả năng truy xuất nguồn gốc giao dịch, phát hiện bất thường, và đáp ứng yêu cầu pháp lý về minh bạch sổ sách kế toán.
+\end{itemize}
+
+\subsection{Quản lý và đồng bộ dữ liệu gốc}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_quan_ly_du_lieu.png}
+  \caption{Sơ đồ phân rã chức năng quản lý và đồng bộ dữ liệu}\label{fig:functional_decomposition_diagram_of_plant_disease_scanning}
+\end{figure}
+
+\textbf{Mô tả chi tiết chức năng:}
+Đây là chức năng điều phối trung tâm, chịu trách nhiệm quản trị toàn bộ vòng đời của dữ liệu gốc. Chức năng này không chỉ cho phép tạo, xem, sửa, xóa (CRUD) các đối tượng dữ liệu mà còn thực thi các quy trình nghiệp vụ liên quan đến việc phê duyệt và đồng bộ hóa. Khi một đối tượng dữ liệu gốc (ví dụ: một nhà cung cấp mới) được tạo hoặc cập nhật, cơ chế đồng bộ (synchronization) sẽ đảm bảo rằng thông tin này được cập nhật nhất quán đến tất cả các phân hệ liên quan, giúp các giao dịch nghiệp vụ luôn sử dụng dữ liệu chính xác và mới nhất.
+\begin{itemize}
+  \item \textbf{Hệ thống Tài khoản:}
+    Đây là thành phần xương sống (backbone) của toàn bộ hệ thống kế toán. Chức năng này cho phép người dùng (thường là Kế toán trưởng hoặc Admin) định nghĩa, thiết lập và quản lý danh mục hệ thống tài khoản kế toán theo chuẩn mực kế toán hiện hành (ví dụ: Thông tư 200/2014/TT-BTC hoặc Thông tư 133/2016/TT-BTC tại Việt Nam). Các chức năng chi tiết bao gồm:
+    \begin{itemize}
+      \item Tạo lập cây tài khoản phân cấp (cha-con).
+      \item Thiết lập các thuộc tính của tài khoản: tính chất (Dư Nợ/Dư Có), loại tiền tệ, hạch toán chi tiết (theo đối tác, hợp đồng, khoản mục chi phí...).
+      \item Liên kết tài khoản với các bút toán tự động và các mẫu báo cáo tài chính.
+    \end{itemize}
+
+  \item \textbf{Quản lý Đối tác:}
+    Chức năng này quản lý tập trung toàn bộ thông tin về các đối tác kinh doanh của doanh nghiệp. Các đối tác được phân loại rõ ràng thành:
+    \begin{itemize}
+      \item \textbf{Nhà cung cấp:} Lưu trữ thông tin định danh (Mã số thuế, địa chỉ), thông tin liên hệ, và các điều khoản mua hàng (điều khoản thanh toán, hạn mức công nợ).
+      \item \textbf{Khách hàng:} Tương tự, lưu trữ thông tin định danh và các điều khoản bán hàng.
+      \item \textbf{Đối tác khác:} Bao gồm các đối tượng nội bộ như nhân viên (để quản lý tạm ứng, lương) hoặc các bên liên quan khác. Dữ liệu đối tác là cơ sở để hạch toán chi tiết và theo dõi công nợ phải thu, phải trả.
+    \end{itemize}
+
+  \item \textbf{Quản lý Tài khoản Ngân hàng/Tiền mặt:}
+    Phân hệ này chịu trách nhiệm quản lý danh mục các tài khoản thanh toán của chính doanh nghiệp. Nó bao gồm:
+    \begin{itemize}
+      \item \textbf{Danh mục tài khoản ngân hàng:} Quản lý thông tin chi tiết của các tài khoản ngân hàng mà doanh nghiệp sở hữu (số tài khoản, tên ngân hàng, chi nhánh, loại tiền tệ).
+      \item \textbf{Danh mục quỹ tiền mặt:} Quản lý các quỹ tiền mặt tại doanh nghiệp (ví dụ: quỹ tiền mặt VNĐ, quỹ tiền mặt USD). Dữ liệu này là bắt buộc để thực hiện các nghiệp vụ thu/chi và là cơ sở để đối chiếu sổ sách kế toán với sao kê ngân hàng (Bank Reconciliation).
+    \end{itemize}
+
+  \item \textbf{Quản lý Cài đặt chung:}
+    Đây là nơi định nghĩa các tham số cấu hình và các danh mục dùng chung khác, áp dụng cho toàn hệ thống. Các chức năng điển hình bao gồm:
+    \begin{itemize}
+      \item \textbf{Quản lý Tiền tệ và Tỷ giá:} Định nghĩa các loại tiền tệ được sử dụng và quản lý bảng tỷ giá hối đoái.
+      \item \textbf{Quản lý Kỳ kế toán:} Thiết lập, mở và đóng các kỳ kế toán (tháng, quý, năm) để kiểm soát việc nhập liệu và chốt sổ.
+      \item \textbf{Quản lý Thuế:} Định nghĩa các loại thuế suất (đặc biệt là VAT đầu vào, đầu ra) để áp dụng tự động trong các nghiệp vụ mua/bán.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Kế toán tổng hợp}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_ke_toan_tong_hop.png}
+  \caption{Sơ đồ phân rã chức năng Kế toán tổng hợp}\label{fig:phan_ra_ke_toan_tong_hop}
+\end{figure}
+
+\textbf{Mô tả chi tiết chức năng:}
+Kế toán tổng hợp là chức năng trung tâm của hệ thống kế toán, chịu trách nhiệm ghi nhận, xử lý và tổng hợp toàn bộ các nghiệp vụ kinh tế phát sinh trong doanh nghiệp. Chức năng này được phân rã thành hai nhóm chức năng chính, vận hành theo trình tự logic và có sự phụ thuộc chặt chẽ, hình thành một quy trình kế toán hoàn chỉnh từ khâu ghi nhận ban đầu đến cập nhật số dư trên sổ cái.
+
+\textbf{Quản lý Bút toán}
+
+\textit{Quản lý Bút toán (Journal Entry)} là bước đầu tiên, đảm nhiệm việc ghi nhận các nghiệp vụ kinh tế phát sinh theo nguyên tắc kế toán kép. Người dùng có thể nhập liệu các giao dịch vào sổ nhật ký chung với đầy đủ thông tin: ngày hạch toán, diễn giải, tài khoản Nợ/Có liên quan và số tiền tương ứng. Hệ thống hỗ trợ kiểm tra tính hợp lệ của bút toán (đảm bảo tổng Nợ luôn bằng tổng Có), đồng thời cho phép tìm kiếm, chỉnh sửa, xóa hoặc lưu tạm bút toán trước khi được phê duyệt và sử dụng cho bước ghi sổ chính thức.
+
+\textbf{Quy trình Ghi sổ}
+
+\textit{Quy trình Ghi sổ (Posting/Unposting)} là bước tiếp theo, thực hiện việc chuyển các bút toán đã được phê duyệt từ sổ nhật ký chung sang các tài khoản trên sổ cái. Chức năng \textit{Posting} sẽ tự động cập nhật số phát sinh và số dư của từng tài khoản, đồng thời ghi nhận tham chiếu chéo giữa sổ nhật ký và sổ cái để thuận tiện cho việc tra cứu và đối chiếu. Chức năng \textit{Unposting} cho phép hủy hoặc đảo ngược các bút toán đã ghi sổ trong trường hợp phát hiện sai sót hoặc cần điều chỉnh, qua đó đảm bảo tính linh hoạt nhưng vẫn duy trì được kiểm soát và tính toàn vẹn của dữ liệu kế toán.
+
+\subsection{Kế toán phải trả}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_ke_toan_phai_tra.png}
+  \caption{Sơ đồ phân rã chức năng kế toán phải trả}\label{fig:functional_decomposition_diagram_of_weather_information}
+\end{figure}
+\textbf{Mô tả chi tiết chức năng:}
+Module Kế toán Phải trả đóng vai trò là chức năng trung tâm trong hệ thống quản lý công nợ nhà cung cấp, thực hiện quản lý toàn diện quy trình từ ghi nhận hóa đơn mua hàng, quy trình phê duyệt, thanh toán, đến báo cáo phân tích và xử lý thuế giá trị gia tăng đầu vào. Module này được thiết kế với năm chức năng con tương tác chặt chẽ với nhau nhằm đảm bảo tính chính xác, tuân thủ quy định kế toán Việt Nam, và khả năng kiểm soát nội bộ hiệu quả.
+
+\textbf{Chức năng xử lý hoá đơn đầu vào}
+
+\textit{Xử lý hóa đơn đầu vào} cung cấp giao diện toàn diện cho việc ghi nhận và quản lý hóa đơn mua hàng từ nhà cung cấp. Hệ thống cho phép người dùng nhập thông tin hóa đơn với cơ chế tìm kiếm tự động nhà cung cấp và đảm bảo tính duy nhất của số hóa đơn theo từng nhà cung cấp và năm tài chính. Mỗi hóa đơn được cấu trúc thành nhiều dòng chi tiết, trong đó mỗi dòng bao gồm thông tin về số lượng, đơn giá, và thuế suất VAT áp dụng với các mức 0\%, 5\%, 10\%, hoặc miễn thuế.
+
+​Hệ thống hỗ trợ đính kèm tài liệu chứng từ với giới hạn tối đa mười tệp tin và tổng dung lượng hai mươi megabyte, đồng thời cung cấp tính năng xem trước cho các định dạng PDF và hình ảnh. Cơ chế lưu nháp tự động được tích hợp để bảo vệ dữ liệu trong quá trình làm việc, trong khi quyền chỉnh sửa và xóa nháp được giới hạn chỉ cho người tạo hoặc quản trị viên hệ thống. Đặc biệt, chức năng nhập hàng loạt từ file Excel được thiết kế với báo cáo lỗi chi tiết từng dòng, giúp tối ưu hóa quy trình nhập liệu cho khối lượng lớn giao dịch. Toàn bộ các thao tác tạo mới, chỉnh sửa, và xóa đều được ghi nhận đầy đủ trong nhật ký kiểm toán nhằm đảm bảo truy vết hoàn chỉnh.​
+
+\textbf{Chức năng Quy trình phê duyệt}
+
+\textit{Quy trình Phê duyệt} áp dụng cơ chế kiểm soát Maker-Checker nhằm đảm bảo tính chính xác và phòng ngừa rủi ro cho các hóa đơn có giá trị cao hoặc nhạy cảm. Hệ thống sử dụng ngưỡng phê duyệt có thể cấu hình linh hoạt, với giá trị mặc định là hai mươi triệu đồng Việt Nam. Khi giá trị hóa đơn vượt quá ngưỡng này, hệ thống tự động chuyển trạng thái sang "Chờ phê duyệt" và gửi thông báo qua email hoặc ứng dụng di động cho Kế toán trưởng có thẩm quyền.​ Một nguyên tắc quan trọng được hệ thống cưỡng chế là người phê duyệt không được trùng với người tạo hóa đơn, đảm bảo nguyên tắc phân tách nhiệm vụ trong kiểm soát nội bộ. Nếu hóa đơn không được xử lý trong vòng bốn mươi tám giờ, cơ chế leo thang tự động sẽ kích hoạt để nhắc nhở hoặc chuyển tiếp cho cấp quản lý cao hơn. Giao diện phê duyệt cung cấp hai tùy chọn rõ ràng là chấp thuận hoặc từ chối, trong đó việc từ chối yêu cầu bắt buộc phải ghi rõ lý do. Hệ thống cũng áp dụng ràng buộc thời gian, không cho phép phê duyệt các hóa đơn thuộc kỳ kế toán đã đóng, đồng thời ghi nhận đầy đủ toàn bộ luồng chuyển trạng thái trong nhật ký kiểm toán.​
+
+\textit{Quản lý thanh toán} đảm nhận vai trò ghi nhận các khoản thanh toán thực tế cho nhà cung cấp và liên kết chúng với các hóa đơn tương ứng. Khi người dùng chọn một nhà cung cấp, hệ thống tự động hiển thị danh sách các hóa đơn chưa thanh toán hoặc thanh toán chưa đầy đủ, hỗ trợ việc lựa chọn và phân bổ thanh toán một cách chính xác. Hệ thống hỗ trợ thanh toán cho nhiều hóa đơn trong cùng một giao dịch, với cơ chế phân bổ mặc định theo nguyên tắc FIFO.​Trước khi thực hiện thanh toán, hệ thống tự động kiểm tra số dư khả dụng của tài khoản tiền mặt hoặc ngân hàng được chọn, đồng thời ngăn chặn các khoản thanh toán vượt quá số nợ còn lại của hóa đơn. Đối với các trường hợp thanh toán độc lập như ứng trước hoặc tạm ứng, chỉ quản trị viên có quyền thực hiện với cảnh báo rõ ràng về tính chất của giao dịch. Tương tự như hóa đơn, các khoản thanh toán có giá trị vượt ngưỡng cũng phải trải qua quy trình phê duyệt trước khi được ghi sổ. Hệ thống tự động tạo bút toán kế toán tương ứng với ghi nợ tài khoản 331 (Phải trả người bán) và ghi có tài khoản tiền mặt hoặc ngân hàng.​
+
+\textit{Báo cáo công nợ} cung cấp khả năng phân tích và theo dõi tình trạng công nợ phải trả theo nhiều góc độ khác nhau. Báo cáo độ tuổi nợ phân loại công nợ thành các nhóm thời gian bao gồm nợ hiện tại, nợ từ một đến ba mươi ngày, ba mươi một đến sáu mươi ngày, sáu mươi một đến chín mươi ngày, và nợ quá hạn trên chín mươi ngày. Thông tin được tổ chức theo từng nhà cung cấp với hiển thị tổng số nợ và số nợ quá hạn, đồng thời cho phép người dùng DrillDown để xem chi tiết từng hóa đơn cùng lịch sử thanh toán tương ứng.​ Hệ thống hỗ trợ xuất báo cáo sang định dạng Excel hoặc PDF với đầy đủ bộ lọc đã áp dụng và dấu thời gian tạo báo cáo. Dashboard tổng quan hiển thị các chỉ số quan trọng như số lượng công nợ quá hạn và danh sách nhà cung cấp có số nợ cao nhất. Cơ chế nhắc nhở tự động được tích hợp để gửi thông báo qua email hoặc ứng dụng khi phát hiện các khoản nợ sắp đến hạn hoặc đã quá hạn. Phân quyền truy cập được thiết lập theo vai trò, trong đó CFO và Kế toán trưởng có quyền xem toàn bộ dữ liệu, trong khi nhân viên kế toán chỉ được xem các báo cáo trong phạm vi trách nhiệm được gán.​
+
+\textit{Xử lý thuế giá trị gia tăng} đầu vào được tự động hóa và tuân thủ chặt chẽ các quy định của Thông tư 200. Đối với mỗi dòng chi phí trong hóa đơn, người dùng bắt buộc phải chọn thuế suất VAT áp dụng trong bốn mức: 0\%, 5\%, 10\%, hoặc miễn thuế. Hệ thống thực hiện kiểm tra tự động để đảm bảo tổng số thuế VAT ghi trên chứng từ phải khớp với tổng thuế VAT của tất cả các dòng, với sai số cho phép tối đa dưới một nghìn đồng, nếu vượt quá sẽ chặn không cho ghi sổ.​ Việc hạch toán thuế được thực hiện tự động theo đúng chuẩn mực, với ghi nợ tài khoản chi phí tương ứng và tài khoản 133 (Thuế GTGT được khấu trừ), đồng thời ghi có tài khoản 331 (Phải trả người bán). Hệ thống cung cấp báo cáo thuế GTGT đầu vào theo kỳ, nhà cung cấp, hoặc loại thuế, với khả năng xuất sang định dạng chuẩn theo Nghị định 123. Màn hình điều chỉnh thuế thủ công được thiết kế dành cho quản trị viên với yêu cầu bắt buộc ghi rõ lý do điều chỉnh và ghi nhận vào nhật ký kiểm toán. Hệ thống áp dụng các ràng buộc nghiệp vụ như chặn tỷ lệ VAT âm hoặc vượt quá một trăm phần trăm, đồng thời ghi nhận toàn bộ các thao tác liên quan đến thuế bao gồm người thực hiện, thời gian, địa chỉ IP, và giá trị trước-sau thay đổi
+
+\subsection{Kế toán phải thu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_ke_toan_phai_thu.png}
+  \caption{Sơ đồ phân rã chức năng kế toán phải thu}\label{fig:functional_decomposition_diagram_accounts_receivable}
+\end{figure}
+\textbf{Mô tả chi tiết chức năng:}
+Module Kế toán Phải thu đảm nhận vai trò quản lý toàn diện quy trình công nợ khách hàng, bao gồm việc lập hóa đơn bán hàng, quy trình phê duyệt, ghi nhận thu tiền, báo cáo phân tích công nợ, và xử lý thuế giá trị gia tăng đầu ra. Module này được thiết kế với năm chức năng con tương tác chặt chẽ nhằm đảm bảo tính chính xác trong ghi nhận doanh thu, tuân thủ quy định kế toán Việt Nam theo Thông tư 200 và Nghị định 123, cũng như khả năng kiểm soát và truy vết đầy đủ cho các hoạt động liên quan đến công nợ phải thu.​
+
+\textbf{Chức năng Xử lý Hóa đơn đầu ra}
+
+Chức năng xử lý hóa đơn đầu ra cung cấp giao diện toàn diện cho việc lập và quản lý hóa đơn bán hàng cho khách hàng. Hệ thống tích hợp cơ chế tìm kiếm tự động khách hàng với khả năng thêm mới nhanh chóng, đồng thời tự động sinh số hóa đơn theo từng khách hàng và kỳ kế toán để đảm bảo tính duy nhất. Ngày lập hóa đơn được ràng buộc phải thuộc kỳ kế toán đang mở, trong khi hạn thanh toán được tự động tính toán theo mặc định ba mươi ngày kể từ ngày lập hóa đơn.​
+
+Mỗi hóa đơn bao gồm nhiều dòng chi tiết với các trường thông tin bắt buộc như mô tả sản phẩm hoặc dịch vụ, số lượng và đơn giá phải là giá trị dương, thuế suất VAT áp dụng, và tài khoản doanh thu phải là tài khoản cấp thấp nhất có thể ghi sổ. Hệ thống tự động tính toán tổng giá trị và các tổng phụ, đồng thời thực hiện kiểm tra tính hợp lệ trực tuyến trên tất cả các trường bắt buộc và quy tắc tài khoản. Chức năng lưu nháp được hỗ trợ bất cứ lúc nào với cơ chế tự động lưu và khôi phục, trong khi quyền chỉnh sửa và xóa nháp được giới hạn chỉ cho người tạo hoặc quản trị viên hệ thống.​
+
+Hệ thống hỗ trợ đính kèm tài liệu chứng từ với khả năng kéo thả, xem trước, và xóa tài liệu chỉ được phép thực hiện trên các hóa đơn ở trạng thái nháp. Cơ chế phòng ngừa trùng lặp được triển khai để chặn việc lưu hoặc ghi sổ các hóa đơn có cặp khách hàng và số hóa đơn trùng với ngày lập hóa đơn. Chức năng nhập hàng loạt từ file CSV hoặc Excel được thiết kế với tính nguyên tử, nghĩa là toàn bộ dữ liệu chỉ được lưu khi không có lỗi, và cung cấp báo cáo lỗi chi tiết từng dòng có thể tải xuống. Toàn bộ các thao tác tạo mới, chỉnh sửa, ghi sổ, nhập khẩu, và xóa đều được ghi nhận đầy đủ trong nhật ký kiểm toán với thông tin trước và sau thay đổi cùng người thực hiện.​
+
+\textbf{Chức năng Quy trình Phê duyệt}
+
+Quy trình phê duyệt áp dụng cơ chế kiểm soát Maker-Checker để đảm bảo tính chính xác và minh bạch cho các hóa đơn có giá trị cao hoặc được đánh dấu là nhạy cảm. Hệ thống sử dụng ngưỡng phê duyệt có thể cấu hình linh hoạt với giá trị mặc định là một trăm triệu đồng Việt Nam, cùng với cờ đánh dấu độ nhạy cảm dựa trên quy tắc nghiệp vụ. Khi hóa đơn vượt quá ngưỡng hoặc được đánh dấu nhạy cảm, hệ thống tự động chuyển trạng thái sang "Chờ phê duyệt" và gửi thông báo qua ứng dụng và email cho Kế toán trưởng có thẩm quyền.​
+
+Nguyên tắc phân tách nhiệm vụ được hệ thống cưỡng chế nghiêm ngặt, người phê duyệt không được trùng với người tạo hóa đơn, mọi nỗ lực vi phạm đều bị chặn và ghi log. Giao diện phê duyệt hiển thị đầy đủ thông tin hóa đơn, tài liệu đính kèm, lịch sử thay đổi, và dự báo tác động đến công nợ phải thu. Người phê duyệt có hai lựa chọn: chấp thuận để ghi sổ hóa đơn, hoặc từ chối với yêu cầu bắt buộc ghi rõ lý do và trả lại trạng thái nháp kèm thông báo cho người tạo. Hệ thống không cho phép phê duyệt các hóa đơn thuộc kỳ kế toán đã đóng, mọi nỗ lực thực hiện đều được ghi log. Đối với các hóa đơn không kích hoạt luồng phê duyệt, hệ thống tự động phê duyệt ngầm và lưu trữ bản ghi này trong nhật ký kiểm toán. Toàn bộ các chuyển trạng thái từ nháp sang chờ phê duyệt, đã ghi sổ, hoặc bị từ chối đều được ghi nhận đầy đủ.​
+
+\textbf{Chức năng Quản lý Thu tiền}
+
+Chức năng quản lý thu tiền đảm nhận vai trò ghi nhận các khoản thanh toán thực tế từ khách hàng và phân bổ chúng vào các hóa đơn tương ứng, bao gồm cả thanh toán một phần và thanh toán ứng trước. Khi người dùng chọn một khách hàng, hệ thống tự động lọc và hiển thị danh sách các hóa đơn chưa thanh toán hoặc thanh toán chưa đầy đủ của khách hàng đó. Biểu mẫu thu tiền bao gồm các trường thông tin như ngày và số chứng từ tự động tạo, tài khoản tiền mặt hoặc ngân hàng, số tiền, tham chiếu, tài liệu đính kèm, và phương thức thanh toán.​
+
+Giao diện phân bổ cho phép chọn một hoặc nhiều hóa đơn, hỗ trợ phân bổ một phần hoặc theo tỷ lệ, và ngăn chặn việc thanh toán vượt quá số tiền còn lại của từng hóa đơn với hiển thị số dư còn lại rõ ràng. Hệ thống cho phép ghi nhận thanh toán độc lập như thanh toán ứng trước hoặc thanh toán vào tài khoản, các khoản này có thể được khớp với hóa đơn trong tương lai. Khi ghi sổ, hệ thống tự động tạo bút toán ghi nợ tài khoản ngân hàng hoặc tiền mặt và ghi có tài khoản công nợ phải thu 131 với đầy đủ các chiều phân tích đã được cấu hình.​
+
+Chức năng đảo ngược giao dịch được hỗ trợ thông qua việc tạo chứng từ đảo ngược có liên kết, giữ nguyên cả hai chứng từ với liên kết chéo và đánh dấu kiểm toán. Tính năng nhập khẩu thanh toán hàng loạt được thiết kế với tính nguyên tử, sử dụng mẫu chuẩn, và trả về bản đồ lỗi chi tiết kèm số dòng. Toàn bộ các hoạt động tạo mới, chỉnh sửa, ghi sổ, đảo ngược, và nhập khẩu đều được ghi nhận đầy đủ trong nhật ký kiểm toán, bao gồm cả các thay đổi trong phân bổ thanh toán.​
+
+\textbf{Chức năng Báo cáo Công nợ}
+
+Chức năng báo cáo công nợ cung cấp khả năng phân tích chi tiết và theo dõi tình trạng công nợ phải thu thông qua báo cáo độ tuổi nợ và hệ thống cảnh báo tự động cho các khoản nợ quá hạn. Báo cáo độ tuổi nợ phân loại công nợ thành các nhóm thời gian bao gồm nợ hiện tại, nợ từ một đến ba mươi ngày, ba mươi một đến sáu mươi ngày, sáu mươi một đến chín mươi ngày, và nợ quá hạn trên chín mươi ngày. Thông tin được tổ chức theo từng khách hàng với hiển thị tổng số nợ và số dư vận hành, cho phép DrillDown từ bất kỳ ô nào đến danh sách hóa đơn với thông tin số tiền đã thanh toán, số tiền còn lại, và chi tiết thanh toán gần nhất.​
+
+Hệ thống hỗ trợ xuất báo cáo sang định dạng Excel hoặc PDF với dấu thời gian chụp nhanh và các bộ lọc đang hoạt động được hiển thị trên file xuất. Dashboard tổng quan hiển thị huy hiệu đếm số lượng hóa đơn quá hạn và danh sách khách hàng nợ quá hạn nhiều nhất. Chức năng nhắc nhở cho phép kích hoạt thông báo qua ứng dụng và email cho một hoặc nhiều khách hàng, với lịch trình cấu hình được bao gồm nhắc trước hạn, đúng hạn, và định kỳ mỗi bảy ngày sau khi quá hạn.​
+
+Phân quyền truy cập được thiết lập theo vai trò, trong đó CFO và Kế toán trưởng có quyền xem toàn bộ dữ liệu công nợ, trong khi nhân viên phụ trách công nợ chỉ được xem phạm vi được gán, với API cưỡng chế bộ lọc theo quyền hạn. Hệ thống loại trừ các hóa đơn đã đảo ngược hoặc hủy khỏi báo cáo, chỉ hiển thị các khoản thanh toán một phần dưới dạng số tiền còn lại. Toàn bộ các hoạt động cảnh báo, xem báo cáo, và xuất file đều được ghi nhận trong nhật ký kiểm toán với thông tin người khởi tạo.​
+
+\textbf{Chức năng Thuế GTGT (VAT)}
+
+Xử lý thuế giá trị gia tăng đầu ra được tự động hóa hoàn toàn và tuân thủ chặt chẽ các quy định về ghi nhận doanh thu và thuế đầu ra. Mỗi dòng hóa đơn yêu cầu bắt buộc chọn thuế suất VAT với giá trị mặc định lấy từ cài đặt hệ thống, cho phép ghi đè với cảnh báo và chỉ hỗ trợ các mức 0\%, 5\%, 10\%, hoặc miễn thuế. Khi ghi sổ, hệ thống tự động phân tách bút toán theo chuẩn mực với ghi nợ tài khoản công nợ phải thu 131, ghi có tài khoản doanh thu 511, và ghi có tài khoản thuế GTGT đầu ra 3331, với quy tắc làm tròn được áp dụng nhất quán.​
+
+Hệ thống thực hiện kiểm tra tính hợp lệ để đảm bảo tổng thuế VAT trên tiêu đề hóa đơn phải bằng tổng thuế VAT của tất cả các dòng, đồng thời tổng thuế VAT trong sổ cái cũng phải khớp với giá trị này. Nếu phát hiện sai lệch vượt quá ngưỡng cho phép, hệ thống sẽ chặn không cho ghi sổ. Hóa đơn giảm giá hoặc hóa đơn âm được hỗ trợ với yêu cầu bắt buộc phải tham chiếu đến hóa đơn gốc, tất cả các liên kết đều được ghi nhận với tham chiếu chéo trong kiểm toán.​
+
+Báo cáo thuế GTGT đầu ra cho phép lọc theo kỳ kế toán, khách hàng, hoặc phân loại VAT, với khả năng xuất sang định dạng Excel theo chuẩn Nghị định 123. Màn hình điều chỉnh VAT thủ công dành cho quản trị viên yêu cầu bắt buộc ghi rõ lý do điều chỉnh và ghi nhận chênh lệch trong nhật ký kiểm toán, với yêu cầu phê duyệt nếu giá trị điều chỉnh vượt quá ngưỡng cấu hình. API được thiết kế đảm bảo tính idempotent trong việc ghi sổ và chặn việc ghi sổ trùng lặp. Toàn bộ các hoạt động liên quan đến thuế bao gồm tạo mới, ghi đè, và điều chỉnh đều được ghi nhận đầy đủ với thông tin người thực hiện, thời gian, địa chỉ IP, và giá trị trước sau thay đổi.​
+
+\subsection{Quản lý dòng tiền}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_quan_ly_dong_von.png}
+  \caption{Sơ đồ phân rã chức năng quản lý dòng tiền}\label{fig:so_do_phan_ra_quan_ly_dong_tien}
+\end{figure}
+
+\textbf{Mô tả chi tiết chức năng:}
+
+Module Quản lý dòng vốn đảm nhận vai trò quản lý toàn diện các hoạt động liên quan đến tiền mặt và tài khoản ngân hàng của doanh nghiệp, bao gồm việc thiết lập và duy trì danh mục tài khoản, ghi nhận các giao dịch thu chi, theo dõi số dư thông qua sổ quỹ và sổ phụ, cũng như đối chiếu với sao kê ngân hàng. Module này được thiết kế với bốn chức năng con tương tác chặt chẽ nhằm đảm bảo tính chính xác của số dư tiền, kiểm soát dòng tiền hiệu quả, và tuân thủ các quy định về quản lý tài sản tiền tệ theo chuẩn mực kế toán Việt Nam.​
+
+\textbf{Chức năng Quản lý thu/chi}
+
+Chức năng quản lý thu chi cung cấp giao diện toàn diện cho việc ghi nhận tất cả các giao dịch thu tiền và chi tiền phát sinh từ các hoạt động kinh doanh của doanh nghiệp. Hệ thống phân biệt rõ ràng giữa hai loại chứng từ chính là phiếu thu và phiếu chi, mỗi loại có quy trình nhập liệu và kiểm soát riêng biệt. Đối với phiếu thu, hệ thống yêu cầu nhập đầy đủ thông tin bao gồm tài khoản tiền mặt hoặc ngân hàng nhận tiền, người nộp tiền, lý do thu, số tiền, và tài khoản đối ứng. Số chứng từ được tự động sinh theo chuỗi riêng cho từng loại và không được phép trùng lặp trong cùng kỳ kế toán.​
+
+Phiếu chi tuân theo cấu trúc tương tự với các trường thông tin về tài khoản chi tiền, người nhận tiền, lý do chi, số tiền, và tài khoản đối ứng. Hệ thống thực hiện kiểm tra số dư khả dụng trước khi cho phép ghi sổ phiếu chi, ngăn chặn các giao dịch chi vượt quá số dư thực tế có trong tài khoản tiền mặt hoặc ngân hàng. Đối với các khoản chi có giá trị lớn vượt quá ngưỡng cấu hình, hệ thống tự động kích hoạt quy trình phê duyệt với cơ chế Maker-Checker tương tự như trong các module công nợ. Chức năng đính kèm tài liệu chứng từ được hỗ trợ đầy đủ với khả năng lưu trữ các file quét hoặc ảnh chụp chứng từ gốc.​
+
+Hệ thống tự động tạo bút toán kế toán tương ứng khi ghi sổ các phiếu thu chi, với phiếu thu ghi nợ tài khoản tiền và ghi có tài khoản đối ứng, trong khi phiếu chi ghi nợ tài khoản đối ứng và ghi có tài khoản tiền. Toàn bộ các thao tác tạo mới, chỉnh sửa, ghi sổ, và xóa phiếu thu chi đều được ghi nhận đầy đủ trong nhật ký kiểm toán với thông tin chi tiết về người thực hiện, thời gian, và nội dung thay đổi.​
+
+\textbf{Chức năng Sổ quỹ và Sổ phụ}
+
+Chức năng sổ quỹ và sổ phụ cung cấp khả năng theo dõi chi tiết và tổng hợp các giao dịch theo từng tài khoản tiền mặt và ngân hàng, hiển thị số dư đầu kỳ, các giao dịch phát sinh trong kỳ, và số dư cuối kỳ một cách liên tục. Sổ quỹ tiền mặt hiển thị toàn bộ các giao dịch thu chi bằng tiền mặt theo trình tự thời gian, với số dư chạy được cập nhật sau mỗi giao dịch để người dùng có thể nắm bắt tình hình tiền mặt tại bất kỳ thời điểm nào. Mỗi dòng trong sổ quỹ bao gồm thông tin về ngày giao dịch, số chứng từ, diễn giải, số tiền thu, số tiền chi, và số dư còn lại.​
+
+Sổ phụ ngân hàng được tổ chức theo từng tài khoản ngân hàng cụ thể, cho phép theo dõi riêng biệt các giao dịch của mỗi tài khoản. Hệ thống hỗ trợ đa tài khoản ngân hàng, mỗi tài khoản có sổ phụ riêng với cấu trúc tương tự như sổ quỹ tiền mặt. Chức năng lọc và tìm kiếm được tích hợp để người dùng có thể nhanh chóng tra cứu các giao dịch theo nhiều tiêu chí khác nhau như khoảng thời gian, loại giao dịch, người thực hiện, hoặc khoảng số tiền. Khả năng DrillDown từ sổ quỹ hoặc sổ phụ vào chi tiết chứng từ gốc giúp người dùng dễ dàng xác minh và kiểm tra tính chính xác của từng giao dịch.​
+
+Hệ thống tự động tính toán và cập nhật số dư theo thời gian thực sau mỗi giao dịch được ghi sổ hoặc hủy bỏ, đảm bảo tính nhất quán giữa số liệu trên sổ quỹ, sổ phụ, và sổ cái tổng hợp. Chức năng xuất báo cáo được hỗ trợ với các định dạng phổ biến như Excel và PDF, bao gồm đầy đủ thông tin về kỳ báo cáo, bộ lọc áp dụng, và dấu thời gian tạo báo cáo. Phân quyền truy cập được thiết lập chặt chẽ, chỉ những người dùng có quyền hạn phù hợp mới có thể xem sổ quỹ và sổ phụ của các tài khoản cụ thể, đảm bảo bảo mật thông tin tài chính nhạy cảm.​
+
+\textbf{Chức năng Đối chiếu Ngân hàng (Reconciliation)}
+
+Chức năng đối chiếu ngân hàng đóng vai trò quan trọng trong việc đảm bảo tính chính xác và đồng bộ giữa số liệu ghi sổ của doanh nghiệp với số liệu thực tế trên sao kê ngân hàng. Quy trình đối chiếu bắt đầu bằng việc nhập hoặc tải lên sao kê ngân hàng, hỗ trợ các định dạng file phổ biến như Excel, CSV, hoặc PDF. Hệ thống tự động phân tích cú pháp và trích xuất thông tin từ sao kê bao gồm ngày giao dịch, số tiền, nội dung giao dịch, và số dư theo sao kê. Thuật toán khớp giao dịch tự động được áp dụng dựa trên các tiêu chí như số tiền khớp chính xác, ngày giao dịch trong khoảng cho phép, và độ tương đồng của nội dung giao dịch.​
+
+Giao diện đối chiếu hiển thị ba phần chính: các giao dịch đã khớp tự động, các giao dịch trên sổ sách chưa xuất hiện trên sao kê ngân hàng, và các giao dịch trên sao kê chưa được ghi nhận trên sổ sách. Người dùng có thể thực hiện khớp thủ công cho các giao dịch mà hệ thống chưa tự động khớp được, với khả năng khớp nhiều-nhiều trong trường hợp một giao dịch trên sao kê tương ứng với nhiều phiếu thu chi hoặc ngược lại. Hệ thống tự động tính toán và hiển thị các khoản chênh lệch giữa số dư sổ sách và số dư sao kê, phân loại thành chênh lệch do chứng từ đang chờ thanh toán, lỗi ghi sổ, hoặc chưa xác định được nguyên nhân.​
+
+Sau khi hoàn tất quy trình đối chiếu, hệ thống cho phép lưu trạng thái đối chiếu và tạo báo cáo đối chiếu chính thức với đầy đủ thông tin về các giao dịch đã khớp, chưa khớp, và giải trình cho các khoản chênh lệch. Chức năng tạo bút toán điều chỉnh được hỗ trợ để ghi nhận các khoản phí ngân hàng, lãi tiền gửi, hoặc các giao dịch khác chưa được ghi sổ. Lịch sử đối chiếu được lưu trữ đầy đủ, cho phép người dùng xem lại các lần đối chiếu trước đó và theo dõi tiến độ xử lý các khoản chênh lệch. Toàn bộ quy trình đối chiếu từ tải sao kê, khớp giao dịch, điều chỉnh, đến hoàn tất đều được ghi nhận trong nhật ký kiểm toán với thông tin chi tiết về người thực hiện và thời gian.​
+
+\subsection{Báo cáo tài chính}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_bao_cao_tai_chinh.png}
+  \caption{Sơ đồ phân rã chức năng báo cáo tài chính}\label{fig:so_do_phan_ra_chuc_nang_bao_cao_tai_chinh}
+\end{figure}
+
+\textbf{Mô tả chi tiết chức năng:}
+
+Module Báo cáo Tài chính đóng vai trò then chốt trong việc tạo lập các báo cáo kế toán tuân thủ theo Thông tư 200, cung cấp thông tin tài chính đầy đủ và chính xác cho các bên có quyền lợi liên quan. Module này được thiết kế với bốn chức năng con tương tác chặt chẽ, bao gồm việc lập Bảng Cân đối Thử, các báo cáo tài chính theo chuẩn TT200, báo cáo chi tiết sổ kế toán, và báo cáo thuế GTGT, nhằm đảm bảo tính tuân thủ pháp lý, khả năng truy vết đầy đủ, và tính toàn vẹn của dữ liệu báo cáo.​
+
+\textbf{Chức năng Lập Bảng Cân đối Thử (S06-DN)}
+Chức năng lập Bảng Cân đối Thử S06-DN cung cấp một công cụ quan trọng để kiểm tra tính cân đối của sổ sách kế toán và chuẩn bị dữ liệu cho các báo cáo tài chính tổng hợp. Hệ thống cho phép người dùng chọn kỳ kế toán cần lập báo cáo, với giao diện lưu trữ lựa chọn kỳ gần nhất của mỗi người dùng và vô hiệu hóa các kỳ trong tương lai. Đối với các kỳ chưa đóng, hệ thống tự động hiển thị dấu chìm nước "NHÁP" để phân biệt rõ ràng với các báo cáo chính thức.​
+
+Cấu trúc báo cáo tuân thủ chặt chẽ định dạng S06-DN theo Thông tư 200, bao gồm các cột hiển thị mã tài khoản, tên tài khoản, số dư đầu kỳ nợ và có, số phát sinh trong kỳ nợ và có, cũng như số dư cuối kỳ nợ và có. Hệ thống thực hiện kiểm tra tự động để đảm bảo tổng số nợ phải bằng tổng số có ở cả cấp độ báo cáo tổng thể và từng kỳ riêng lẻ. Dữ liệu được trích xuất chỉ từ các chứng từ đã ghi sổ, với tùy chọn chẩn đoán cho phép quản trị viên bao gồm cả chứng từ nháp kèm theo biểu ngữ cảnh báo rõ ràng, trạng thái này được ghi nhận trong bản chụp nhanh báo cáo.​
+
+Về hiệu năng, hệ thống được tối ưu hóa để hiển thị báo cáo trong vòng hai giây cho tối đa năm mươi nghìn dòng sổ cái, với đường dẫn xuất file theo luồng kèm thanh tiến độ và thông báo cho các tập dữ liệu lớn hơn. Cơ chế phân quyền RBAC được áp dụng ở cả cấp độ truy vấn và DrillDown, với URL có chữ ký điện tử có hiệu lực bảy ngày cho các file đính kèm và xuất báo cáo. Toàn bộ các truy cập được ghi nhận với địa chỉ IP và thông tin trình duyệt. Kiểm tra trước khi xuất báo cáo sẽ chặn nếu phát hiện sổ cái không cân đối hoặc khóa kỳ không nhất quán, hiển thị thông báo lỗi có thể thực hiện và liên kết trợ giúp.​
+
+\textbf{Chức năng Lập Báo cáo Tài chính (TT200)}
+
+Chức năng lập báo cáo tài chính theo TT200 cung cấp khả năng tạo các báo cáo tài chính chính thức bao gồm Bảng Cân đối Kế toán B01-DN, Báo cáo Kết quả Hoạt động Kinh doanh B02-DN, Báo cáo Lưu chuyển Tiền tệ B03-DN, và Sổ kế toán chi tiết F01. Mỗi báo cáo được hiển thị theo mẫu chuẩn TT200 với tiêu đề bao gồm đầy đủ thông tin pháp lý của doanh nghiệp. Hệ thống sử dụng các bảng ánh xạ để liên kết từng dòng mục trong báo cáo với các khoản tài khoản và phép toán tương ứng, trong đó các ánh xạ này được quản lý theo phiên bản và mọi chỉnh sửa yêu cầu quyền quản trị viên với lý do bắt buộc, tạo ra bản ghi kiểm toán bao gồm sự khác biệt trước và sau.​
+
+Mỗi dòng mục trong báo cáo được trang bị chú giải và trợ giúp trực tuyến, hiển thị công thức ánh xạ và ví dụ về các tài khoản đóng góp, cho phép DrillDown đến danh sách tài khoản liên quan và tiếp tục đến các chứng từ chi tiết. Chế độ so sánh kỳ được hỗ trợ để hiển thị số liệu kỳ hiện tại so với kỳ trước, bao gồm cột chênh lệch tuyệt đối và phần trăm, với các tùy chọn ẩn các dòng bằng không hoặc không trọng yếu theo ngưỡng có thể cấu hình. Cơ chế kiểm tra tính hợp lệ sẽ chặn việc xuất báo cáo nếu phát hiện bất kỳ ánh xạ nào tạo ra giá trị rỗng hoặc sổ cái không cân đối, hiển thị bảng lỗi liệt kê các dòng có vấn đề và đề xuất cách khắc phục.​
+
+Hệ thống hỗ trợ xuất báo cáo theo định dạng PDF chuẩn TT200 và Excel, trong đó cả hai định dạng đều nhúng phiên bản ánh xạ và các tham số được sử dụng. Báo cáo cho kỳ chưa đóng sẽ có dấu chìm nước "NHÁP" và chân trang bao gồm mã băm cùng danh mục file. Giao diện người dùng được thiết kế với khả năng hiển thị từng phần với khung xương tải, cho phép người dùng mở các phần trong khi các phần còn lại đang được tính toán. Đối với các truy vấn chạy lâu, hệ thống cung cấp tùy chọn xử lý nền với thông báo khi hoàn tất. Phân quyền RBAC được áp dụng theo công ty và vai trò, với ràng buộc cấp dòng được tôn trọng trong trường hợp kích hoạt phân quyền theo phòng ban.​
+
+Quản lý thay đổi được thực hiện thông qua chức năng xem nhật ký thay đổi ánh xạ, hiển thị người thực hiện, thời gian, nội dung thay đổi, và cho phép khôi phục về phiên bản trước với khả năng chạy lại các bản chụp nhanh bị ảnh hưởng theo yêu cầu. Các công cụ hỗ trợ đối soát được tích hợp, bao gồm liên kết đến báo cáo S06-DN cho các tài khoản đóng góp vào dòng mục cụ thể và chế độ giải thích phương sai làm nổi bật các yếu tố dẫn dắt chính.​
+
+\textbf{Chức năng Lập Báo cáo Thuế}
+
+Chức năng lập báo cáo thuế tập trung vào việc tạo các báo cáo liên quan đến thuế giá trị gia tăng, tuân thủ các quy định của Nghị định 123 và các văn bản hướng dẫn khác. Báo cáo thuế GTGT đầu vào và đầu ra được tổ chức theo kỳ kế toán, cho phép lọc theo nhà cung cấp hoặc khách hàng, phân loại thuế suất, và xuất sang định dạng Excel theo mẫu chuẩn với các trường thông tin bắt buộc bao gồm mã số thuế, tên đối tác, số hóa đơn, ngày hóa đơn, giá trị trước thuế, thuế suất, và số thuế GTGT.​
+
+Hệ thống tự động tổng hợp số thuế GTGT được khấu trừ và số thuế GTGT đầu ra phải nộp, tính toán số thuế phải nộp hoặc được hoàn trong kỳ. Chức năng DrillDown cho phép truy vết từ mỗi dòng trong báo cáo thuế về hóa đơn mua hàng hoặc bán hàng gốc, sau đó đến chứng từ ghi sổ và bút toán chi tiết. Cơ chế đối soát được tích hợp để so sánh tổng số thuế trên báo cáo với số liệu trên sổ cái tài khoản 133 và 3331, cảnh báo nếu phát hiện sự chênh lệch vượt quá ngưỡng cho phép.​
+
+Báo cáo tờ khai thuế được hỗ trợ với khả năng xuất theo mẫu chính thức của cơ quan thuế, bao gồm đầy đủ thông tin về doanh nghiệp, kỳ tính thuế, và các chỉ tiêu bắt buộc. Chức năng lưu trữ lịch sử khai báo cho phép theo dõi các lần khai báo trước đó, so sánh sự thay đổi giữa các kỳ, và lưu trữ trạng thái nộp cho cơ quan thuế. Toàn bộ các thao tác tạo báo cáo, xuất file, và chỉnh sửa đều được ghi nhận trong nhật ký kiểm toán với thông tin về người thực hiện, thời gian, và nội dung thay đổi.​
+
+\subsection{Báo cáo quản trị (BI)}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_bao_cao_quan_tri.png}
+  \caption{Sơ đồ phân rã chức năng báo cáo quản trị}\label{fig:so_do_phan_ra_chuc_nang_bao_cao_quan_tri}
+\end{figure}
+\textbf{Mô tả chi tiết chức năng:}
+
+Module Báo cáo quản trị (Business Intelligence) đóng vai trò cung cấp khả năng phân tích và trực quan hóa dữ liệu tài chính theo thời gian thực, giúp các nhà quản lý có cái nhìn toàn diện và kịp thời về tình hình hoạt động kinh doanh của doanh nghiệp. Module này được thiết kế với hai chức năng con chính tương tác chặt chẽ, bao gồm việc xem dashboard tổng quan với các widget trực quan và khả năng tùy chỉnh dashboard theo nhu cầu cá nhân, nhằm hỗ trợ ra quyết định nhanh chóng dựa trên dữ liệu chính xác và cập nhật liên tục.​
+
+\textbf{Chức năng Xem Dashboard}
+
+Chức năng xem dashboard cung cấp giao diện trực quan hiển thị các chỉ số tài chính quan trọng thông qua các widget được thiết kế sẵn, đáp ứng nhu cầu giám sát hoạt động kinh doanh của các cấp quản lý. Hệ thống tích hợp sẵn các widget cốt lõi bao gồm: so sánh doanh thu và chi phí, số dư công nợ phải thu và phải trả, số lượng hóa đơn quá hạn, số dư tiền mặt và ngân hàng, danh sách năm khách hàng nợ nhiều nhất và năm nhà cung cấp cần thanh toán nhiều nhất, cùng với tổng hợp cho kỳ hiện tại hoặc kỳ được chọn.​
+
+Pipeline dữ liệu ETL được thiết kế với khả năng giám sát chặt chẽ, cho phép quản trị viên xem trạng thái công việc, lỗi phát sinh, thời gian chạy lần cuối, và số lượng bản ghi được xử lý. Hệ thống ghi nhận đầy đủ tất cả các lần chạy, lỗi, và lần làm mới dữ liệu kèm theo dấu thời gian và thông tin người thực hiện. Độ tươi mới của dữ liệu được hiển thị rõ ràng với thời gian cập nhật lần cuối và huy hiệu màu theo ba mức: xanh lá cho dữ liệu mới hơn năm phút, vàng cho dữ liệu từ năm đến ba mươi phút, và đỏ cho dữ liệu cũ hơn ba mươi phút. Người dùng có quyền hạn phù hợp có thể sử dụng nút làm mới thủ công với giới hạn tần suất, đồng thời hệ thống tự động làm mới dữ liệu mỗi năm phút.​
+
+Khi dữ liệu bị thiếu hoặc widget gặp lỗi, hệ thống hiển thị biểu ngữ cảnh báo rõ ràng và vô hiệu hóa các tính năng xuất file cũng như tương tác cho đến khi pipeline dữ liệu hoạt động trở lại bình thường. Tất cả các truy vấn widget được tối ưu hóa để hoàn thành trong vòng hai giây với khối lượng dữ liệu lên đến năm mươi nghìn giao dịch, trong khi các widget chạy chậm hoặc thất bại đều được ghi log chi tiết bao gồm tên widget, bộ lọc áp dụng, thời gian truy vấn, và thông báo lỗi. Phân quyền RBAC được áp dụng nghiêm ngặt, chỉ quản trị viên và kế toán trưởng mới có quyền xem và chỉnh sửa cấu hình widget cũng như pipeline dữ liệu, đồng thời đảm bảo không có rò rỉ dữ liệu giữa các công ty hoặc phân đoạn khác nhau.​
+
+Chức năng DrillDown được tích hợp chặt chẽ, cho phép người dùng nhấp vào bất kỳ phần tử nào trong biểu đồ hoặc bảng để lọc chi tiết hơn trên dashboard hoặc mở một cửa sổ (modal) hiển thị danh sách các chứng từ liên quan. Ví dụ: từ widget độ tuổi nợ phải thu, người dùng có thể DrillDown để xem danh sách các hóa đơn cụ thể. Bộ lọc chung của dashboard hỗ trợ lọc theo kỳ, công ty, tài khoản, khách hàng và phòng ban, và được áp dụng cho tất cả các widget, trừ những widget được cấu hình bộ lọc riêng. Hệ thống cũng hỗ trợ chế độ so sánh và phân đoạn dữ liệu, cho phép hiển thị số liệu kỳ hiện tại so với kỳ trước, phân nhóm theo khu vực, khách hàng hoặc theo top cao nhất/thấp nhất, kèm theo chú giải có thể tương tác.​
+
+Luồng DrillDown được tổ chức rõ ràng, đi từ dashboard tổng quan đến các báo cáo chi tiết, chứng từ và tài liệu đính kèm, với thanh breadcrumb và nút quay lại để người dùng dễ dàng điều hướng. Khi không có dữ liệu, hệ thống hiển thị trạng thái rỗng kèm gợi ý điều chỉnh lại bộ lọc. Khi có lỗi ở một widget, hệ thống hiển thị thông báo lỗi rõ ràng và cung cấp liên kết trợ giúp hoặc nút thử lại. Hệ thống hỗ trợ liên kết sâu (deep link), cho phép sao chép và chia sẻ URL dashboard kèm theo bộ lọc hiện tại; chỉ người dùng có đủ quyền (kiểm tra RBAC phía máy chủ) mới xem được nội dung tương ứng. Tất cả thao tác DrillDown và lọc đều hỗ trợ điều khiển bằng chuột và bàn phím, đồng thời hệ thống lưu lại trạng thái hiện tại của phiên làm việc và ngăn xếp các bước DrillDown để người dùng có thể quay lại dễ dàng.​
+
+\textbf{Chức năng Tùy chỉnh Dashboard}
+
+Chức năng tùy chỉnh dashboard cung cấp khả năng cá nhân hóa cao cho từng người dùng, cho phép họ điều chỉnh giao diện dashboard theo vai trò và sở thích cá nhân để có được thông tin quan trọng một cách nhanh chóng. Hệ thống hỗ trợ thêm mới, sắp xếp lại, và thay đổi kích thước các widget thông qua giao diện kéo thả trực quan, với bố cục được lưu trữ riêng cho mỗi người dùng tại phía máy chủ và đồng bộ trên tất cả các thiết bị. Bảng điều khiển ``Thêm Widget'' liệt kê tất cả các widget khả dụng kèm theo chức năng xem trước, cho phép người dùng đăng ký hoặc hủy đăng ký các widget, cũng như khôi phục dashboard về cài đặt mặc định của công ty hoặc người dùng bất cứ lúc nào.​
+
+Phân quyền truy cập widget dựa trên vai trò được thiết lập chặt chẽ, một số widget chỉ hiển thị cho quản trị viên, kế toán trưởng hoặc bộ phận tài chính, trong khi các widget khác có sẵn cho tất cả người dùng, với cưỡng chế từ cả phía máy chủ và máy khách. Mỗi thực thể widget cho phép cấu hình riêng biệt để thiết lập bộ lọc, kỳ, và cách nhóm dữ liệu, với mỗi widget giữ lại thiết lập xem riêng của mình. Chức năng xuất dữ liệu widget hiện tại sang định dạng CSV, PNG hoặc Excel được hỗ trợ đầy đủ, với mỗi thao tác xuất được ghi nhận vào nhật ký kiểm toán.​
+
+Hệ thống được thiết kế với khả năng tiếp cận đầy đủ, bao gồm hỗ trợ ARIA, điều hướng bằng bàn phím, và độ tương phản màu sắc tuân thủ chuẩn WCAG~AA. Toàn bộ các thao tác cấu hình widget, thay đổi thiết lập xem, và xuất dữ liệu đều được ghi nhận trong log với thông tin người dùng, dấu thời gian, và sự khác biệt so với cài đặt trước đó. Các widget chuỗi thời gian hiển thị biểu đồ mini bên cạnh mỗi chỉ số KPI với chỉ báo tăng giảm và phần trăm thay đổi so với kỳ trước, với mũi tên được tô màu theo mức độ trọng yếu.​​
+
+\subsection{AI Chatbot}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_ai_chatbot.png}
+  \caption{Sơ đồ phân rã chức năng AI Chatbot}\label{fig:so_do_phan_ra_chuc_nang_ai_chatbot}
+\end{figure}
+
+\textbf{Mô tả chi tiết chức năng:}
+
+Module AI RAG Chatbot đóng vai trò cung cấp trợ lý thông minh hỗ trợ người dùng trong quá trình làm việc với hệ thống kế toán, sử dụng công nghệ Retrieval-Augmented Generation để trả lời câu hỏi dựa trên dữ liệu thực tế của doanh nghiệp và tài liệu hướng dẫn. Module này được thiết kế với hai chức năng con chính tương tác chặt chẽ, bao gồm khả năng hỏi đáp ngữ cảnh với trích dẫn nguồn và trích dẫn nguồn thông tin chính xác, nhằm nâng cao năng suất làm việc, giảm thời gian tìm kiếm thông tin, và đảm bảo tính tuân thủ trong việc cung cấp thông tin tài chính nhạy cảm.​
+
+\textbf{Chức năng Hỏi - đáp (Q\&A)}
+
+Chức năng hỏi đáp cung cấp khả năng tương tác bằng ngôn ngữ tự nhiên, cho phép người dùng đặt câu hỏi về dữ liệu kế toán, quy trình nghiệp vụ, và tài liệu hướng dẫn để nhận được câu trả lời chính xác kèm theo trích dẫn nguồn. Hệ thống tích hợp widget chatbot nổi trên tất cả các màn hình chính với khả năng ẩn hiện linh hoạt và truy cập nhanh thông qua phím tắt, đồng thời xử lý các trạng thái tải dữ liệu, lỗi, và dự phòng khi backend hoặc mạng gặp sự cố. Phiên đăng nhập và phân quyền RBAC được cưỡng chế nghiêm ngặt, chatbot chỉ trả lời các câu hỏi liên quan đến dữ liệu và tài liệu mà người dùng được phép truy cập, với tất cả các truy vấn được ghi nhận log kèm thông tin người dùng và ngữ cảnh.​
+
+Chế độ bảo mật được thiết lập để ngăn chặn việc hiển thị dữ liệu nhạy cảm trong gợi ý hoặc câu trả lời nếu người dùng không có quyền truy cập, mọi nỗ lực vi phạm đều bị chặn và ghi nhận log. Giao diện widget cho phép người dùng kiểm toán đầy đủ, tải xuống, hoặc xóa lịch sử đối thoại, với các cuộc trò chuyện được lưu trữ riêng cho từng người dùng và ẩn khỏi các vai trò khác trừ khi được phép bởi quản trị viên hoặc kiểm toán.
+
+Công nghệ tìm kiếm kết hợp được áp dụng, sử dụng tìm kiếm ngữ nghĩa, từ khóa, và bộ lọc metadata để định vị các đoạn trích tài liệu hoặc dữ liệu sổ cái liên quan, hỗ trợ cả câu hỏi tiếng Việt và tiếng Anh. Mỗi câu trả lời đều bao gồm trích dẫn với liên kết có thể nhấp đến nguồn tài liệu hoặc giao dịch, tóm tắt ở đầu, và chuỗi truy vết đầy đủ khi mở rộng, đảm bảo không có câu trả lời nào được trả về mà không có nguồn tham khảo. Chatbot không bao giờ bịa đặt các con số hoặc số liệu kế toán, luôn trích xuất từ giao dịch hoặc tài liệu thực tế với dấu thời gian và ngữ cảnh, các cơ chế bảo vệ sẽ chặn nếu không có bằng chứng khả dụng.​
+
+\textbf{Chức năng Trích dẫn Nguồn}
+
+Chức năng trích dẫn nguồn đảm bảo tính minh bạch và khả năng truy vết cho mọi thông tin mà chatbot cung cấp, cho phép người dùng xác minh độ chính xác của câu trả lời bằng cách truy cập trực tiếp vào dữ liệu gốc. Sau mỗi lần lưu hoặc ghi sổ chứng từ thành công, backend kích hoạt webhook n8n nhận thông tin về mã công ty, tiêu đề chứng từ, các dòng chi tiết, khách hàng hoặc nhà cung cấp liên quan, và số dư tổng hợp để nhúng vào Pinecone. Các embedding được lưu trữ theo namespace công ty, quá trình lập chỉ mục lại là idempotent và xử lý các lần thử lại cũng như ghi log nếu n8n không khả dụng.​
+
+Panel chatbot tối thiểu trong ứng dụng cho phép người dùng đặt câu hỏi bằng tiếng Việt như "Tình hình công nợ hiện tại ra sao?", gọi endpoint backend thực hiện tìm kiếm kết hợp trên Pinecone và các tổng hợp sổ cái. Câu trả lời luôn bao gồm câu trả lời ngôn ngữ tự nhiên, danh sách trích dẫn với ID chứng từ hoặc hóa đơn kèm liên kết hoặc số tham chiếu, và chỉ báo độ tin cậy, nếu không tìm thấy bằng chứng, chatbot trả lời "Không đủ dữ liệu" và gợi ý các bước tiếp theo. Mỗi truy vấn chatbot được ghi nhận log kiểm toán với thông tin người dùng, công ty, dấu thời gian, câu hỏi, tóm tắt câu trả lời, và các tham chiếu trích dẫn, lỗi được hiển thị cho người dùng kèm hướng dẫn thử lại.​
+
+\section{Mô hình luồng dữ liệu DFD (Data Flow Diagram)}
+\subsection{Biểu đồ DFD mức ngữ cảnh}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_DFP_muc_ngu_canh.png}
+  \caption{Sơ đồ DFD mức ngữ cảnh}\label{fig:so_do_dfd_muc_ngu_canh}
+\end{figure}
+\subsection{Mô hình luồng dữ liệu DFD phân rã cấp 0 (chức năng chính)}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/so_do_dfp_muc_0.png}
+  \caption{Sơ đồ DFD phân rã cấp 0 (chức năng chính)}\label{fig:so_do_dfd_cap_0}
+\end{figure}
+\section{Mô hình Use Case}
+\subsection{Xác định Actor:}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Actor và các chức năng chính của hệ thống}
+  \label{tab:actor_usecase}\\
+  \hline
+  \textbf{Actor} & \textbf{Vai trò và Chức năng chính} \\
+  \hline
+  \endfirsthead
+  %
+  \multicolumn{2}{c}%
+  {{\bfseries \tablename\ \thetable{} -- Tiếp theo từ trang trước}} \\
+  \hline
+  \textbf{Actor} & \textbf{Vai trò và Chức năng chính} \\
+  \hline
+  \endhead
+  %
+  \hline \multicolumn{2}{r}{{Tiếp tục trang sau}} \\ \hline
+  \endfoot
+  %
+  \hline
+  \endlastfoot
+  %
+  \textbf{Admin} \newline \textbf{(Quản trị viên)} &
+  \textbf{Vai trò:} Quản lý kỹ thuật hệ thống, cấu hình công ty \newline\newline
+  \textbf{Chức năng chính:} \newline
+  - Quản lý người dùng (tạo, sửa, xóa, phân quyền) \newline
+  - Cấu hình thông tin công ty (logo, địa chỉ, MST) \newline
+  - Quản lý năm tài chính và kỳ kế toán \newline
+  - Quản lý hệ thống danh mục (Customers, Suppliers, COA) \newline
+  - Import/Export dữ liệu từ Excel \newline
+  - Xem audit logs và monitoring \newline
+  - Cấu hình widget BI Dashboard \newline
+  - Quản lý cấu hình chatbot AI \\
+  \hline
+
+  \textbf{Accountant} \newline \textbf{(Nhân viên kế toán)} &
+  \textbf{Vai trò:} Thực hiện nghiệp vụ kế toán hàng ngày \newline\newline
+  \textbf{Chức năng chính:} \newline
+  - Tạo và nhập chứng từ kế toán (nháp) \newline
+  - Nhập hóa đơn mua hàng (Purchase Bills) \newline
+  - Lập hóa đơn bán hàng (Sales Invoices) \newline
+  - Ghi nhận phiếu thu/chi tiền mặt và ngân hàng \newline
+  - Quản lý dữ liệu khách hàng và nhà cung cấp \newline
+  - Xem sổ quỹ và sổ phụ ngân hàng \newline
+  - Xem báo cáo công nợ (AR/AP Aging) \newline
+  - Sử dụng AI Chatbot để hỏi đáp nghiệp vụ \newline
+  - Đối chiếu ngân hàng \\
+  \hline
+
+  \textbf{Chief Accountant} \newline \textbf{(Kế toán trưởng)} &
+  \textbf{Vai trò:} Giám sát, phê duyệt và đóng sổ kế toán \newline\newline
+  \textbf{Chức năng chính:} \newline
+  - Phê duyệt chứng từ (Maker-Checker workflow) \newline
+  - Phê duyệt hóa đơn mua/bán và thanh toán lớn \newline
+  - Ghi sổ (Post) chứng từ lên Sổ cái \newline
+  - Đóng kỳ kế toán (Period Close) \newline
+  - Lập Bảng Cân đối Thử (S06-DN) \newline
+  - Lập báo cáo tài chính (B01-DN, B02-DN, B03-DN) \newline
+  - Lập báo cáo chi tiết F01 \newline
+  - Xem toàn bộ audit trail \newline
+  - Điều chỉnh VAT thủ công \newline
+  - Lên lịch và phân phối báo cáo định kỳ \newline
+  - Xem toàn bộ Dashboard BI \\
+  \hline
+
+  \textbf{CFO} \newline \textbf{(Giám đốc tài chính)} &
+  \textbf{Vai trò:} Xem báo cáo và phân tích dữ liệu tài chính \newline\newline
+  \textbf{Chức năng chính:} \newline
+  - Xem các báo cáo tài chính (B01, B02, B03) \newline
+  - Xem Trial Balance và F01 \newline
+  - Xem Dashboard BI và phân tích xu hướng \newline
+  - So sánh đa kỳ và phân tích variance \newline
+  - Xem báo cáo công nợ tổng hợp \newline
+  - Xem dự báo và kịch bản tài chính \newline
+  - Đóng kỳ kế toán (có quyền) \newline
+  - Xuất báo cáo định kỳ \newline
+  - Phê duyệt chứng từ có giá trị cao (tùy chọn) \\
+  \hline
+
+\end{longtable}
+
+\subsection{Xây dựng biểu đồ Use Case tổng quát}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_tong_quat.png}
+  \caption{Use Case tổng quát}\label{fig:usecase_tong_quat}
+\end{figure}
+
+\subsection{Đặc tả chi tiết Use Case}
+
+\subsubsection{UC-1: Cấu hình hệ thống}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/usecase_uc1.png}
+  \caption{Use Case UC-1: Cấu hình hệ thống}\label{fig:usecase_uc1_cau_hinh_he_thong}
+\end{figure}
+
+\paragraph{UC-1.2: Cấu hình Năm tài chính \& Tiền tệ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Cấu hình Năm tài chính \& Tiền tệ}
+  \label{tab:spec_config_fiscal}\\
+  \hline
+  \textbf{Use Case ID} &
+  UC-1.2 \\ \hline
+  \endfirsthead
+  %
+  \endhead
+  %
+  \textbf{Use Case Name} &
+  Cấu hình Năm tài chính \& Tiền tệ (Fiscal Year \& Currency Setup) \\ \hline
+  \textbf{Use Case Description} &
+  Là Quản trị viên (Admin), tôi muốn thiết lập ngày bắt đầu năm tài chính và đồng tiền hạch toán chuẩn (Base Currency) để làm cơ sở cho toàn bộ các giao dịch và báo cáo trong hệ thống. \\ \hline
+  \textbf{Actor} &
+  Quản trị viên (Admin) \\ \hline
+  \textbf{Trigger} &
+  Khi khởi tạo hệ thống lần đầu cho doanh nghiệp hoặc khi có sự thay đổi về chính sách kế toán (hiếm gặp). \\ \hline
+  \textbf{Pre-Condition} &
+  - Quản trị viên đã đăng nhập thành công vào hệ thống. \newline
+  - Quyền hạn "System Configuration" được kích hoạt. \newline
+  - Hệ thống ở trạng thái bảo trì (Maintenance Mode) khuyến nghị để tránh xung đột dữ liệu.
+  \\ \hline
+  \textbf{Post-Condition} &
+  - Tham số hệ thống được cập nhật. \newline
+  - Các phân hệ khác (Mua hàng, Bán hàng) sẽ sử dụng đồng tiền và lịch tài chính mới này. \newline
+  - Log lịch sử thay đổi cấu hình được ghi lại. \\ \hline
+  \textbf{Basic Flow} &
+  1. Quản trị viên truy cập module "Thiết lập Tham số Hệ thống". \newline
+  2. Hệ thống hiển thị các tab cấu hình, mặc định chọn tab "Tài chính". \newline
+  3. Quản trị viên chọn chức năng "Chỉnh sửa tham số". \newline
+  4. Quản trị viên nhập/chọn các thông tin: \newline
+  - Ngày bắt đầu năm tài chính (Ví dụ: 01/01 hoặc 01/04). \newline
+  - Đồng tiền hạch toán (Ví dụ: VND). \newline
+  - Định dạng số học (Dấu phẩy/Dấu chấm). \newline
+  5. Hệ thống kiểm tra tính hợp lệ của dữ liệu (Validation). \newline
+  6. Quản trị viên nhấn nút "Lưu thay đổi". \newline
+  7. Hệ thống hiển thị cảnh báo về tác động của việc thay đổi (nếu có). \newline
+  8. Quản trị viên xác nhận lưu. \newline
+  9. Hệ thống lưu tham số và thông báo "Cập nhật thành công".
+  \\ \hline
+  \textbf{Alternative Flow} &
+  \textbf{AF1: Xem lịch sử cấu hình} \newline
+  2a. Tại giao diện tab "Tài chính", Admin chọn "Xem lịch sử". \newline
+  2b. Hệ thống hiển thị danh sách các lần thay đổi trước đó (Ai đổi, Thời gian, Giá trị cũ/mới). \newline
+  2c. Use Case kết thúc.
+  \\ \hline
+  \textbf{Exception Flow} &
+  \textbf{E1: Đã phát sinh dữ liệu kế toán (Critical)} \newline
+  5a. Hệ thống phát hiện đã có chứng từ (Voucher) trạng thái "Posted" trong Database. \newline
+  5b. Hệ thống \textbf{CHẶN} việc thay đổi "Đồng tiền hạch toán" và "Ngày bắt đầu năm tài chính". \newline
+  5c. Hiển thị thông báo lỗi: "Không thể thay đổi cấu hình lõi khi đã phát sinh nghiệp vụ. Vui lòng liên hệ bộ phận kỹ thuật hoặc reset dữ liệu." \newline
+  5d. Use Case kết thúc (hoặc quay lại bước 4 để sửa các tham số không quan trọng khác như format số). \newline
+  \textbf{E2: Ngày bắt đầu không hợp lệ} \newline
+  5a. Admin chọn ngày bắt đầu là ngày 31/02 hoặc định dạng sai. \newline
+  5b. Hệ thống báo lỗi định dạng. \newline
+  5c. Quay lại bước 4. \\ \hline
+  \textbf{Business Rules} &
+  \textbf{BR1.2-1 (Tính nhất quán):} Đồng tiền hạch toán là duy nhất cho một Tenant (Doanh nghiệp). Nếu muốn đa tiền tệ, phải dùng tính năng quy đổi tỷ giá, không đổi đồng tiền gốc. \newline
+  \textbf{BR1.2-2 (Niên độ):} Năm tài chính phải đảm bảo độ dài trọn vẹn 12 tháng kế toán. \newline
+  \textbf{BR1.2-3 (Bất biến):} Cấu hình này bị khóa (Read-only) ngay khi chứng từ đầu tiên được ghi sổ (Post). \\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR1.2-1: Mọi thay đổi cấu hình phải được ghi Audit Log (IP, User ID, Timestamp). \newline
+  NFR1.2-2: Việc thay đổi format số (ví dụ: 1,000.00 sang 1.000,00) phải cập nhật hiển thị trên toàn bộ UI ngay lập tức mà không cần khởi động lại server. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-2: Quản lý danh mục}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc2.png}
+  \caption{Use Case UC-2: Quản lý danh mục }\label{fig:usecase_uc2}
+\end{figure}
+\paragraph{UC-2.1: Quản lý Tài khoản Kế toán}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Hệ thống Tài khoản}
+  \label{tab:spec_manage_coa}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Hệ thống Tài khoản (Chart of Accounts - COA) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán trưởng hoặc Quản trị viên xem, thiết lập và quản lý danh mục tài khoản kế toán theo chuẩn TT200, bao gồm việc kích hoạt/ngưng sử dụng và thêm mới các tài khoản con chi tiết. \\ \hline
+  \textbf{Actor} & Kế toán trưởng (Chief Accountant), Quản trị viên (Admin) \\ \hline
+  \textbf{Trigger} & Doanh nghiệp cần tùy chỉnh hệ thống tài khoản để phù hợp với nhu cầu quản lý chi tiết hoặc khi khởi tạo dữ liệu ban đầu. \\ \hline
+  \textbf{Pre-Condition} & - Tài khoản người dùng có quyền Admin hoặc Chief Accountant. \newline
+  - Hệ thống đã được khởi tạo dữ liệu mẫu (Seeding) theo chuẩn TT200 (tối thiểu 154 tài khoản). \\ \hline
+  \textbf{Post-Condition} & - Cấu trúc cây tài khoản được cập nhật. \newline
+  - Các tài khoản mới sẵn sàng để hạch toán trên chứng từ. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn menu "Hệ thống tài khoản". \newline
+  2. Hệ thống hiển thị danh sách tài khoản dưới dạng cây (Tree View) đa cấp. \newline
+  3. Actor tìm kiếm tài khoản (theo số hiệu hoặc tên). \newline
+  4. Actor chọn chức năng "Thêm tài khoản con". \newline
+  5. Hệ thống hiển thị form thêm mới. \newline
+  6. Actor nhập thông tin: Số hiệu, Tên tài khoản, Tính chất (Dư Nợ/Có/Lưỡng tính). \newline
+  7. Actor nhấn "Lưu". \newline
+  8. Hệ thống kiểm tra trùng mã và quy tắc nghiệp vụ. \newline
+  9. Hệ thống lưu và hiển thị thông báo thành công. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Sửa tài khoản:} Tại bước 4, Actor chọn "Sửa". Hệ thống cho phép sửa Tên nhưng khóa trường Số hiệu (nếu đã có phát sinh). \newline
+  \textbf{A2. Ngưng sử dụng:} Actor chọn "Ngưng kích hoạt". Tài khoản sẽ ẩn khỏi các màn hình nhập liệu nhưng vẫn giữ số liệu lịch sử. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Trùng mã:} Nếu Số hiệu tài khoản đã tồn tại, hệ thống báo lỗi "Mã tài khoản đã tồn tại". \newline
+  \textbf{E2. Xóa tài khoản gốc:} Nếu Actor cố xóa các tài khoản cấp 1 mặc định của TT200, hệ thống chặn và báo lỗi "Không thể xóa tài khoản hệ thống". \\ \hline
+  \textbf{Business Rules} & BR2.1-1: Hệ thống phải preload đầy đủ danh mục theo thông tư 200 (>= 154 tài khoản). \newline
+  BR2.1-2: Không được phép trùng Số hiệu tài khoản trong cùng một công ty. \newline
+  BR2.1-3: Chỉ tài khoản chi tiết (Leaf node) mới được phép chọn để hạch toán trong chứng từ (Postable = True). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.1-1: Cây tài khoản hỗ trợ mở rộng tối thiểu 3 cấp. \newline
+  NFR2.1-2: Tìm kiếm hỗ trợ tiếng Việt có dấu và không dấu (Typeahead). \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.2: Quản lý Khách hàng}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Khách hàng}
+  \label{tab:spec_manage_customer}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.2 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Khách hàng (Customer Management) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán viên quản lý thông tin hồ sơ khách hàng để phục vụ theo dõi công nợ phải thu (AR) và xuất hóa đơn. \\ \hline
+  \textbf{Actor} & Kế toán viên (Accountant), Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Khi có khách hàng mới hoặc cần cập nhật thông tin liên lạc/thuế của khách hàng hiện tại. \\ \hline
+  \textbf{Pre-Condition} & Người dùng đã đăng nhập và có quyền truy cập phân hệ Bán hàng hoặc Danh mục. \\ \hline
+  \textbf{Post-Condition} & Hồ sơ khách hàng được tạo lập/cập nhật và có thể chọn trong màn hình Lập phiếu thu/Hóa đơn. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập danh sách Khách hàng. \newline
+  2. Hệ thống hiển thị danh sách dạng bảng (Grid) với phân trang. \newline
+  3. Actor nhấn nút "Thêm mới". \newline
+  4. Hệ thống hiển thị form nhập liệu. \newline
+  5. Actor nhập các trường bắt buộc: Tên khách hàng, Mã số thuế, Địa chỉ, Email. \newline
+  6. Hệ thống tự động sinh Mã khách hàng (nếu Actor không nhập). \newline
+  7. Actor nhấn "Lưu". \newline
+  8. Hệ thống validate Mã số thuế và Email. \newline
+  9. Hệ thống lưu dữ liệu và cập nhật danh sách. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xem chi tiết công nợ:} Tại màn hình danh sách, Actor chọn xem chi tiết. Hệ thống hiển thị thêm tab "Tổng quan công nợ" (Số dư hiện tại, Số hóa đơn quá hạn). \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Trùng Mã số thuế:} Hệ thống phát hiện MST đã tồn tại $\rightarrow$ Cảnh báo "Khách hàng này đã tồn tại" và hiển thị link đến hồ sơ cũ. \newline
+  \textbf{E2. Xóa khách hàng đã có giao dịch:} Actor chọn xóa $\rightarrow$ Hệ thống kiểm tra thấy có hóa đơn/phiếu thu liên quan $\rightarrow$ Báo lỗi và gợi ý chuyển sang trạng thái "Ngừng hoạt động". \\ \hline
+  \textbf{Business Rules} & BR2.2-1: Mã khách hàng tự sinh theo định dạng CUST-YYYY-NNNN và phải duy nhất. \newline
+  BR2.2-2: Mã số thuế phải hợp lệ (Check thuật toán checksum). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.2-1: Danh sách hỗ trợ tải (Lazy load) nhanh với dữ liệu > 10.000 bản ghi. \newline
+  NFR2.2-2: Mọi thao tác thay đổi dữ liệu phải được ghi log (Audit Trail). \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.3: Quản lý Nhà cung cấp}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Nhà cung cấp}
+  \label{tab:spec_manage_supplier}\\
+  \hline
+  \textbf{Use Case ID} &
+  UC-2.3 \\ \hline
+  \endfirsthead
+  %
+  \endhead
+  %
+  \textbf{Use Case Name} &
+  Quản lý Nhà cung cấp \\ \hline
+  \textbf{Use Case Description} &
+  Là kế toán viên, tôi muốn quản lý danh sách nhà cung cấp để phục vụ cho nghiệp vụ mua hàng và công nợ phải trả.\\ \hline
+  \textbf{Actor} &
+  Kế toán viên (Accountant), Trưởng phòng Kế toán (Chief Accountant), Quản trị viên (Admin) \\ \hline
+  \textbf{Trigger} &
+  Người dùng cần thêm mới hoặc cập nhật thông tin nhà cung cấp \\ \hline
+  \textbf{Pre-Condition} &
+  - Người dùng đã đăng nhập hệ thống \newline
+  - Người dùng có quyền quản lý danh mục nhà cung cấp
+  \\ \hline
+  \textbf{Post-Condition} &
+  - Thông tin nhà cung cấp được lưu thành công \newline
+  - Nhà cung cấp có thể sử dụng trong chứng từ mua hàng \newline
+  - Hệ thống ghi log thay đổi \\ \hline
+  \textbf{Basic Flow} &
+  1. Người dùng truy cập "Danh mục" > "Nhà cung cấp" \newline
+  2. Hệ thống hiển thị danh sách nhà cung cấp \newline
+  3. Người dùng chọn "Thêm nhà cung cấp" \newline
+  4. Người dùng nhập: Mã NCC, Tên NCC, Mã số thuế, Địa chỉ, Điện thoại, Email, Người liên hệ, Nhóm NCC, Điều khoản thanh toán \newline
+  5. Hệ thống validate và kiểm tra trùng lặp \newline
+  6. Người dùng lưu thông tin \newline
+  7. Hệ thống lưu và thông báo thành công
+  \\ \hline
+  \textbf{Alternative Flow} &
+  \textbf{AF1: Import từ Excel} \newline
+  3a. Người dùng chọn "Import từ Excel" \newline
+  3b. Người dùng tải file mẫu hoặc chọn file Excel \newline
+  3c. Hệ thống đọc và validate dữ liệu \newline
+  3d. Hệ thống hiển thị preview dữ liệu sẽ import \newline
+  3e. Người dùng xác nhận import \newline
+  3f. Hệ thống import và báo cáo kết quả (thành công/lỗi) \newline
+  3g. Use Case kết thúc \newline
+
+  \textbf{AF2: Export Excel} \newline
+  3a. Người dùng chọn "Export Excel" \newline
+  3b. Người dùng chọn bộ lọc (nếu cần) \newline
+  3c. Hệ thống tạo file Excel \newline
+  3d. Người dùng tải file về máy \newline
+  3e. Use Case kết thúc \newline
+
+  \textbf{AF3: Cập nhật thông tin nhà cung cấp} \newline
+  3a. Người dùng chọn nhà cung cấp từ danh sách \newline
+  3b. Hệ thống hiển thị form với dữ liệu hiện tại \newline
+  3c. Người dùng chỉnh sửa thông tin \newline
+  3d. Use Case tiếp tục bước 5
+  \\ \hline
+  \textbf{Exception Flow} &
+  \textbf{EF1: Phát hiện trùng lặp} \newline
+  5a. Hệ thống cảnh báo mã NCC hoặc MST đã tồn tại \newline
+  5b. Hệ thống đề xuất xem nhà cung cấp trùng \newline
+  5c. Người dùng sửa mã hoặc hủy thao tác \newline
+  5d. Use Case quay lại bước 4 \newline
+
+  \textbf{EF2: File Excel không đúng định dạng} \newline
+  3c1. Hệ thống hiển thị lỗi chi tiết từng dòng \newline
+  3c2. Người dùng sửa file và thử lại \newline
+  3c3. Use Case quay lại bước 3b \\ \hline
+  \textbf{Business Rules} &
+  BR2.3-1: Mã nhà cung cấp phải duy nhất trong hệ thống \newline
+  BR2.3-2: Mã số thuế phải hợp lệ theo quy định (10-13 số) \newline
+  BR2.3-3: Không được xóa nhà cung cấp đã có phát sinh công nợ\\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR2.3-1: Hỗ trợ import tối đa 10,000 nhà cung cấp/lần \newline
+  NFR2.3-2: Tìm kiếm real-time với autocomplete < 300ms \newline
+  NFR2.3-3: Export Excel hoàn tất trong < 5 giây cho 50,000 bản ghi \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.4: Quản lý Tài khoản Ngân hàng (Bank Accounts)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Tài khoản Ngân hàng}
+  \label{tab:spec_manage_bank}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.4 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Tài khoản Ngân hàng \& Tiền mặt \\ \hline
+  \textbf{Use Case Description} & Quản lý danh sách các tài khoản ngân hàng và quỹ tiền mặt, bao gồm thiết lập số dư đầu kỳ để phục vụ thu/chi. \\ \hline
+  \textbf{Actor} & Kế toán trưởng, Kế toán viên (được phân quyền) \\ \hline
+  \textbf{Trigger} & Doanh nghiệp mở tài khoản ngân hàng mới hoặc cần điều chỉnh thông tin tài khoản hiện có. \\ \hline
+  \textbf{Pre-Condition} & - Hệ thống đã có danh sách các Ngân hàng (Vietcombank, ACB,...) để chọn. \newline
+  - Chưa chốt sổ kỳ kế toán đầu tiên (nếu nhập số dư đầu kỳ). \\ \hline
+  \textbf{Post-Condition} & Tài khoản mới hiển thị trong các danh sách chọn phương thức thanh toán. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập danh sách "Tài khoản Ngân hàng/Tiền mặt". \newline
+  2. Hệ thống hiển thị danh sách kèm số dư hiện tại (nếu có quyền xem). \newline
+  3. Actor chọn "Thêm tài khoản". \newline
+  4. Actor nhập: Số tài khoản (bắt buộc), Tên ngân hàng (chọn từ list), Chi nhánh, Loại tiền tệ. \newline
+  5. Actor nhập "Số dư đầu kỳ" (nếu là thiết lập lần đầu). \newline
+  6. Actor nhấn "Lưu". \newline
+  7. Hệ thống kiểm tra tính duy nhất của Số tài khoản. \newline
+  8. Lưu và cập nhật danh sách. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Số tài khoản trùng:} Hệ thống báo lỗi nếu số tài khoản đã tồn tại trong hệ thống. \newline
+  \textbf{E2. Xóa tài khoản đã dùng:} Không cho phép xóa tài khoản đã từng được sử dụng trong bất kỳ phiếu Thu/Chi nào $\rightarrow$ Thông báo "Tài khoản đã phát sinh giao dịch". \\ \hline
+  \textbf{Business Rules} & BR2.4-1: Số dư đầu kỳ phải khớp với số liệu trên Báo cáo tài chính hoặc Biên bản bàn giao khi chuyển đổi hệ thống. \newline
+  BR2.4-2: Tài khoản được quản lý theo phạm vi từng Công ty (Company ID) trong mô hình Multi-tenancy. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.4-1: Tooltip trên giao diện chọn tài khoản phải hiển thị nhanh số dư hiện tại để kế toán viên biết đủ tiền chi hay không. \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.5: Thiết lập tham số công ty}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Thiết lập Tham số Công ty}
+  \label{tab:spec_company_settings}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Thiết lập Tham số Công ty (Company Settings) \\ \hline
+  \textbf{Use Case Description} & Cho phép Admin cấu hình các thông số pháp lý, quy tắc đánh số chứng từ, thuế suất và giao diện báo cáo. \\ \hline
+  \textbf{Actor} & Quản trị viên (Admin), Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Khi khởi tạo công ty mới hoặc thay đổi chính sách kế toán/năm tài chính. \\ \hline
+  \textbf{Pre-Condition} & Đăng nhập với quyền Admin cao nhất. \\ \hline
+  \textbf{Post-Condition} & Các thiết lập mới được áp dụng ngay lập tức cho các giao dịch phát sinh sau đó. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập "Cài đặt Công ty". \newline
+  2. Hệ thống hiển thị các tab: Thông tin chung, Năm tài chính, Thuế, Đánh số, Mẫu in. \newline
+  3. Actor chỉnh sửa Năm tài chính (nếu cần). \newline
+  4. Actor cấu hình danh sách Thuế suất VAT (0\%, 5\%, 8\%, 10\%). \newline
+  5. Actor thiết lập quy tắc sinh mã chứng từ (Prefix, độ dài số). \newline
+  6. Actor tải lên Logo công ty và thông tin Footer cho báo cáo. \newline
+  7. Actor nhấn "Lưu cấu hình". \newline
+  8. Hệ thống validate toàn vẹn dữ liệu và lưu lại. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xem trước mẫu in:} Tại tab Mẫu in, Actor nhấn "Preview" để xem Logo và Footer hiển thị thế nào trên PDF báo cáo tài chính. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Thay đổi năm tài chính sai quy tắc:} Nếu Actor chọn năm tài chính trùng lặp hoặc tạo khoảng trống thời gian $\rightarrow$ Hệ thống báo lỗi. \newline
+  \textbf{E2. Mã chứng từ xung đột:} Nếu quy tắc mã mới gây trùng lặp với chứng từ cũ đã lưu $\rightarrow$ Hệ thống từ chối lưu. \\ \hline
+  \textbf{Business Rules} & BR2.5-1: Tiền tệ hạch toán (Base Currency) là VND. \newline
+  BR2.5-2: Việc thay đổi cấu hình phải tuân thủ tính chất Transaction (Thành công tất cả hoặc không lưu gì cả). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.5-1: Mọi thay đổi cấu hình đều phải được ghi log Audit ở mức độ chi tiết cao nhất (Critical). \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.6: Nhập khẩu Dữ liệu}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Nhập khẩu Dữ liệu}
+  \label{tab:spec_import_data}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.6 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Nhập khẩu Dữ liệu (Data Import \& Migration) \\ \hline
+  \textbf{Use Case Description} & Hỗ trợ người dùng nhập hàng loạt dữ liệu danh mục (Khách hàng, Nhà cung cấp, Số dư đầu kỳ) từ file Excel/CSV mẫu để tiết kiệm thời gian nhập liệu thủ công. \\ \hline
+  \textbf{Actor} & Admin, Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Khi mới triển khai hệ thống (Migration) hoặc khi cần thêm danh sách lớn đối tác mới. \\ \hline
+  \textbf{Pre-Condition} & - File nhập liệu đã được chuẩn bị đúng theo biểu mẫu (Template) của hệ thống. \newline
+  - Tài khoản có quyền "Import". \\ \hline
+  \textbf{Post-Condition} & - Các bản ghi hợp lệ được tạo mới trong CSDL. \newline
+  - File báo cáo lỗi (nếu có) được tải xuống. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Nhập khẩu". \newline
+  2. Actor chọn loại dữ liệu (VD: Danh mục Khách hàng). \newline
+  3. Hệ thống cung cấp link "Tải file mẫu". \newline
+  4. Actor tải file Excel chứa dữ liệu lên hệ thống. \newline
+  5. Hệ thống đọc file và thực hiện Validate từng dòng (Format, Data Type, Duplicates). \newline
+  6. Hệ thống hiển thị màn hình "Kết quả kiểm tra": Số dòng hợp lệ, Số dòng lỗi. \newline
+  7. Nếu không có lỗi nghiêm trọng, Actor nhấn "Thực hiện Import". \newline
+  8. Hệ thống thực hiện ghi dữ liệu theo Transaction. \newline
+  9. Hệ thống thông báo hoàn tất. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Tải file lỗi:} Tại bước 6, nếu có dòng lỗi, Actor nhấn "Tải file lỗi". Hệ thống trả về file Excel kèm cột ghi chú lý do lỗi tại từng dòng để sửa. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Sai định dạng file:} Người dùng upload file .doc hoặc ảnh $\rightarrow$ Hệ thống báo lỗi định dạng. \newline
+  \textbf{E2. Transaction Rollback:} Trong quá trình ghi dữ liệu (Bước 8), nếu xảy ra lỗi hệ thống $\rightarrow$ Toàn bộ dữ liệu của lô nhập khẩu bị hủy bỏ để đảm bảo tính toàn vẹn. \\ \hline
+  \textbf{Business Rules} & BR2.6-1: Nhập khẩu số dư đầu kỳ (Opening Balance) chỉ được phép khi kỳ kế toán chưa đóng và tổng Nợ phải bằng tổng Có. \newline
+  BR2.6-2: Nếu import trùng mã đối tượng đã có, hệ thống sẽ bỏ qua hoặc cập nhật (tùy cấu hình). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.6-1: Hệ thống phải xử lý được file tối thiểu 1.000 dòng trong dưới 30 giây. \newline
+  NFR2.6-2: Thông báo lỗi phải chỉ rõ số dòng và nguyên nhân (VD: "Dòng 12: Sai định dạng Email"). \\ \hline
+\end{longtable}
+
+\paragraph{UC-2.7: Tra cứu Nhật ký (Audit Log)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Tra cứu Nhật ký Hệ thống}
+  \label{tab:spec_audit_log}\\
+  \hline
+  \textbf{Use Case ID} & UC-2.7 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Tra cứu Nhật ký (Audit Log) \\ \hline
+  \textbf{Use Case Description} & Cho phép Admin/Kiểm toán viên xem lại lịch sử thay đổi của các bản ghi dữ liệu chủ để phát hiện sai sót hoặc gian lận. \\ \hline
+  \textbf{Actor} & Admin, Kiểm toán viên (Auditor) \\ \hline
+  \textbf{Trigger} & Khi cần điều tra nguyên nhân sai lệch dữ liệu hoặc thực hiện quy trình kiểm toán định kỳ. \\ \hline
+  \textbf{Pre-Condition} & Người dùng có quyền truy cập module Audit. \\ \hline
+  \textbf{Post-Condition} & Không có dữ liệu nào bị thay đổi (Chức năng chỉ đọc). \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập menu "Nhật ký hệ thống". \newline
+  2. Hệ thống hiển thị danh sách log (Mới nhất lên đầu). \newline
+  3. Actor sử dụng bộ lọc: Khoảng thời gian, Người dùng, Loại đối tượng (Khách hàng/TK), Hành động (Thêm/Sửa/Xóa). \newline
+  4. Hệ thống trả về kết quả lọc. \newline
+  5. Actor chọn một dòng để xem chi tiết. \newline
+  6. Hệ thống hiển thị: Giá trị Cũ (Old Value) vs Giá trị Mới (New Value), IP người dùng, Thời gian thực hiện. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Kiểm tra toàn vẹn (Integrity Check):} Actor nhấn nút "Quét dữ liệu rác". Hệ thống chạy job ngầm để tìm các bản ghi mồ côi (Orphan records) và báo cáo kết quả. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Không có quyền truy cập:} Nếu user thường cố truy cập API audit $\rightarrow$ Hệ thống trả về lỗi 403 Forbidden. \\ \hline
+  \textbf{Business Rules} & BR2.7-1: Nhật ký hệ thống là bất biến (Immutable), không ai được phép sửa đổi hoặc xóa log. \newline
+  BR2.7-2: Phải ghi nhận cả các nỗ lực truy cập/sửa đổi thất bại (Failed attempts). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR2.7-1: Hỗ trợ tìm kiếm trong kho dữ liệu Log lớn (có thể lên tới hàng triệu bản ghi) với độ trễ thấp. \newline
+  NFR2.7-2: API cho phép tải log về để lưu trữ offline. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-3: Quản lý Chứng từ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc3.png}
+  \caption{Use Case UC-3: Quản lý Chứng từ}\label{fig:usecase_quan_ly_chung_tu}
+\end{figure}
+\paragraph{UC-3.1: Quản lý Danh sách chứng từ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Danh sách Chứng từ}
+  \label{tab:spec_voucher_list}\\
+  \hline
+  \textbf{Use Case ID} & UC-3.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Danh sách Chứng từ (Voucher List \& Search) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán viên xem danh sách tổng quan, tìm kiếm mờ (Fuzzy search) và lọc chứng từ theo nhiều tiêu chí để phục vụ công tác rà soát số liệu. \\ \hline
+  \textbf{Actor} & Kế toán viên, Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Người dùng cần tìm lại một chứng từ cũ hoặc kiểm tra các chứng từ đang ở trạng thái Nháp (Draft). \\ \hline
+  \textbf{Pre-Condition} & Đăng nhập thành công vào phân hệ Kế toán. \\ \hline
+  \textbf{Post-Condition} & Danh sách chứng từ hiển thị đúng theo bộ lọc. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập menu "Danh sách chứng từ". \newline
+  2. Hệ thống hiển thị bảng dữ liệu gồm: Số chứng từ, Ngày, Loại, Tổng tiền, Trạng thái (Ghi sổ/Nháp), Người tạo. \newline
+  3. Hệ thống hiển thị Badge đếm số lượng: "5 Nháp", "120 Đã ghi sổ". \newline
+  4. Actor nhập từ khóa vào ô tìm kiếm (VD: "Tiếp khách", "1500000"). \newline
+  5. Hệ thống thực hiện tìm kiếm toàn văn (Full-text search) và trả về kết quả. \newline
+  6. Actor chọn bộ lọc nâng cao (Khoảng thời gian, Loại chứng từ). \newline
+  7. Hệ thống làm mới danh sách theo bộ lọc. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xóa chứng từ Nháp:} Actor chọn một dòng đang ở trạng thái Nháp $\rightarrow$ Nhấn "Xóa" $\rightarrow$ Nhập lý do $\rightarrow$ Hệ thống xóa mềm và ghi log. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Xóa chứng từ đã ghi sổ:} Actor cố xóa chứng từ trạng thái "Posted" $\rightarrow$ Hệ thống chặn và báo lỗi "Không thể xóa chứng từ đã ghi sổ". \\ \hline
+  \textbf{Business Rules} & BR3.1-1: Chỉ được xóa chứng từ ở trạng thái Nháp (Draft) và chưa được tham chiếu bởi chứng từ khác. \newline
+  BR3.1-2: User chỉ nhìn thấy chứng từ thuộc Công ty/Chi nhánh mà mình được phân quyền (RBAC). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR3.1-1: Hỗ trợ Lazy Loading (cuộn vô tận hoặc phân trang) để hiển thị mượt mà danh sách > 10.000 bản ghi. \newline
+  NFR3.1-2: Bộ lọc và sắp xếp phải được lưu lại (Persist) cho phiên làm việc sau của người dùng. \\ \hline
+\end{longtable}
+\paragraph{UC-3.2: Lập \& Chỉnh sửa Chứng từ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Lập \& Chỉnh sửa Chứng từ}
+  \label{tab:spec_voucher_form}\\
+  \hline
+  \textbf{Use Case ID} & UC-3.2 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Lập \& Chỉnh sửa Chứng từ (Voucher Form Entry) \\ \hline
+  \textbf{Use Case Description} & Cung cấp giao diện nhập liệu chi tiết (Header \& Lines) cho phép định khoản Nợ/Có, tự động tính toán tổng và lưu nháp. \\ \hline
+  \textbf{Actor} & Kế toán viên \\ \hline
+  \textbf{Trigger} & Phát sinh nghiệp vụ kinh tế cần ghi nhận (VD: Chi tiền mặt, Nhập kho). \\ \hline
+  \textbf{Pre-Condition} & Các danh mục (Tài khoản, Khách hàng) đã sẵn sàng. \\ \hline
+  \textbf{Post-Condition} & Chứng từ được lưu vào hệ thống ở trạng thái Nháp (Draft). \\ \hline
+  \textbf{Basic Flow} & 1. Actor nhấn "Thêm mới" hoặc chọn sửa một chứng từ Nháp. \newline
+  2. Hệ thống hiển thị Form: Thông tin chung (Ngày, Diễn giải) và Lưới chi tiết (Grid). \newline
+  3. Actor nhập thông tin Header. \newline
+  4. Actor nhập dòng chi tiết 1: TK Nợ, TK Có, Số tiền, Đối tượng, Diễn giải. \newline
+  5. Actor nhấn Tab/Enter để tự động thêm dòng mới. \newline
+  6. Hệ thống tự động tính tổng Nợ/Có real-time. \newline
+  7. Actor nhấn "Lưu Nháp". \newline
+  8. Hệ thống lưu dữ liệu tạm (cho phép chưa cân hoặc thiếu thông tin). \newline
+  9. Hệ thống thông báo "Đã lưu nháp". \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Undo/Redo:} Trong quá trình nhập, Actor nhấn Ctrl+Z để hoàn tác thao tác nhập sai. \newline
+  \textbf{A2. Copy dòng:} Actor dùng phím tắt để nhân bản dòng định khoản tương tự. \\ \hline
+  \textbf{Business Rules} & BR3.2-1: (Story 3.4) Chỉ cho phép chọn Tài khoản chi tiết (Leaf Account) để hạch toán. \newline
+  BR3.2-2: Ngày chứng từ phải thuộc kỳ kế toán đang mở (Open Period). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR3.2-1: Lưới nhập liệu phải hỗ trợ > 20 dòng mà không bị giật lag (Target: nhập 20 dòng < 60s). \newline
+  NFR3.2-2: Cơ chế "Optimistic Save" - Lưu nháp ngay cả khi tắt trình duyệt đột ngột (Local Storage). \\ \hline
+\end{longtable}
+\paragraph{UC-3.3: Ghi sổ \& Xử lý Giao dịch}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Ghi sổ \& Xử lý Giao dịch}
+  \label{tab:spec_posting_workflow}\\
+  \hline
+  \textbf{Use Case ID} & UC-3.3 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Ghi sổ, Bỏ ghi \& Đảo bút (Post/Unpost/Reverse) \\ \hline
+  \textbf{Use Case Description} & Chuyển đổi trạng thái chứng từ để chính thức ghi nhận vào Sổ cái (General Ledger) hoặc hủy bỏ/điều chỉnh bút toán sai. \\ \hline
+  \textbf{Actor} & Kế toán trưởng, Kế toán viên (có quyền Post) \\ \hline
+  \textbf{Trigger} & Sau khi chứng từ Nháp đã được kiểm tra và đầy đủ thông tin hợp lệ. \\ \hline
+  \textbf{Pre-Condition} & Chứng từ đang ở trạng thái Nháp (Draft) và Kỳ kế toán đang mở. \\ \hline
+  \textbf{Post-Condition} & - Trạng thái chuyển sang "Posted". \newline
+  - Số liệu được cập nhật vào bảng Sổ cái (GL Entries). \\ \hline
+  \textbf{Basic Flow} & 1. Actor mở chứng từ Nháp cần ghi sổ. \newline
+  2. Actor nhấn nút "Ghi sổ" (Post). \newline
+  3. Hệ thống thực hiện Validation nghiêm ngặt (Double-Entry Check). \newline
+  4. Hệ thống kiểm tra: Tổng Nợ = Tổng Có. \newline
+  5. Hệ thống thực hiện Transaction: Cập nhật trạng thái + Sinh dòng GL. \newline
+  6. Hệ thống hiển thị: "Ghi sổ thành công" và khóa không cho sửa. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Bỏ ghi (Unpost):} Actor chọn chứng từ "Posted" $\rightarrow$ Nhấn "Bỏ ghi" $\rightarrow$ Hệ thống kiểm tra ràng buộc $\rightarrow$ Xóa dòng GL $\rightarrow$ Trả về trạng thái Nháp. \newline
+  \textbf{A2. Đảo bút (Reverse):} Actor chọn chứng từ $\rightarrow$ Nhấn "Đảo bút" $\rightarrow$ Hệ thống sinh tự động chứng từ mới (REV-XXX) với bút toán ngược lại (Nợ $\leftrightarrow$ Có). \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Lệch Nợ/Có:} Nếu Tổng Nợ $\neq$ Tổng Có $\rightarrow$ Chặn Ghi sổ và báo lỗi "Chứng từ chưa cân". \newline
+  \textbf{E2. Thiếu thông tin bắt buộc:} Nếu thiếu Mã đối tượng/Dự án theo quy định $\rightarrow$ Báo lỗi cụ thể từng dòng. \\ \hline
+  \textbf{Business Rules} & BR3.3-1: Không được phép xóa chứng từ đã Ghi sổ, chỉ được phép Đảo bút (Reversal) để đảm bảo dấu vết kiểm toán (Audit Trail). \newline
+  BR3.3-2: Cấm Đảo bút của một chứng từ Đảo bút (Double Reversal). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR3.3-1: Quá trình Ghi sổ phải là Atomic Transaction (Thành công trọn vẹn hoặc không làm gì cả). \\ \hline
+\end{longtable}
+
+\paragraph{UC-3.5: Tra cứu Lịch sử Chứng từ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Tra cứu Lịch sử Chứng từ}
+  \label{tab:spec_voucher_audit}\\
+  \hline
+  \textbf{Use Case ID} & UC-3.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Tra cứu Lịch sử \& Nhật ký Chứng từ (Voucher Audit Trail) \\ \hline
+  \textbf{Use Case Description} & Xem lại toàn bộ vòng đời của một chứng từ từ lúc tạo, sửa, ghi sổ đến khi bỏ ghi/đảo bút để phục vụ mục đích kiểm toán và giải trình số liệu. \\ \hline
+  \textbf{Actor} & Kế toán trưởng, Kiểm toán viên, Admin \\ \hline
+  \textbf{Trigger} & Khi có nghi ngờ về số liệu chứng từ hoặc trong đợt kiểm toán định kỳ. \\ \hline
+  \textbf{Pre-Condition} & Người dùng có quyền xem Audit Log. \\ \hline
+  \textbf{Post-Condition} & Hiển thị chi tiết lịch sử thay đổi. \\ \hline
+  \textbf{Basic Flow} & 1. Actor mở chi tiết một chứng từ (Phiếu thu/chi/Kế toán). \newline
+  2. Actor nhấn vào biểu tượng "Lịch sử" (History/Audit). \newline
+  3. Hệ thống hiển thị dòng thời gian (Timeline) các sự kiện. \newline
+  4. Actor chọn một phiên bản cũ để so sánh. \newline
+  5. Hệ thống hiển thị sự khác biệt (Diff View): Cột "Giá trị cũ" (màu đỏ) vs "Giá trị mới" (màu xanh). \newline
+  6. Actor xem chi tiết: Người sửa, IP, Thời gian, Lý do. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Tải bằng chứng:} Actor nhấn nút "Xuất PDF Lịch sử" để in ra biên bản phục vụ ký duyệt giải trình. \\ \hline
+  \textbf{Business Rules} & BR3.5-1: Mỗi lần thay đổi trạng thái (Post/Unpost) hoặc số tiền đều phải lưu lại bản chụp (Snapshot) của chứng từ tại thời điểm đó. \newline
+  BR3.5-2: Dữ liệu Audit không thể bị xóa hoặc sửa bởi bất kỳ ai (kể cả Admin DB - Tamper proof). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR3.5-1: Bản ghi log phải chứa mã Hash (SHA-256) của dữ liệu để đảm bảo tính toàn vẹn (chống sửa đổi ngầm trong Database). \\ \hline
+\end{longtable}
+\paragraph{UC-3.6: Khóa/Mở Kỳ Kế toán}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Khóa/Mở Kỳ Kế toán}
+  \label{tab:spec_period_ops}\\
+  \hline
+  \textbf{Use Case ID} & UC-3.6 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Khóa/Mở Kỳ Kế toán (Period Closing/Reopening) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán trưởng thực hiện khóa sổ cuối kỳ để ngăn chặn việc chỉnh sửa số liệu, hoặc mở lại sổ khi cần điều chỉnh sai sót có kiểm soát. \\ \hline
+  \textbf{Actor} & Kế toán trưởng (Chief Accountant), Admin \\ \hline
+  \textbf{Trigger} & Đến ngày cuối tháng/quý cần chốt số liệu báo cáo hoặc khi phát hiện sai sót trọng yếu cần sửa ở kỳ cũ. \\ \hline
+  \textbf{Pre-Condition} & - Tài khoản có quyền "Period Manager". \newline
+  - Các chứng từ trong kỳ phải ở trạng thái "Đã ghi sổ" (Posted) hoặc đã được xử lý triệt để. \\ \hline
+  \textbf{Post-Condition} & - Trạng thái kỳ kế toán chuyển đổi (Open $\leftrightarrow$ Closed). \newline
+  - Hệ thống chặn/cho phép các thao tác Ghi sổ vào kỳ tương ứng. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập màn hình "Quản lý Kỳ kế toán". \newline
+  2. Hệ thống hiển thị danh sách 12 kỳ của năm tài chính kèm trạng thái (Mở/Đóng). \newline
+  3. Actor chọn một kỳ đang mở và nhấn "Khóa sổ". \newline
+  4. Hệ thống kiểm tra các điều kiện toàn vẹn (VD: Không còn chứng từ treo/Nháp). \newline
+  5. Hệ thống yêu cầu xác nhận. \newline
+  6. Actor xác nhận. \newline
+  7. Hệ thống cập nhật trạng thái sang "Đã khóa" (Closed) và ghi log. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Mở lại kỳ (Re-open):} Actor chọn kỳ đã khóa $\rightarrow$ Nhấn "Mở lại sổ" $\rightarrow$ Nhập lý do mở lại (Bắt buộc) $\rightarrow$ Hệ thống lưu lý do và mở khóa. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Còn chứng từ chưa xử lý:} Hệ thống phát hiện còn chứng từ ở trạng thái "Draft" trong kỳ $\rightarrow$ Báo lỗi và liệt kê danh sách chứng từ cần xử lý trước khi khóa. \\ \hline
+  \textbf{Business Rules} & BR3.6-1: Không được phép ghi sổ (Post) hoặc sửa đổi chứng từ thuộc kỳ đã Khóa. \newline
+  BR3.6-2: Việc mở lại kỳ phải được ghi log Audit ở mức độ cảnh báo cao (Warning) để kiểm soát gian lận. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR3.6-1: Thao tác khóa sổ phải áp dụng tức thời (Real-time) cho toàn bộ người dùng đang online. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-4: Kế toán phải trả}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/use_case_uc4.png}
+  \caption{Use Case UC-4: kế toán phải trả}\label{fig:usecase_ke_toan_phai_tra}
+\end{figure}
+\paragraph{UC-4.1: Quản lý Hóa đơn Mua hàng}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Hóa đơn Mua hàng}
+  \label{tab:spec_ap_bill_entry}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Hóa đơn Mua hàng (Purchase Bill Entry) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán viên ghi nhận hóa đơn từ nhà cung cấp, kiểm tra tính hợp lệ (thuế, giá trị) và lưu trữ chứng từ gốc. \\ \hline
+  \textbf{Actor} & Kế toán viên AP (AP Accountant) \\ \hline
+  \textbf{Trigger} & Nhận được hóa đơn GTGT/Hóa đơn bán hàng từ Nhà cung cấp. \\ \hline
+  \textbf{Pre-Condition} & - Nhà cung cấp đã tồn tại trong Danh mục (UC-2.3). \newline
+  - Kỳ kế toán đang mở. \\ \hline
+  \textbf{Post-Condition} & - Hóa đơn được lưu (Nháp hoặc Chờ duyệt/Đã ghi sổ). \newline
+  - Công nợ phải trả (TK 331) được ghi nhận (nếu đã Ghi sổ). \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn "Tạo Hóa đơn Mua hàng". \newline
+  2. Hệ thống hiển thị Form nhập liệu. \newline
+  3. Actor chọn Nhà cung cấp (Typeahead search). \newline
+  4. Actor nhập thông tin chung: Số hóa đơn, Ngày hóa đơn, Ngày đáo hạn (Auto-calc), Diễn giải. \newline
+  5. Actor nhập chi tiết dòng hàng: Mặt hàng, Số lượng, Đơn giá, Thuế suất VAT (0/5/8/10\%). \newline
+  6. Hệ thống tự động tính: Tiền hàng, Tiền thuế, Tổng thanh toán. \newline
+  7. Actor đính kèm file scan hóa đơn (Drag \& Drop). \newline
+  8. Actor nhấn "Lưu". \newline
+  9. Hệ thống kiểm tra trùng Số hóa đơn theo Nhà cung cấp/Năm. \newline
+  10. Hệ thống lưu trạng thái và thông báo thành công. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Import từ Excel:} Actor chọn chức năng Import $\rightarrow$ Tải file mẫu $\rightarrow$ Hệ thống validate hàng loạt $\rightarrow$ Lưu nháp các bản ghi hợp lệ. \newline
+  \textbf{A2. Tự động kích hoạt quy trình duyệt:} Nếu tổng tiền > Hạn mức (VD: 20 triệu) $\rightarrow$ Hệ thống chuyển trạng thái sang "Chờ duyệt" (Pending Approval) thay vì "Đã ghi sổ". \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Sai lệch tiền thuế:} Nếu Tổng tiền thuế nhập tay $\neq$ Tổng thuế tính toán từ các dòng (sai lệch > 1.000đ) $\rightarrow$ Cảnh báo và yêu cầu xác nhận hoặc sửa lại. \newline
+  \textbf{E2. Trùng hóa đơn:} Nếu (Mã NCC + Số HĐ + Năm) đã tồn tại $\rightarrow$ Báo lỗi "Hóa đơn này đã được nhập". \\ \hline
+  \textbf{Business Rules} & BR4.1-1: Số tiền (Quantity $\times$ Price) phải luôn dương. \newline
+  BR4.1-2: Bắt buộc đính kèm file chứng từ gốc nếu giá trị hóa đơn vượt ngưỡng quy định. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR4.1-1: Hệ thống hỗ trợ đính kèm tối đa 10 file/20MB, xem trước (Preview) ngay trên trình duyệt mà không cần tải về. \\ \hline
+\end{longtable}
+\paragraph{UC-4.2: Phê duyệt Hóa đơn (Maker-Checker)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Phê duyệt Hóa đơn (Maker-Checker)}
+  \label{tab:spec_ap_approval}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.2 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Phê duyệt Hóa đơn (Bill Approval Workflow) \\ \hline
+  \textbf{Use Case Description} & Quy trình phê duyệt tự động hoặc thủ công dựa trên hạn mức tiền, đảm bảo nguyên tắc "Người duyệt khác Người lập" (Segregation of Duties). \\ \hline
+  \textbf{Actor} & Kế toán trưởng (Checker), Kế toán viên (Maker) \\ \hline
+  \textbf{Trigger} & Khi Kế toán viên gửi một hóa đơn có giá trị vượt quá hạn mức cấu hình (VD: 20.000.000 VNĐ). \\ \hline
+  \textbf{Pre-Condition} & Hóa đơn đang ở trạng thái "Chờ duyệt" (Pending Approval). \\ \hline
+  \textbf{Post-Condition} & - Trạng thái chuyển sang "Đã ghi sổ" (Posted) hoặc "Từ chối" (Rejected). \newline
+  - Ghi nhận Audit Log người duyệt. \\ \hline
+  \textbf{Basic Flow} & 1. Hệ thống gửi thông báo (App/Email) cho Kế toán trưởng. \newline
+  2. Kế toán trưởng truy cập danh sách "Cần phê duyệt". \newline
+  3. Kế toán trưởng xem chi tiết hóa đơn và file đính kèm. \newline
+  4. Kế toán trưởng nhấn "Duyệt" (Approve). \newline
+  5. Hệ thống ghi nhận bút toán vào Sổ cái. \newline
+  6. Hệ thống cập nhật trạng thái "Đã ghi sổ" và thông báo lại cho người lập. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Từ chối (Reject):} Kế toán trưởng nhấn "Từ chối" $\rightarrow$ Nhập lý do (Bắt buộc) $\rightarrow$ Trạng thái về "Nháp" để KTV sửa hoặc hủy. \newline
+  \textbf{A2. Duyệt tự động:} Nếu Hóa đơn < Hạn mức $\rightarrow$ Hệ thống tự động duyệt ngay khi lưu và ghi log "Auto-approved by System". \\ \hline
+  \textbf{Business Rules} & BR4.2-1: Người phê duyệt không được trùng với Người tạo phiếu (Hệ thống tự động chặn nút Duyệt nếu trùng User ID). \newline
+  BR4.2-2: Không cho phép duyệt hóa đơn thuộc kỳ kế toán đã đóng. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR4.2-1: Quy trình chuyển trạng thái phải được ghi vết đầy đủ (Ai, Khi nào, Hành động) để phục vụ kiểm toán sau này. \\ \hline
+\end{longtable}
+
+\paragraph{UC-4.3: Quản lý Thanh toán \& Phân bổ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Thanh toán}
+  \label{tab:spec_ap_payment}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.3 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Thanh toán (Payment \& Allocation) \\ \hline
+  \textbf{Use Case Description} & Lập phiếu chi/ủy nhiệm chi để thanh toán cho nhà cung cấp và phân bổ số tiền trả cho các hóa đơn cụ thể (Gạch nợ). \\ \hline
+  \textbf{Actor} & Kế toán viên AP, Thủ quỹ \\ \hline
+  \textbf{Trigger} & Đến hạn thanh toán công nợ hoặc thanh toán ngay khi mua hàng. \\ \hline
+  \textbf{Pre-Condition} & - Số dư Tiền mặt/Ngân hàng đủ để thanh toán. \newline
+  - Có các hóa đơn chưa thanh toán (Open Bills). \\ \hline
+  \textbf{Post-Condition} & - Giảm số dư tiền, Giảm công nợ phải trả. \newline
+  - Các hóa đơn liên quan được cập nhật trạng thái "Đã thanh toán" hoặc "Thanh toán 1 phần". \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Thanh toán cho Nhà cung cấp". \newline
+  2. Actor chọn Nhà cung cấp và Tài khoản chi (Tiền mặt/Ngân hàng). \newline
+  3. Hệ thống hiển thị danh sách các Hóa đơn còn nợ (Sắp xếp theo hạn thanh toán - FIFO). \newline
+  4. Actor nhập "Số tiền thanh toán". \newline
+  5. Hệ thống tự động phân bổ tiền cho các hóa đơn cũ nhất (Auto-allocation). \newline
+  6. Actor có thể điều chỉnh số tiền phân bổ cho từng hóa đơn nếu muốn. \newline
+  7. Actor nhấn "Lưu \& Ghi sổ". \newline
+  8. Hệ thống kiểm tra số dư tài khoản tiền. \newline
+  9. Hệ thống sinh bút toán (Nợ 331 / Có 111, 112). \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Thanh toán tạm ứng (Prepayment):} Actor chọn "Thanh toán trước" (chưa có hóa đơn) $\rightarrow$ Hệ thống ghi nhận khoản ứng trước (Nợ 331) để cấn trừ sau. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Chi quá số dư:} Nếu Số tiền chi > Số dư khả dụng $\rightarrow$ Cảnh báo "Tài khoản không đủ tiền" (trừ khi có hạn mức thấu chi). \newline
+  \textbf{E2. Thanh toán vượt quá nợ:} Nếu Số tiền phân bổ > Số dư nợ của hóa đơn $\rightarrow$ Chặn và yêu cầu nhập lại. \\ \hline
+  \textbf{Business Rules} & BR4.3-1: Nguyên tắc phân bổ mặc định là FIFO (Nợ cũ trả trước) trừ khi người dùng chỉ định rõ trả cho hóa đơn nào. \newline
+  BR4.3-2: Một phiếu chi có thể thanh toán cho nhiều hóa đơn cùng lúc. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR4.3-1: Hiển thị số dư tài khoản ngân hàng Real-time ngay trên form thanh toán để hỗ trợ ra quyết định. \\ \hline
+\end{longtable}
+
+\paragraph{UC-4.4: Báo cáo Công nợ \& Cảnh báo (AP Aging)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Báo cáo Tuổi nợ AP}
+  \label{tab:spec_ap_aging}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.4 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Báo cáo Tuổi nợ \& Cảnh báo Quá hạn (AP Aging \& Alerts) \\ \hline
+  \textbf{Use Case Description} & Cung cấp cái nhìn tổng quan về tình hình công nợ theo các khoảng thời gian (Buckets), giúp Kế toán và Giám đốc tài chính nhận diện các khoản nợ quá hạn và lập kế hoạch thanh toán. \\ \hline
+  \textbf{Actor} & Kế toán công nợ, Kế toán trưởng, CFO \\ \hline
+  \textbf{Trigger} & Định kỳ hàng tuần/tháng hoặc khi cần rà soát dòng tiền chi. \\ \hline
+  \textbf{Pre-Condition} & Các hóa đơn mua hàng và phiếu chi đã được ghi sổ đầy đủ. \\ \hline
+  \textbf{Post-Condition} & Báo cáo được hiển thị hoặc xuất ra file để xử lý tiếp. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập "Báo cáo Tuổi nợ Phải trả". \newline
+  2. Hệ thống tổng hợp dữ liệu và hiển thị Dashboard: Tổng nợ, Nợ trong hạn, Nợ quá hạn. \newline
+  3. Hệ thống phân loại nợ theo các nhóm (Buckets): Hiện tại, 1-30 ngày, 31-60 ngày, 61-90 ngày, >90 ngày. \newline
+  4. Actor nhấn vào một nhóm (VD: >90 ngày) để xem chi tiết từng Nhà cung cấp. \newline
+  5. Actor chọn một Nhà cung cấp để xem danh sách các hóa đơn cụ thể đang nợ. \newline
+  6. Actor nhấn nút "Gửi nhắc nhở nội bộ" hoặc "Lập kế hoạch trả". \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xuất báo cáo:} Actor chọn "Xuất Excel/PDF" $\rightarrow$ Hệ thống xuất file snapshot tại thời điểm hiện tại. \newline
+  \textbf{A2. Gửi email cảnh báo:} Hệ thống (Background Job) tự động quét và gửi email cho Kế toán trưởng danh sách các hóa đơn sắp quá hạn (theo cấu hình). \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Dữ liệu chưa đồng bộ:} Nếu có hóa đơn đang chờ duyệt (Pending) $\rightarrow$ Hệ thống hiển thị cảnh báo "Số liệu có thể chưa đầy đủ do còn chứng từ chưa duyệt". \\ \hline
+  \textbf{Business Rules} & BR4.4-1: Tuổi nợ được tính dựa trên "Ngày đáo hạn" (Due Date) của hóa đơn, không phải Ngày hóa đơn. \newline
+  BR4.4-2: Các khoản thanh toán chưa phân bổ (Unallocated Payment) được hiển thị riêng để người dùng tự cấn trừ. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR4.4-1: Báo cáo phải hỗ trợ Drill-down (từ Tổng hợp $\rightarrow$ Chi tiết) mượt mà với độ trễ < 2s. \\ \hline
+\end{longtable}
+
+\paragraph{UC-4.5: Đối chiếu \& Xác nhận Công nợ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Đối chiếu Công nợ}
+  \label{tab:spec_ap_reconcile}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Đối chiếu \& Xác nhận Công nợ (Supplier Statement) \\ \hline
+  \textbf{Use Case Description} & Tạo Biên bản đối chiếu công nợ, gửi cho Nhà cung cấp và xử lý các chênh lệch số liệu (nếu có). \\ \hline
+  \textbf{Actor} & Kế toán công nợ \\ \hline
+  \textbf{Trigger} & Cuối tháng/quý hoặc trước khi thực hiện quyết toán hợp đồng. \\ \hline
+  \textbf{Pre-Condition} & Đã hoàn tất nhập liệu các chứng từ trong kỳ đối chiếu. \\ \hline
+  \textbf{Post-Condition} & Biên bản đối chiếu được lưu trữ, các chênh lệch được ghi nhận để xử lý. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn Nhà cung cấp và Kỳ đối chiếu. \newline
+  2. Hệ thống sinh "Bảng đối chiếu công nợ" (Liệt kê Hóa đơn, Thanh toán, Số dư đầu/cuối). \newline
+  3. Actor kiểm tra và nhấn "Xuất biên bản" (Mẫu TT200). \newline
+  4. Actor gửi biên bản cho Nhà cung cấp (qua Email tích hợp hoặc in ra). \newline
+  5. Nhà cung cấp phản hồi (Xác nhận hoặc Từ chối). \newline
+  6. Actor cập nhật trạng thái đối chiếu vào hệ thống (Đã khớp / Lệch). \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xử lý chênh lệch:} Nếu NCC báo lệch $\rightarrow$ Actor nhập "Ghi chú tranh chấp" (Dispute Note) vào hệ thống $\rightarrow$ Tạo task kiểm tra lại chứng từ gốc. \newline
+  \textbf{A2. Import đối chiếu:} Actor upload file Excel đối chiếu của NCC $\rightarrow$ Hệ thống tự so khớp và tô màu các dòng lệch. \\ \hline
+  \textbf{Business Rules} & BR4.5-1: Biên bản đối chiếu xuất ra phải có mã Hash/QR code để đảm bảo tính xác thực (chống sửa đổi file PDF). \newline
+  BR4.5-2: Không được phép chốt sổ kỳ kế toán nếu còn các khoản công nợ trọng yếu chưa được xác nhận (Configurable). \\ \hline
+\end{longtable}
+
+\paragraph{UC-4.6: Nhật ký AP \& Kiểm soát tuân thủ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Nhật ký AP \& Kiểm soát Tuân thủ}
+  \label{tab:spec_ap_audit}\\
+  \hline
+  \textbf{Use Case ID} & UC-4.6 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Nhật ký AP \& Kiểm soát Tuân thủ (Audit Trail \& Compliance) \\ \hline
+  \textbf{Use Case Description} & Ghi lại toàn bộ lịch sử tác động lên dữ liệu công nợ và hỗ trợ khôi phục dữ liệu hoặc điều tra gian lận. \\ \hline
+  \textbf{Actor} & Admin, Kiểm toán viên nội bộ \\ \hline
+  \textbf{Trigger} & Khi cần tra soát lịch sử hoặc thực hiện sao lưu định kỳ. \\ \hline
+  \textbf{Post-Condition} & File log được trích xuất hoặc báo cáo vi phạm được tạo. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập "Nhật ký Phân hệ AP". \newline
+  2. Actor lọc theo tiêu chí: Người dùng (VD: Kế toán A), Hành động (Xóa/Sửa), Số tiền (> 50 triệu). \newline
+  3. Hệ thống hiển thị danh sách sự kiện chi tiết (Payload Diff). \newline
+  4. Actor phát hiện hành vi đáng ngờ (VD: Sửa số tài khoản nhận tiền). \newline
+  5. Actor đánh dấu "Flag" để điều tra thêm. \\ \hline
+  \textbf{Business Rules} & BR4.7-1: Mọi hành động Xóa (Delete) hoặc Đảo bút (Reverse) trong AP đều được coi là sự kiện rủi ro cao (High Risk) và được tô đỏ trong Log. \newline
+  BR4.7-2: Dữ liệu Audit Log được lưu trữ độc lập và không thể bị sửa đổi (WORM - Write Once Read Many). \\ \hline
+\end{longtable}
+
+\subsubsection{UC-5: Kế toán phải thu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc5.png}
+  \caption{Use Case UC5: Kế toán phải thu}\label{fig:usecase_ke_toan_phai_thu}
+\end{figure}
+
+\paragraph{UC-5.1: Quản lý Hóa đơn Bán hàng}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Hóa đơn Bán hàng}
+  \label{tab:spec_ar_invoice}\\
+  \hline
+  \textbf{Use Case ID} & UC-5.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Hóa đơn Bán hàng (Sales Invoice Entry) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán viên ghi nhận doanh thu bán hàng, xuất hóa đơn GTGT và ghi nhận công nợ phải thu, đồng thời kiểm soát hạn mức tín dụng của khách hàng. \\ \hline
+  \textbf{Actor} & Kế toán viên AR (Maker), Kế toán trưởng (Checker) \\ \hline
+  \textbf{Trigger} & Khi phát sinh nghiệp vụ bán hàng hoặc cung cấp dịch vụ xong. \\ \hline
+  \textbf{Pre-Condition} & - Khách hàng đã được tạo trong danh mục. \newline
+  - Kỳ kế toán đang mở. \\ \hline
+  \textbf{Post-Condition} & - Hóa đơn được lưu và ghi nhận doanh thu (TK 511), thuế (TK 3331), công nợ (TK 131). \newline
+  - Hạn mức tín dụng khả dụng của khách hàng bị trừ đi tương ứng. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Tạo Hóa đơn Bán hàng". \newline
+  2. Hệ thống hiển thị form nhập liệu. \newline
+  3. Actor chọn Khách hàng (Typeahead search). \newline
+  4. \textbf{<<Include>> Kiểm tra Hạn mức Tín dụng:} Hệ thống tự động kiểm tra (Tổng nợ hiện tại + Hóa đơn mới) có vượt Hạn mức cho phép không. \newline
+  5. Actor nhập thông tin chung: Ngày hóa đơn, Hạn thanh toán (Net 30), Diễn giải. \newline
+  6. Actor nhập chi tiết dòng hàng: Sản phẩm, Số lượng, Đơn giá, Thuế suất VAT. \newline
+  7. Hệ thống tự động tính: Tiền hàng, Tiền thuế, Tổng phải thu. \newline
+  8. Actor nhấn "Lưu \& Ghi sổ". \newline
+  9. Hệ thống sinh số hóa đơn tự động và hạch toán vào Sổ cái. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Vượt hạn mức tín dụng:} Tại bước 4, nếu vượt hạn mức $\rightarrow$ Hệ thống cảnh báo và chặn Ghi sổ $\rightarrow$ Yêu cầu chuyển sang trạng thái "Chờ duyệt" (Pending Approval) để xin ý kiến cấp trên. \newline
+  \textbf{A2. Duyệt hóa đơn (UC-5.2):} Nếu hóa đơn có giá trị lớn hoặc khách hàng rủi ro $\rightarrow$ Actor gửi yêu cầu duyệt $\rightarrow$ Kế toán trưởng phê duyệt mới được Ghi sổ. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Khách hàng bị khóa:} Nếu khách hàng đang ở trạng thái "Dừng giao dịch" (Blacklist) $\rightarrow$ Hệ thống báo lỗi và không cho chọn. \newline
+  \textbf{E2. Trùng lắp:} Hệ thống chặn nếu nhập trùng Số hóa đơn giấy (nếu có quản lý song song). \\ \hline
+  \textbf{Business Rules} & BR5.1-1: Doanh thu (511) và Thuế (3331) phải được hạch toán tách biệt theo từng dòng hoặc tổng hóa đơn. \newline
+  BR5.1-2: Không được phép xuất hóa đơn lùi ngày (Backdate) vào kỳ kế toán đã đóng. \\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR5.1-1 (Hiệu năng): Hệ thống phải hỗ trợ tính toán lại tổng tiền (Subtotal, VAT, Total) tức thì (dưới 500ms) ngay khi người dùng thay đổi số lượng hoặc đơn giá trên lưới nhập liệu. \newline
+
+  NFR5.1-2 (Tính toàn vẹn): Cơ chế "Autosave" phải hoạt động ngầm định mỗi 30 giây hoặc khi mất kết nối mạng để đảm bảo không mất dữ liệu đang nhập dở. \newline
+
+  NFR5.1-3 (Nhập liệu): Chức năng Import từ Excel phải xử lý được tệp tin chứa tối thiểu 1.000 dòng hóa đơn trong một lần nạp với cơ chế "Atomic" (Thành công hết hoặc lỗi hết). \\ \hline
+\end{longtable}
+
+\paragraph{UC-5.3: Quản lý thu tiền \& Phân bổ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Quản lý Thu tiền \& Phân bổ}
+  \label{tab:spec_ar_receipt}\\
+  \hline
+  \textbf{Use Case ID} & UC-5.3 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Thu tiền \& Phân bổ (Receipt \& Allocation) \\ \hline
+  \textbf{Use Case Description} & Ghi nhận các khoản tiền khách hàng thanh toán (qua Ngân hàng/Tiền mặt) và thực hiện gạch nợ (allocate) cho các hóa đơn cụ thể. \\ \hline
+  \textbf{Actor} & Kế toán viên AR, Thủ quỹ \\ \hline
+  \textbf{Trigger} & Nhận được Báo có ngân hàng hoặc Phiếu thu tiền mặt. \\ \hline
+  \textbf{Pre-Condition} & Có các hóa đơn bán hàng còn nợ (Open Invoices). \\ \hline
+  \textbf{Post-Condition} & - Tăng tiền (TK 111/112), Giảm công nợ (TK 131). \newline
+  - Trạng thái hóa đơn chuyển thành "Đã thanh toán" (Paid) hoặc "Thanh toán 1 phần" (Partial). \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Thu tiền Khách hàng". \newline
+  2. Actor chọn Khách hàng nộp tiền. \newline
+  3. Hệ thống hiển thị danh sách hóa đơn còn nợ (Sắp xếp theo hạn thanh toán). \newline
+  4. Actor nhập: Số tiền thu, Tài khoản nhận (Bank/Cash), Ngày thu. \newline
+  5. Actor thực hiện \textbf{Phân bổ (Allocation):} \newline
+  - Mặc định: Hệ thống tự điền số tiền vào các hóa đơn cũ nhất (FIFO). \newline
+  - Tùy chỉnh: Actor sửa số tiền gạch nợ cho từng hóa đơn cụ thể. \newline
+  6. Actor nhấn "Lưu \& Ghi sổ". \newline
+  7. Hệ thống hạch toán Nợ 112 / Có 131 và cập nhật số dư hóa đơn. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Thu trước (Advance Payment):} Actor nhập số tiền nhưng không chọn hóa đơn nào (hoặc chưa có hóa đơn) $\rightarrow$ Hệ thống ghi nhận là "Tiền khách hàng trả trước" (Dư Có 131 chờ phân bổ sau). \newline
+  \textbf{A2. Import Báo có:} Actor upload file sao kê ngân hàng $\rightarrow$ Hệ thống tự động gợi ý khớp lệnh dựa trên Nội dung chuyển khoản (VD: "Thanh toan HD001"). \\ \hline
+  \textbf{Business Rules} & BR5.3-1: Tổng số tiền phân bổ không được vượt quá số tiền thực thu. \newline
+  BR5.3-2: Nếu khách hàng trả thừa, phần thừa được treo lại ở trạng thái "Unallocated" để trừ vào hóa đơn sau. \\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR5.3-1: Thuật toán gạch nợ tự động (Auto-allocation) theo FIFO phải xử lý được việc phân bổ cho 500 hóa đơn cùng lúc trong thời gian dưới 3 giây. \newline
+  NFR5.3-2: Hệ thống phải có cơ chế khóa (Locking) để ngăn chặn trường hợp hai kế toán viên cùng thực hiện thu tiền cho một hóa đơn tại cùng một thời điểm (Tránh thu tiền hai lần - Double Counting). \\ \hline
+\end{longtable}
+\paragraph{UC-5.4: Báo cáo Công nợ Phải thu}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Báo cáo Công nợ Phải thu}
+  \label{tab:spec_ar_aging}\\
+  \hline
+  \textbf{Use Case ID} & UC-5.4 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Báo cáo Công nợ Phải thu (AR Aging Report) \\ \hline
+  \textbf{Use Case Description} & Phân loại các khoản phải thu theo thời gian quá hạn để xác định nợ xấu và ưu tiên thu hồi. \\ \hline
+  \textbf{Actor} & Kế toán trưởng, Kế toán AR, Giám đốc \\ \hline
+  \textbf{Trigger} & Xem định kỳ hàng tuần hoặc trước các cuộc họp dòng tiền. \\ \hline
+  \textbf{Post-Condition} & Báo cáo hiển thị trên màn hình hoặc xuất file Excel/PDF. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn "Báo cáo Tuổi nợ". \newline
+  2. Hệ thống tính toán tuổi nợ của tất cả hóa đơn chưa thanh toán (Ngày hiện tại - Ngày đáo hạn). \newline
+  3. Hệ thống hiển thị bảng tổng hợp theo Khách hàng và các cột (Buckets): \newline
+  - Trong hạn (Current) \newline
+  - Quá hạn 1-30 ngày \newline
+  - Quá hạn 31-60 ngày \newline
+  - Quá hạn > 90 ngày (Nợ khó đòi). \newline
+  4. Actor click vào một dòng Khách hàng để xem chi tiết các hóa đơn cấu thành. \newline
+  5. Actor chọn hành động: "Gửi Email nhắc nợ" hoặc "Xuất báo cáo". \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Gửi nhắc nợ hàng loạt:} Actor lọc danh sách nợ > 30 ngày $\rightarrow$ Chọn tất cả $\rightarrow$ Nhấn "Gửi thông báo" $\rightarrow$ Hệ thống gửi email template cho từng khách hàng. \\ \hline
+  \textbf{Business Rules} & BR5.4-1: Tiền trả trước (Advances) được hiển thị là số âm hoặc cột riêng để bù trừ khi xem tổng nợ. \newline
+  BR5.4-2: Các hóa đơn đang tranh chấp (Disputed) vẫn tính vào tuổi nợ nhưng có cờ đánh dấu riêng. \\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR5.4-1 (Tốc độ Báo cáo): Báo cáo tuổi nợ phải hiển thị kết quả trong vòng 5 giây đối với dữ liệu khách hàng lên tới 10.000 bản ghi. \newline
+  NFR5.4-2 (Định dạng Xuất): File xuất Excel phải giữ nguyên định dạng (Format) và công thức tính toán (nếu có) để kế toán có thể tiếp tục xử lý thủ công mà không cần định dạng lại. \newline
+  NFR5.4-3 (Snapshot): Báo cáo xuất ra phải kèm theo Dấu thời gian (Timestamp) chính xác tại thời điểm xuất để phục vụ việc đối chiếu sau này (vì tuổi nợ thay đổi theo từng ngày). \\ \hline
+\end{longtable}
+
+\paragraph{UC-5.5: Đối chiếu \& Xác nhận Công nợ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Đối chiếu Công nợ Khách hàng}
+  \label{tab:spec_ar_reconcile}\\
+  \hline
+  \textbf{Use Case ID} & UC-5.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Đối chiếu \& Xác nhận Công nợ (Customer Statement) \\ \hline
+  \textbf{Use Case Description} & Tạo và gửi bảng đối chiếu công nợ định kỳ cho khách hàng để xác nhận số dư cuối kỳ, phục vụ kiểm toán và chốt sổ. \\ \hline
+  \textbf{Actor} & Kế toán viên AR \\ \hline
+  \textbf{Trigger} & Cuối tháng, cuối năm tài chính hoặc khi thanh lý hợp đồng. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn Khách hàng và Kỳ đối chiếu (Từ ngày - Đến ngày). \newline
+  2. Hệ thống trích xuất dữ liệu: Số dư đầu, Các Hóa đơn phát sinh, Các khoản Đã thu, Số dư cuối. \newline
+  3. Actor xem trước (Preview) Biên bản đối chiếu. \newline
+  4. Actor nhấn "Gửi cho Khách hàng" (qua Email). \newline
+  5. Hệ thống ghi nhận trạng thái "Đã gửi" và lưu Audit log. \newline
+  6. Khách hàng phản hồi xác nhận. \newline
+  7. Actor cập nhật trạng thái "Đã khớp đúng" vào hệ thống. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xử lý sai lệch:} Khách hàng phản hồi sai số liệu $\rightarrow$ Actor kiểm tra lại $\rightarrow$ Nếu sai do nhập liệu: Thực hiện Điều chỉnh (Adjustment Voucher). \newline
+  \textbf{A2. Xuất Batch:} Actor chọn "Tất cả khách hàng có số dư" $\rightarrow$ Hệ thống tạo file nén (ZIP) chứa biên bản đối chiếu của từng khách hàng. \\ \hline
+  \textbf{Business Rules} & BR5.5-1: Biên bản phải liệt kê chi tiết từng giao dịch (Statement of Account) để khách hàng dễ đối soát. \newline
+  BR5.5-2: Email gửi đi phải có tracking (đã nhận/đã xem) để làm bằng chứng pháp lý. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR5.5-1: Hệ thống phải lưu trữ lịch sử các lần gửi đối chiếu tối thiểu 10 năm theo quy định của Luật Kế toán. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-6: Quản lý tiền mặt/ngân hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc6.png}
+  \caption{Use Case UC-6: Quản lý tiền mặt/ngân hàng}\label{fig:usecase_quan_ly_tien_mat_ngan_hang}
+\end{figure}
+
+\paragraph{UC-6.3: Điều chuyển tiền nội bộ}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Điều chuyển tiền nội bộ (Payment Entry)}
+  \label{tab:spec_cash_payment}\\
+  \hline
+  \textbf{Use Case ID} & UC-6.3 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Quản lý Chi tiền (Payment Entry \& Posting) \\ \hline
+  \textbf{Use Case Description} & Cho phép Kế toán viên lập phiếu chi tiền mặt hoặc ủy nhiệm chi ngân hàng để thanh toán cho nhà cung cấp (AP) hoặc chi trả các khoản chi phí hoạt động (Expense), bao gồm quy trình phê duyệt nếu vượt hạn mức. \\ \hline
+  \textbf{Actor} & Kế toán viên (Maker), Kế toán trưởng (Checker) \\ \hline
+  \textbf{Trigger} & Khi đến hạn thanh toán công nợ hoặc phát sinh nhu cầu chi tiêu nội bộ. \\ \hline
+  \textbf{Pre-Condition} & - Tài khoản tiền/ngân hàng đang hoạt động (Active). \newline
+  - Số dư khả dụng đủ để thực hiện giao dịch (trừ khi cho phép thấu chi). \\ \hline
+  \textbf{Post-Condition} & - Tiền trong quỹ/tài khoản giảm (Có TK 111/112). \newline
+  - Nợ phải trả giảm (Nợ TK 331) hoặc Chi phí tăng (Nợ TK 6xx). \newline
+  - Trạng thái phiếu là "Đã ghi sổ" (Posted) hoặc "Chờ duyệt" (Pending Approval). \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Lập Phiếu chi / Ủy nhiệm chi". \newline
+  2. Hệ thống hiển thị Form nhập liệu. \newline
+  3. Actor chọn Tài khoản chi (Cash/Bank) và Đối tượng nhận (NCC hoặc Nhân viên). \newline
+  4. Actor nhập số tiền và nội dung. \newline
+  5. \textbf{Hệ thống kiểm tra Số dư (Balance Guard):} So sánh số tiền chi với số dư hiện tại. \newline
+  6. \textbf{Phân bổ (Allocation):} \newline
+  - Nếu trả cho NCC: Hệ thống hiển thị danh sách hóa đơn nợ $\rightarrow$ Actor chọn hóa đơn hoặc để tự động gạch nợ (FIFO). \newline
+  - Nếu chi phí khác: Actor chọn Tài khoản chi phí (VD: 642 - Chi phí quản lý). \newline
+  7. Actor nhấn "Lưu \& Ghi sổ". \newline
+  8. Hệ thống kiểm tra Hạn mức phê duyệt (Threshold Check). \newline
+  9. Nếu dưới hạn mức: Ghi sổ ngay lập tức và sinh bút toán GL. \newline
+  10. Hệ thống thông báo thành công. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Vượt hạn mức (Maker-Checker):} Tại bước 8, nếu số tiền > Hạn mức (VD: 20tr) $\rightarrow$ Trạng thái chuyển thành "Chờ duyệt" (Pending Approval) $\rightarrow$ Gửi thông báo cho Kế toán trưởng $\rightarrow$ Sau khi được duyệt mới sinh bút toán GL. \newline
+  \textbf{A2. Chi phí không qua công nợ (Standalone):} Chọn đối tượng vãng lai $\rightarrow$ Nhập lý do chi $\rightarrow$ Hạch toán thẳng vào TK Chi phí (6xx/8xx) mà không qua TK 331. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Không đủ số dư (Overdraft):} Tại bước 5, nếu Số dư < Số chi $\rightarrow$ Hệ thống cảnh báo (Warning) hoặc Chặn (Block) tùy cấu hình công ty $\rightarrow$ Ghi log nỗ lực chi quá mức. \newline
+  \textbf{E2. Tài khoản đích bị khóa:} Nếu Tài khoản Ngân hàng công ty đang trạng thái Inactive $\rightarrow$ Báo lỗi và không cho chọn. \\ \hline
+  \textbf{Business Rules} & BR6.3-1: Nguyên tắc hạch toán: Luôn ghi Có 111/112 (Lấy mã GL từ cấu hình Tài khoản ngân hàng) và Nợ 331 (nếu trả NCC) hoặc Nợ 6xx (nếu chi phí). \newline
+  BR6.3-2: Không được phép sửa/xóa phiếu chi đã Ghi sổ, chỉ được phép Đảo bút (Reversal) kèm lý do bắt buộc. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR6.3-1: Hiệu năng: Thao tác Ghi sổ (Post) đơn giản phải hoàn thành trong $\le$ 10 giây. \newline
+  NFR6.3-2: Bảo mật: Phân quyền dữ liệu (Row-level Security) theo Công ty (Company ID). \\ \hline
+\end{longtable}
+
+\paragraph{UC-6.5: Đối chiếu Ngân hàng}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Đối chiếu Ngân hàng}
+  \label{tab:spec_bank_recon}\\
+  \hline
+  \textbf{Use Case ID} & UC-6.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Đối chiếu Ngân hàng (Bank Reconciliation) \\ \hline
+  \textbf{Use Case Description} & Nhập sao kê ngân hàng (Excel), tự động so khớp với sổ cái kế toán để phát hiện sai lệch và thực hiện điều chỉnh. \\ \hline
+  \textbf{Actor} & Kế toán viên, Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Cuối tháng hoặc khi nhận được Sổ phụ ngân hàng. \\ \hline
+  \textbf{Pre-Condition} & Đã nhập liệu các giao dịch thu chi trong kỳ. \\ \hline
+  \textbf{Post-Condition} & Trạng thái kỳ đối chiếu chuyển sang "Hoàn thành" (Completed). \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn Tài khoản và Kỳ đối chiếu. \newline
+  2. Actor tải lên file Excel sao kê (Import Statement). \newline
+  3. \textbf{Khớp tự động (Auto-Match):} Hệ thống chạy thuật toán so khớp dựa trên Ngày ($\pm$ biên độ), Số tiền và Số tham chiếu. \newline
+  4. Hệ thống hiển thị 2 cột: Sổ cái vs Sao kê. \newline
+  - Màu Xanh: Đã khớp. \newline
+  - Màu Đỏ: Chưa khớp (Lệch). \newline
+  5. Actor xử lý chênh lệch: \newline
+  - Khớp thủ công (Manual Match). \newline
+  - Tạo phiếu điều chỉnh (Adjustment) cho phí ngân hàng/lãi vay chưa nhập. \newline
+  6. Actor xác nhận và Lưu biên bản đối chiếu. \\ \hline
+  \textbf{Business Rules} & BR6.5-1: Không được phép chốt sổ kỳ kế toán nếu Tài khoản ngân hàng chưa được đối chiếu xong. \newline
+  BR6.5-2: Thuật toán so khớp phải xử lý được sai lệch nhỏ về ngày tháng (do độ trễ xử lý ngân hàng). \\ \hline
+  \textbf{Non-Functional Requirements} &
+  NFR6.5-1 (Xử lý lỗi Import): Khi import file sao kê bị lỗi, hệ thống phải chỉ rõ số dòng lỗi và lý do cụ thể (VD: "Dòng 15: Sai định dạng ngày") thay vì báo lỗi chung chung. \newline
+  NFR6.5-2 (Audit Log): Mọi thao tác khớp lệnh (Match) hoặc bỏ khớp (Unmatch) phải được ghi lại kèm theo lý do và người thực hiện để phục vụ thanh tra thuế. \newline
+  NFR6.5-3 (Lưu trữ): Trạng thái đối chiếu của từng tài khoản/tháng phải được lưu trữ vĩnh viễn (Snapshot) để đối chứng về sau. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-7: Báo cáo tài chính}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc7.png}
+  \caption{Sơ đồ Use Case UC-7: Báo cáo tài chính}\label{fig:usecase_uc7}
+\end{figure}
+
+\paragraph{UC-7.1: Bảng Cân đối phát sinh}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Bảng Cân đối Số phát sinh (S06-DN)}
+  \label{tab:spec_trial_balance}\\
+  \hline
+  \textbf{Use Case ID} & UC-7.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Bảng Cân đối Số phát sinh (S06-DN Trial Balance) \\ \hline
+  \textbf{Use Case Description} & Tổng hợp số dư đầu kỳ, phát sinh trong kỳ và số dư cuối kỳ của tất cả tài khoản kế toán để kiểm tra tính cân đối (Tổng Nợ = Tổng Có) theo mẫu S06-DN của Thông tư 200. \\ \hline
+  \textbf{Actor} & Kế toán trưởng \\ \hline
+  \textbf{Trigger} & Cuối tháng/quý khi cần khóa sổ hoặc kiểm tra số liệu. \\ \hline
+  \textbf{Pre-Condition} & Các bút toán trong kỳ đã được Ghi sổ (Posted). \\ \hline
+  \textbf{Post-Condition} & Báo cáo hiển thị đúng mẫu, số liệu cân bằng. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn menu "Bảng Cân đối Số phát sinh". \newline
+  2. Actor chọn Kỳ báo cáo (Tháng/Quý/Năm) và Mức độ chi tiết (Cấp 1/Cấp 2/Chi tiết). \newline
+  3. Hệ thống tính toán và hiển thị bảng dữ liệu gồm các cột: \newline
+  - Mã TK, Tên TK. \newline
+  - Số dư Đầu kỳ (Nợ/Có). \newline
+  - Số phát sinh Trong kỳ (Nợ/Có). \newline
+  - Số dư Cuối kỳ (Nợ/Có). \newline
+  4. Hệ thống kiểm tra dòng Tổng cộng: Đảm bảo Tổng Nợ = Tổng Có ở tất cả các cột. \newline
+  5. \textbf{Drill-down:} Actor click vào một con số phát sinh $\rightarrow$ Hệ thống mở danh sách các chứng từ cấu thành nên con số đó. \newline
+  6. Actor nhấn "Xuất khẩu" (PDF/Excel) theo mẫu TT200. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Mất cân đối:} Nếu Tổng Nợ $\neq$ Tổng Có $\rightarrow$ Hệ thống hiển thị cảnh báo đỏ rực "Dữ liệu GL mất cân đối" và gợi ý các bút toán lỗi. \newline
+  \textbf{E2. Kỳ chưa khóa:} Nếu kỳ báo cáo đang mở $\rightarrow$ Báo cáo hiển thị Watermark "DRAFT" (Nháp) trên nền PDF. \\ \hline
+  \textbf{Business Rules} & BR7.1-1: Số liệu chỉ được lấy từ các chứng từ đã Ghi sổ (Posted), bỏ qua các chứng từ Nháp (trừ khi bật chế độ Diagnostic). \newline
+  BR7.1-2: Số dư đầu kỳ này phải khớp tuyệt đối với Số dư cuối kỳ trước. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR7.1-1 (Hiệu năng): Báo cáo phải render xong trong vòng 2 giây với dữ liệu lên tới 50.000 dòng GL. \newline
+  NFR7.1-2 (Bảo mật): Link tải báo cáo (Signed URL) chỉ có hiệu lực trong 7 ngày để tránh rò rỉ dữ liệu tài chính. \\ \hline
+\end{longtable}
+
+\paragraph{UC-7.2: Lập Báo cáo Tài chính (B01, B02, B03)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Báo cáo Tài chính (B01, B02, B03)}
+  \label{tab:spec_fin_statements}\\
+  \hline
+  \textbf{Use Case ID} & UC-7.2 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Lập Báo cáo Tài chính (Financial Statements) \\ \hline
+  \textbf{Use Case Description} & Tạo bộ Báo cáo tài chính theo chuẩn TT200 (Cân đối kế toán, Kết quả kinh doanh, Lưu chuyển tiền tệ) dựa trên bảng Mapping tài khoản. \\ \hline
+  \textbf{Actor} & Kế toán trưởng, CFO \\ \hline
+  \textbf{Trigger} & Cuối năm tài chính hoặc định kỳ báo cáo cho Ban giám đốc/Ngân hàng. \\ \hline
+  \textbf{Pre-Condition} & - Bảng S06-DN đã cân đối. \newline
+  - Cấu hình Mapping (Công thức chỉ tiêu) đã được thiết lập. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn loại báo cáo (VD: B01 - Cân đối kế toán). \newline
+  2. Actor chọn Kỳ báo cáo và nhấn "Lập báo cáo". \newline
+  3. Hệ thống dựa vào \textbf{Bảng Mapping} để cộng gộp số dư các tài khoản vào từng Mã số chỉ tiêu (VD: Mã 110 = Dư Nợ 111 + 112 + 113). \newline
+  4. Hệ thống hiển thị báo cáo với 2 cột: Kỳ này vs Kỳ trước (So sánh). \newline
+  5. Actor rà soát số liệu. \newline
+  6. \textbf{Kiểm tra chéo (Cross-check):} VD: Lợi nhuận sau thuế trên B02 phải khớp với Lợi nhuận chưa phân phối tăng thêm trên B01. \newline
+  7. Actor nhấn "Xuất bản" (Publish) để lưu Snapshot. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Điều chỉnh Mapping:} Phát hiện số liệu sai $\rightarrow$ Actor vào "Cấu hình Mapping" $\rightarrow$ Sửa công thức (VD: Thêm TK 128 vào Mã 120) $\rightarrow$ Hệ thống tính lại báo cáo và ghi log thay đổi version Mapping. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Thiếu Mapping:} Nếu có tài khoản có số dư nhưng chưa được map vào chỉ tiêu nào $\rightarrow$ Hệ thống cảnh báo "Tài khoản 1388 chưa được định nghĩa trong báo cáo" và chặn xuất bản. \\ \hline
+  \textbf{Business Rules} & BR7.2-1: Báo cáo B03 (Lưu chuyển tiền tệ) phải hỗ trợ phương pháp Trực tiếp (Direct Method) theo quy định. \newline
+  BR7.2-2: Mọi thay đổi về công thức Mapping phải được phê duyệt hoặc ghi log Audit chi tiết (Diff) để giải trình với kiểm toán. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR7.2-1 (Snapshot): Mỗi lần xuất bản phải lưu lại một bản chụp (Snapshot) bất biến kèm mã Hash để đảm bảo số liệu không bị thay đổi ngầm sau này. \\ \hline
+\end{longtable}
+
+\paragraph{UC-7.6: Sổ Kế toán Chi tiết (F01)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Sổ Kế toán Chi tiết (F01)}
+  \label{tab:spec_detailed_ledger}\\
+  \hline
+  \textbf{Use Case ID} & UC-7.6 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Sổ Kế toán Chi tiết (F01 Detailed Ledger) \\ \hline
+  \textbf{Use Case Description} & Trích xuất sổ chi tiết cho một hoặc nhiều tài khoản/đối tượng cụ thể (VD: Sổ chi tiết công nợ khách hàng A, Sổ chi tiết tồn kho hàng B) theo mẫu quy định. \\ \hline
+  \textbf{Actor} & Kế toán viên, Kiểm toán viên \\ \hline
+  \textbf{Trigger} & Khi cần đối chiếu công nợ, kiểm kê kho hoặc giải trình thuế. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn "Sổ Kế toán Chi tiết". \newline
+  2. Actor chọn Tài khoản (VD: 131) và Đối tượng chi tiết (VD: Khách hàng X). \newline
+  3. Hệ thống hiển thị danh sách giao dịch: Ngày, Số CT, Diễn giải, TK đối ứng, Nợ, Có, Số dư sau mỗi giao dịch. \newline
+  4. Actor sử dụng bộ lọc tìm kiếm (VD: Lọc theo số tiền > 10 triệu). \newline
+  5. Actor nhấn "Xuất Excel". \newline
+  6. Hệ thống xuất file kèm đầy đủ Header/Footer pháp lý (Mẫu F01-DN). \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Xuất hàng loạt (Bulk Export):} Actor chọn "Tất cả khách hàng" $\rightarrow$ Hệ thống chạy ngầm (Background Job) và gửi email thông báo khi file ZIP sẵn sàng tải về. \\ \hline
+  \textbf{Business Rules} & BR7.6-1: Sổ chi tiết phải hiển thị được thông tin tham chiếu chéo (Cross-reference), tức là Số chứng từ gốc phải link được về màn hình xem chứng từ. \newline
+  BR7.6-2: Phân quyền dữ liệu (Data Scope): Kế toán kho chỉ xem được sổ 156, Kế toán công nợ chỉ xem được 131/331. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR7.6-1 (Hiệu năng): Hỗ trợ xuất dữ liệu lớn (lên tới 100.000 dòng) thông qua cơ chế Streaming để không làm treo trình duyệt. \newline
+  NFR7.6-2 (Định dạng): File Excel xuất ra phải được căn chỉnh tự động (Auto-fit), ngắt trang in (Page Break) chuẩn để ký đóng dấu ngay. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-8: Phân tích \& Quản trị Kinh doanh}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc8.png}
+  \caption{Use Case UC-8: Phân tích \& Quản trị kinh doanh}\label{fig:usecase_phan_tich_kinh_doanh}
+\end{figure}
+
+\paragraph{UC-8.1: Dashboard Tổng quan}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Dashboard Tổng quan }
+  \label{tab:spec_exec_dashboard}\\
+  \hline
+  \textbf{Use Case ID} & UC-8.1 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Dashboard Tổng quan (Executive Dashboard) \\ \hline
+  \textbf{Use Case Description} & Cung cấp cái nhìn toàn cảnh về sức khỏe tài chính doanh nghiệp thông qua các biểu đồ trực quan, KPI thời gian thực (Dòng tiền, Doanh thu, Lợi nhuận) để hỗ trợ ra quyết định chiến lược. \\ \hline
+  \textbf{Actor} & Giám đốc Tài chính (CFO) \\ \hline
+  \textbf{Trigger} & Khi đăng nhập vào hệ thống hoặc cần xem báo cáo nhanh hàng ngày. \\ \hline
+  \textbf{Pre-Condition} & Dữ liệu từ các phân hệ GL, AP, AR, Cash đã được cập nhật. \\ \hline
+  \textbf{Post-Condition} & Các biểu đồ hiển thị dữ liệu mới nhất. \\ \hline
+  \textbf{Basic Flow} & 1. Actor truy cập trang chủ "Dashboard Tổng quan". \newline
+  2. Hệ thống tổng hợp dữ liệu từ Data Warehouse/Cache. \newline
+  3. Hệ thống hiển thị các Widget (Thẻ thông tin): \newline
+  - Thẻ KPI: Tổng Doanh thu, Lợi nhuận gộp, Số dư tiền mặt, Nợ phải thu. (Kèm \% tăng giảm so với kỳ trước). \newline
+  - Biểu đồ Dòng tiền (Cash Flow): Đường thu (Inflow) vs Đường chi (Outflow) theo tháng. \newline
+  - Biểu đồ Top: Top 5 Khách hàng doanh thu cao nhất, Top 5 khoản chi phí lớn nhất. \newline
+  4. Actor sử dụng bộ lọc thời gian (Tháng này/Quý này/Năm nay). \newline
+  5. Hệ thống làm mới dữ liệu theo bộ lọc. \newline
+  6. Actor di chuột vào biểu đồ để xem con số chi tiết (Tooltip). \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Drill-down:} Actor click vào cột "Doanh thu Tháng 10" $\rightarrow$ Hệ thống chuyển sang màn hình Báo cáo chi tiết doanh thu của tháng đó. \\ \hline
+  \textbf{Business Rules} & BR8.1-1: Dữ liệu Dashboard phải được làm mới (Refresh) tối thiểu 15 phút/lần hoặc Real-time tùy cấu hình. \newline
+  BR8.1-2: Phân quyền dữ liệu (Data Scope): Giám đốc chi nhánh chỉ thấy số liệu của chi nhánh mình. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR8.1-1 (Hiệu năng): Thời gian tải Dashboard không được quá 3 giây. Sử dụng cơ chế Caching (Redis) cho các truy vấn nặng. \\ \hline
+\end{longtable}
+
+\paragraph{UC-8.4: Tùy chỉnh Dashboard}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Tùy chỉnh Dashboard}
+  \label{tab:spec_custom_dash}\\
+  \hline
+  \textbf{Use Case ID} & UC-8.4 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Tùy chỉnh Dashboard (Self-Service Customization) \\ \hline
+  \textbf{Use Case Description} & Cho phép người dùng Admin hoặc Quản lý tự thêm, xóa, sắp xếp và cấu hình các Widget biểu đồ trên Dashboard cá nhân của họ. \\ \hline
+  \textbf{Actor} & Admin\\ \hline
+  \textbf{Basic Flow} & 1. Actor nhấn nút "Chỉnh sửa Dashboard" (Edit Mode). \newline
+  2. Hệ thống hiển thị kho Widget (Thư viện biểu đồ): Biểu đồ tròn, Cột, KPI Card, Bảng dữ liệu. \newline
+  3. Actor Kéo \& Thả (Drag \& Drop) một Widget vào vùng trống. \newline
+  4. Actor cấu hình Widget: Chọn nguồn dữ liệu (VD: Doanh thu theo SP), Loại biểu đồ, Màu sắc. \newline
+  5. Actor thay đổi kích thước và vị trí các Widget. \newline
+  6. Actor nhấn "Lưu thay đổi". \\ \hline
+  \textbf{Business Rules} & BR8.4-1: Cấu hình Dashboard được lưu theo từng User (Personalization). \newline
+  BR8.4-2: Có nút "Khôi phục mặc định" để quay về thiết kế chuẩn của hệ thống. \\ \hline
+\end{longtable}
+
+\paragraph{UC-8.5: Dự báo Thông minh}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Dự báo Thông minh}
+  \label{tab:spec_forecasting}\\
+  \hline
+  \textbf{Use Case ID} & UC-8.5 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Dự báo Thông minh (Smart Forecasting) \\ \hline
+  \textbf{Use Case Description} & Sử dụng dữ liệu lịch sử và các thuật toán hồi quy (Regression) để dự báo xu hướng doanh thu và dòng tiền trong tương lai (3-6 tháng tới). \\ \hline
+  \textbf{Actor} & CFO, Trưởng phòng Kinh doanh \\ \hline
+  \textbf{Trigger} & Khi lập kế hoạch ngân sách hoặc đánh giá mục tiêu kinh doanh. \\ \hline
+  \textbf{Pre-Condition} & Có đủ dữ liệu lịch sử tối thiểu 12 tháng để mô hình chạy chính xác. \\ \hline
+  \textbf{Basic Flow} & 1. Actor chọn chức năng "Dự báo Dòng tiền" hoặc "Dự báo Doanh thu". \newline
+  2. Actor chọn tham số: \newline
+  - Kỳ dự báo: 3 tháng / 6 tháng / 1 năm tới. \newline
+  - Mô hình: Tăng trưởng tuyến tính (Linear) hoặc Theo mùa (Seasonal/Holt-Winters). \newline
+  3. Hệ thống chạy thuật toán phân tích dữ liệu quá khứ. \newline
+  4. Hệ thống hiển thị biểu đồ: \newline
+  - Đường nét liền: Dữ liệu thực tế. \newline
+  - Đường nét đứt: Dữ liệu dự báo. \newline
+  - Vùng mờ (Confidence Interval): Khoảng tin cậy (Kịch bản Tốt nhất - Xấu nhất). \newline
+  5. Hệ thống đưa ra các "Insight": VD: "Dự kiến thiếu hụt tiền mặt vào tháng 5 do chu kỳ chi trả cổ tức". \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Thiếu dữ liệu:} Nếu dữ liệu lịch sử < 6 tháng $\rightarrow$ Hệ thống cảnh báo "Không đủ dữ liệu để dự báo chính xác" và hiển thị kết quả thô. \\ \hline
+  \textbf{Business Rules} & BR8.5-1: Kết quả dự báo chỉ mang tính tham khảo, hệ thống phải hiển thị rõ tỷ lệ sai số (MAPE - Mean Absolute Percentage Error). \\ \hline
+\end{longtable}
+
+\subsubsection{UC-9: AI Chatbot}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc9.png}
+  \caption{Use Case UC-9: AI Chatbot}\label{fig:usecase_AI_chatbot}
+\end{figure}
+
+\paragraph{UC-9.0: Đồng bộ \& Index Dữ liệu}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Đồng bộ \& Index Dữ liệu}
+  \label{tab:spec_data_indexing}\\
+  \hline
+  \textbf{Use Case ID} & UC-9.0 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Đồng bộ \& Index Dữ liệu (Data Indexing via n8n) \\ \hline
+  \textbf{Use Case Description} & Tự động trích xuất thông tin từ các chứng từ mới (Voucher) hoặc tài liệu nghiệp vụ, chuyển đổi thành Vector (Embedding) và lưu vào Vector Database để phục vụ tìm kiếm. \\ \hline
+  \textbf{Actor} & Hệ thống n8n (Automation), Backend Service \\ \hline
+  \textbf{Trigger} & Sau khi một chứng từ được Ghi sổ (Posted) thành công hoặc tài liệu mới được upload. \\ \hline
+  \textbf{Basic Flow} & 1. Backend bắn Webhook tới n8n chứa thông tin chứng từ (Header, Lines, Partner). \newline
+  2. n8n nhận dữ liệu và thực hiện làm sạch (Cleaning). \newline
+  3. n8n gọi OpenAI API để tạo Embedding (Vector hóa văn bản). \newline
+  4. n8n lưu Vector + Metadata (CompanyID, VoucherID, Content) vào Pinecone/Milvus. \newline
+  5. Hệ thống ghi log kết quả Index thành công. \\ \hline
+  \textbf{Exception Flow} & \textbf{E1. Lỗi API Embedding:} Nếu OpenAI API timeout $\rightarrow$ n8n thực hiện Retry (thử lại) 3 lần với cơ chế Backoff $\rightarrow$ Nếu vẫn lỗi, gửi cảnh báo cho Admin. \\ \hline
+  \textbf{Business Rules} & BR9.0-1: Dữ liệu phải được phân tách theo Namespace của từng công ty (Multi-tenancy Isolation) để tránh AI trả lời nhầm dữ liệu công ty khác. \\ \hline
+\end{longtable}
+
+\paragraph{UC-9.2: Hỏi đáp Nghiệp vụ \& Tra cứu (RAG Q\&A)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Hỏi đáp Nghiệp vụ (RAG Q\&A)}
+  \label{tab:spec_rag_qa}\\
+  \hline
+  \textbf{Use Case ID} & UC-9.2 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Hỏi đáp Nghiệp vụ \& Tra cứu (Contextual RAG Q\&A) \\ \hline
+  \textbf{Use Case Description} & Cho phép người dùng đặt câu hỏi bằng ngôn ngữ tự nhiên (Tiếng Việt) về nghiệp vụ, chính sách hoặc tra cứu số liệu sổ cái. Hệ thống sử dụng RAG để tìm kiếm và tổng hợp câu trả lời có trích dẫn nguồn. \\ \hline
+  \textbf{Actor} & Người dùng (Accountant), Chatbot AI \\ \hline
+  \textbf{Trigger} & Người dùng mở Widget Chat và nhập câu hỏi. \\ \hline
+  \textbf{Pre-Condition} & - Dữ liệu đã được Index vào Vector DB (UC-9.0). \newline
+  - Người dùng có quyền truy cập dữ liệu tương ứng (RBAC). \\ \hline
+  \textbf{Post-Condition} & Câu trả lời được hiển thị kèm trích dẫn (Citations). \\ \hline
+  \textbf{Basic Flow} & 1. Actor nhập câu hỏi (VD: "Công nợ của khách hàng A hiện tại là bao nhiêu?"). \newline
+  2. Hệ thống phân tích ý định (Intent Detection) và lọc quyền truy cập. \newline
+  3. \textbf{Hybrid Search:} Hệ thống tìm kiếm dữ liệu liên quan trong Pinecone (Vector) và Database (Keyword/SQL). \newline
+  4. Hệ thống tổng hợp ngữ cảnh (Context) từ các tài liệu/chứng từ tìm được. \newline
+  5. LLM sinh câu trả lời dựa trên ngữ cảnh (Tránh bịa đặt - Hallucination). \newline
+  6. Hệ thống hiển thị câu trả lời kèm Link trích dẫn đến chứng từ gốc. \\ \hline
+  \textbf{Alternative Flow} & \textbf{A1. Không đủ dữ liệu:} Nếu độ tin cậy thấp $\rightarrow$ Chatbot trả lời "Không tìm thấy thông tin phù hợp" và gợi ý liên hệ Admin. \newline
+  \textbf{A2. Hỏi về quy trình:} Nếu câu hỏi dạng "Làm thế nào để..." $\rightarrow$ Chuyển sang UC-9.3 (Hướng dẫn quy trình). \\ \hline
+  \textbf{Business Rules} & BR9.2-1: Tuyệt đối không trả lời các câu hỏi về dữ liệu nhạy cảm mà user không có quyền xem (VD: Lương, Giá vốn - nếu không được phép). \newline
+  BR9.2-2: Mọi câu trả lời liên quan đến số liệu tài chính phải có trích dẫn nguồn (Source Citation). \\ \hline
+  \textbf{Non-Functional Requirements} & NFR9.2-1 (Độ trễ): Câu trả lời phải được phản hồi trong vòng 5-8 giây. \newline
+  NFR9.2-2 (Chính xác): AI phải ưu tiên tính trung thực, thà trả lời "Không biết" còn hơn trả lời sai số liệu. \\ \hline
+\end{longtable}
+
+\paragraph{UC-9.3: Hướng dẫn Quy trình (Guided Journeys)}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Hướng dẫn Quy trình}
+  \label{tab:spec_guided_journey}\\
+  \hline
+  \textbf{Use Case ID} & UC-9.3 \\ \hline
+  \endfirsthead
+  \textbf{Use Case Name} & Hướng dẫn Quy trình (Guided Journeys) \\ \hline
+  \textbf{Use Case Description} & Chatbot nhận diện câu hỏi "Làm thế nào" (How-to) và cung cấp hướng dẫn từng bước (Step-by-step), bao gồm cả việc điều hướng người dùng đến màn hình chức năng tương ứng. \\ \hline
+  \textbf{Actor} & Người dùng \\ \hline
+  \textbf{Trigger} & Người dùng hỏi cách thực hiện một tác vụ (VD: "Cách nhập số dư đầu kỳ?"). \\ \hline
+  \textbf{Basic Flow} & 1. Actor hỏi: "Làm sao để nhập phiếu thu?". \newline
+  2. Hệ thống nhận diện Intent là "Workflow Guide". \newline
+  3. Chatbot hiển thị danh sách các bước thực hiện (Checklist). \newline
+  4. Chatbot cung cấp Link nội bộ (Deep Link) tới màn hình "Phiếu thu". \newline
+  5. Actor thực hiện theo hướng dẫn và đánh dấu hoàn thành từng bước. \\ \hline
+  \textbf{Non-Functional Requirements} & NFR9.3-1: Hướng dẫn phải nhận biết ngữ cảnh (Context-aware), VD: nếu đang ở màn hình Phiếu thu rồi thì không cần chỉ cách mở màn hình nữa mà chỉ cách điền form. \\ \hline
+\end{longtable}
+
+\subsubsection{UC-10: Khoá/mở sổ kỳ Kế toán}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/usecase_uc10.png}
+  \caption{Use Case UC-10: Khoá/Mở Sổ kỳ kế toán}\label{fig:usecase_khoa_mo_so}
+\end{figure}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\firstcolwidth}|>{\raggedright\arraybackslash}p{\secondcolwidth}|}
+  \caption{Đặc tả chi tiết Use Case - Khóa sổ Kế toán}
+  \label{tab:spec_period_closing}\\
+  \hline
+  \textbf{Use Case ID} &
+  UC-10.1 \\ \hline
+  \endfirsthead
+  %
+  \endhead
+  %
+  \textbf{Use Case Name} &
+  Khóa sổ Kỳ Kế toán (Close Accounting Period) \\ \hline
+  \textbf{Use Case Description} &
+  Cho phép Trưởng phòng Kế toán thực hiện chốt số liệu của một kỳ (tháng/quý) và ngăn chặn mọi thao tác thêm/sửa/xóa dữ liệu trong kỳ đó. \\ \hline
+  \textbf{Actor} &
+  Trưởng phòng Kế toán (Chief Accountant) \\ \hline
+  \textbf{Pre-Condition} &
+  1. User phải có quyền "Period Closing". \newline
+  2. Không tồn tại chứng từ nào ở trạng thái "Draft" (Nháp) trong kỳ. \newline
+  3. Bảng Cân đối phát sinh phải cân (Tổng Nợ = Tổng Có). \newline
+  4. Kỳ trước đó phải đã được khóa (Ví dụ: Muốn khóa tháng 2 thì tháng 1 phải khóa rồi).
+  \\ \hline
+  \textbf{Post-Condition} &
+  - Trạng thái kỳ chuyển sang "CLOSED". \newline
+  - Hệ thống tự động sinh bút toán kết chuyển doanh thu/chi phí (nếu chọn). \newline
+  - Toàn bộ chứng từ trong kỳ chuyển sang trạng thái "LOCKED" (Read-only). \\ \hline
+  \textbf{Basic Flow} &
+  1. Trưởng phòng KT chọn menu "Quy trình cuối tháng" -> "Khóa sổ". \newline
+  2. Hệ thống hiển thị danh sách các kỳ, người dùng chọn kỳ cần khóa (Ví dụ: 01/2025). \newline
+  3. Người dùng bấm "Kiểm tra điều kiện" (Validate). \newline
+  4. Hệ thống quét toàn bộ dữ liệu trong kỳ để kiểm tra Pre-condition. \newline
+  5. Hệ thống hiển thị kết quả: "Đủ điều kiện khóa sổ". \newline
+  6. Người dùng bấm "Thực hiện Khóa". \newline
+  7. Hệ thống cập nhật trạng thái kỳ và thông báo thành công.
+  \\ \hline
+  \textbf{Exception Flow} &
+  \textbf{E1: Còn chứng từ Nháp (Draft)} \newline
+  4a. Hệ thống phát hiện có 3 phiếu chi đang ở trạng thái Draft. \newline
+  4b. Hệ thống hiển thị danh sách các phiếu này và thông báo: "Vui lòng ghi sổ hoặc xóa các chứng từ nháp trước khi khóa kỳ". \newline
+  4c. Use Case dừng lại.
+  \newline
+  \textbf{E2: Lệch bảng cân đối} \newline
+  4a. Hệ thống phát hiện Tổng Nợ $\neq$ Tổng Có. \newline
+  4b. Hệ thống cảnh báo đỏ: "Dữ liệu không cân bằng. Vui lòng chạy bảo trì hệ thống".
+  \\ \hline
+  \textbf{Business Rules} &
+  \textbf{BR10.1:} Chỉ được khóa theo trình tự thời gian (Tháng 1 -> Tháng 2 -> ...). Không được khóa nhảy cóc. \newline
+  \textbf{BR10.2:} Một khi đã khóa, chỉ có tài khoản cấp Trưởng phòng trở lên mới có quyền Mở lại (Re-open).
+  \\ \hline
+\end{longtable}
+
+\subsection{Sơ đồ tuần tự}
+\subsubsection{UC-1.2: Cấu hình tham số tiền tệ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/seq_cau_hinh_tham_so_tien_te.png}
+  \caption{Sơ đồ tuần tự UC-1.2: Cấu hình tham số tiền tệ}\label{fig:sequence_cau_hinh_tham_so}
+\end{figure}
+
+\subsubsection{UC-2.2: Thêm mới khách hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{chapter_4/seq_them_khach_hang.png}
+  \caption{Sơ đồ tuần tự UC-2.2: Thêm mới khách hàng}\label{fig:sequence_them_khach_hang}
+\end{figure}
+\subsubsection{UC-2.6: Nhập khẩu dữ liệu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{chapter_4/seq_nhap_khau_du_lieu.png}
+  \caption{Sơ đồ tuần tự UC-2.6: Nhập khẩu dữ liệu}\label{fig:sequence_nhap_khau_du_lieu}
+\end{figure}
+\subsubsection{UC-3.3: Ghi sổ chứng từ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/seq_ghi_so_chung_tu.png}
+  \caption{Sơ đồ tuần tự UC-3.3: Ghi sổ chứng từ}\label{fig:sequence_ghi_so_chung_tu}
+\end{figure}
+
+\subsubsection{UC-4.2: Duyệt hoá đơn}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{chapter_4/seq_duyet_hoa_don.png}
+  \caption{Sơ đồ tuần tự UC-4.2: Duyệt hoá đơn}\label{fig:sequence_duyet_hoa_don}
+\end{figure}
+
+\subsubsection{UC-4.3: Thanh toán và gạch nợ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{chapter_4/seq_thanh_toan_gach_no.png}
+  \caption{Sơ đồ tuần tự UC-4.3: Thanh toán và gạch nợ}\label{fig:sequence_thanh_toan_gach_no}
+\end{figure}
+\subsubsection{UC-5.3: Quản lý thu tiền và phân bổ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/seq_phan_bo_thu_tien.png}
+  \caption{Sơ đồ tuần tự UC-5.3: Quản lý thu tiền và phân bổ}\label{fig:sequence_quan_ly_thu_tien_va_phan_bo}
+\end{figure}
+
+\subsubsection{UC-6.3: Lập phiếu chi}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/seq_chi_tien_uc-6.png}
+  \caption{Sơ đồ tuần tự UC-6.3: Lập phiếu chi}\label{fig:sequence_lap_phieu_chi}
+\end{figure}
+
+\subsubsection{UC-7.2: Lập bảng cân đối phát sinh}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{chapter_4/seq_tao_bang_can_doi.png}
+  \caption{Sơ đồ tuần tự UC-7.2: Lập bảng cân đối phát sinh}\label{fig:sequence_lap_bang_can_doi_phat_sinh}
+\end{figure}
+\subsubsection{Truy xuất nguồn gốc}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{chapter_4/seq_truy_xuat_nguon_goc.png}
+  \caption{Sơ đồ tuần tự Truy xuất nguồn gốc thuộc UC-7}\label{fig:sequence_truy_xuat_nguon_goc}
+\end{figure}
+
+\subsubsection{UC-8.1: Xem Dashboard tổng quan}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/seq_xem_dashboard.png}
+  \caption{Sơ đồ tuần tự UC-8.1: Xem Dashboard tổng quan}\label{fig:sequence_xem_dashboard}
+\end{figure}
+
+\subsubsection{UC-9.0: Index dữ liệu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/seq_index_du_lieu.png}
+  \caption{Sơ đồ tuần tự UC-9.0: Index dữ liệu}\label{fig:sequence_index_du_lieu}
+\end{figure}
+
+\subsubsection{UC-9.2: Hỏi đáp nghiệp vụ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/seq_hoi_dap_nghiep_vu.png}
+  \caption{Sơ đồ tuần tự UC-9.2: Hỏi đáp nghiệp vụ}\label{fig:sequence_hoi_dap_nghiep_vu}
+\end{figure}
+\subsubsection{UC-10: Khoá/Mở Sổ kỳ kế toán}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_4/seq_khoa_mo_so.png}
+  \caption{Sơ đồ tuần tự UC-10: Khoá mở sổ kỳ kế toán}\label{fig:sequence_khoa_mo_so}
+\end{figure}
+
+\section{Mô hình cơ sở dữ liệu quan hệ}
+\subsection{Tổng quan}
+\textbf{Khoá chính:} \underline{id}
+
+\textbf{Khoá ngoại:} \textbf{company\_id, supplier\_id, customer\_id, ...}
+
+\textbf{Khoá chính và khoá ngoại:} \underline{\textbf{id}}
+\begin{itemize} [label=$-$]
+  \item companies (\underline{id}, code, name, tax\_code, address, logo\_url, contact\_email, contact\_phone, fiscal\_year\_start, created\_at, updated\_at)
+  \item users (\underline{id}, \textbf{company\_id}, email, password\_hash, full\_name, role, status, failed\_login\_count, locked\_until, reset\_token, reset\_token\_expiry, created\_at, updated\_at)
+  \item customers (\underline{id}, \textbf{company\_id}, code, name, tax\_code, address, email, phone, active, created\_at, updated\_at)
+  \item suppliers (\underline{id}, \textbf{company\_id}, code, name, tax\_code, address, email, phone, active, created\_at, updated\_at)
+  \item chart\_of\_accounts (\underline{id}, \textbf{company\_id}, \textbf{parent\_id}, code, name, name\_english, type, normal\_side, postable, active, ordering\_position, description, created\_at, updated\_at)
+  \item bank\_accounts (\underline{id}, \textbf{company\_id}, account\_number, bank\_name, branch, type, gl\_account\_code, opening\_balance, opening\_balance\_locked, last\_reconciled\_date, last\_reconciled\_balance, active, created\_at, updated\_at)
+  \item accounting\_periods (\underline{id}, \textbf{company\_id}, fiscal\_year, period\_number, period\_name, start\_date, end\_date, status, closed\_by, closed\_at, close\_reason, version, created\_at, updated\_at)
+  \item vouchers (\underline{id}, \textbf{company\_id}, \textbf{period\_id}, voucher\_number, voucher\_date, description, currency, status, total\_debit, total\_credit, \textbf{entered\_by}, \textbf{posted\_by}, posted\_at, \textbf{reversal\_of}, \textbf{reversed\_by}, \textbf{reversed\_by\_voucher\_id}, is\_locked, version, created\_at, updated\_at)
+  \item voucher\_lines (\underline{id}, \textbf{voucher\_id}, \textbf{company\_id}, line\_number, \textbf{account\_id}, debit, credit, description, \textbf{customer\_id}, vendor\_id, \textbf{bank\_account\_id}, item\_id, created\_at, updated\_at)
+  \item journal\_entries (\underline{id}, \textbf{voucher\_id}, \textbf{company\_id}, \textbf{period\_id}, \textbf{account\_id}, debit\_amount, credit\_amount, \textbf{customer\_id}, \textbf{supplier\_id}, posted\_at, created\_at, updated\_at)
+  \item purchase\_bills (\underline{id}, \textbf{company\_id}, \textbf{supplier\_id}, bill\_number, bill\_date, due\_date, reference, description, status, total\_amount, vat\_amount, is\_sensitive, \textbf{created\_by\_id}, \textbf{approved\_by\_id}, \textbf{posted\_voucher\_id}, created\_at, updated\_at)
+  \item purchase\_bill\_lines (\underline{id}, \textbf{purchase\_bill\_id}, \textbf{company\_id}, line\_number, \textbf{account\_id}, description, quantity, unit\_price, amount, vat\_rate, vat\_amount, item\_id, created\_at, updated\_at)
+  \item ap\_payments (\underline{id}, \textbf{company\_id}, \textbf{supplier\_id}, payment\_number, payment\_date, due\_date, payee, amount, payment\_method, \textbf{cash\_account\_id}, \textbf{bank\_account\_id}, reference, payment\_proof\_url, is\_standalone, status, \textbf{created\_by\_id}, \textbf{approved\_by\_id}, \textbf{linked\_voucher\_id}, posted\_at, created\_at, updated\_at)
+  \item sales\_invoices (\underline{id}, \textbf{company\_id}, \textbf{customer\_id}, invoice\_number, invoice\_date, due\_date, reference, description, status, total\_amount, vat\_amount, amount\_paid, remaining\_balance, is\_sensitive, is\_deleted, deleted\_at, \textbf{original\_invoice\_id}, posted\_voucher\_id, \textbf{created\_by\_id}, \textbf{approved\_by\_id}, created\_at, updated\_at)
+  \item sales\_invoice\_lines (\underline{id}, \textbf{sales\_invoice\_id}, \textbf{company\_id}, line\_number, \textbf{account\_id}, description, quantity, unit\_price, amount, vat\_rate, vat\_amount, item\_id, created\_at, updated\_at)
+  \item ar\_payments (\underline{id}, \textbf{company\_id}, \textbf{customer\_id}, receipt\_number, receipt\_date, payee, amount, payment\_method, \textbf{cash\_account\_id}, \textbf{bank\_account\_id}, reference, receipt\_proof\_url, is\_standalone, status, \textbf{created\_by\_id}, \textbf{posted\_by\_id}, \textbf{linked\_voucher\_id}, reversal\_reason, \textbf{original\_receipt\_id}, \textbf{reversing\_receipt\_id}, posted\_at, created\_at, updated\_at)
+  \item approval\_workflows (\underline{id}, \textbf{company\_id}, \textbf{purchase\_bill\_id}, \textbf{sales\_invoice\_id}, status, threshold\_amount, bill\_amount, is\_sensitive, approval\_reason, rejection\_reason, \textbf{created\_by\_id}, \textbf{approved\_by\_id}, approved\_at, rejected\_at, created\_at, updated\_at)
+  \item audit\_logs (\underline{id}, company\_id, user\_id, email, action, entity\_type, entity\_id, entity\_display, event\_type, actor\_role, success, failure\_reason, reason, changes, metadata, ip\_address, user\_agent, trace\_id, chain\_hash, retention\_until, created\_at)
+\end{itemize}
+
+\subsection{Định nghĩa các thực thể}
+\subsubsection{Bảng \texttt{companies} - Công ty}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh công ty & BIGINT & PK & Không \\
+  2 & code & Mã công ty & VARCHAR(16) & & Không \\
+  3 & name & Tên công ty & VARCHAR(255) & & Không \\
+  4 & tax\_code & Mã số thuế & VARCHAR(10) & & Không \\
+  5 & address & Địa chỉ & VARCHAR(512) & & Không \\
+  6 & logo\_url & Đường dẫn logo & VARCHAR(512) & & Có \\
+  7 & contact\_email & Email liên hệ & VARCHAR(255) & & Có \\
+  8 & contact\_phone & Số điện thoại & VARCHAR(32) & & Có \\
+  9 & fiscal\_year\_start & Ngày bắt đầu năm tài chính & DATE & & Có \\
+  10 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  11 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{users} - Người dùng}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh người dùng & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Có \\
+  3 & email & Địa chỉ email & VARCHAR(255) & & Không \\
+  4 & password\_hash & Mật khẩu đã mã hoá & VARCHAR(255) & & Không \\
+  5 & full\_name & Họ và tên & VARCHAR(255) & & Không \\
+  6 & role & Vai trò (ADMIN, ACCOUNTANT, VIEWER) & VARCHAR(50) & & Không \\
+  7 & status & Trạng thái (ACTIVE, INACTIVE, LOCKED) & VARCHAR(20) & & Không \\
+  8 & failed\_login\_count & Số lần đăng nhập thất bại & INTEGER & & Không \\
+  9 & locked\_until & Thời gian khoá tài khoản & TIMESTAMP & & Có \\
+  10 & reset\_token & Token đặt lại mật khẩu & VARCHAR(255) & & Có \\
+  11 & reset\_token\_expiry & Thời hạn token & TIMESTAMP & & Có \\
+  12 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  13 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{customers} - Khách hàng}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & code & Mã khách hàng & VARCHAR(32) & & Không \\
+  4 & name & Tên khách hàng & VARCHAR(255) & & Không \\
+  5 & tax\_code & Mã số thuế & VARCHAR(20) & & Có \\
+  6 & address & Địa chỉ & VARCHAR(512) & & Có \\
+  7 & email & Email & VARCHAR(255) & & Có \\
+  8 & phone & Số điện thoại & VARCHAR(20) & & Có \\
+  9 & active & Trạng thái hoạt động & BOOLEAN & & Không \\
+  10 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  11 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{suppliers} - Nhà cung cấp}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & code & Mã nhà cung cấp & VARCHAR(32) & & Không \\
+  4 & name & Tên nhà cung cấp & VARCHAR(255) & & Không \\
+  5 & tax\_code & Mã số thuế & VARCHAR(20) & & Có \\
+  6 & address & Địa chỉ & VARCHAR(512) & & Có \\
+  7 & email & Email & VARCHAR(255) & & Có \\
+  8 & phone & Số điện thoại & VARCHAR(20) & & Có \\
+  9 & active & Trạng thái hoạt động & BOOLEAN & & Không \\
+  10 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  11 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{chart\_of\_accounts} - Hệ thống tài khoản}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & parent\_id & Mã tài khoản cha & BIGINT & FK & Có \\
+  4 & code & Số hiệu tài khoản & VARCHAR(20) & & Không \\
+  5 & name & Tên tài khoản & VARCHAR(255) & & Không \\
+  6 & name\_english & Tên tiếng Anh & VARCHAR(255) & & Có \\
+  7 & type & Loại (ASSET, LIABILITY, EQUITY...) & VARCHAR(50) & & Không \\
+  8 & normal\_side & Bên số dư (DEBIT, CREDIT) & VARCHAR(50) & & Không \\
+  9 & postable & Cho phép ghi sổ & BOOLEAN & & Không \\
+  10 & active & Trạng thái hoạt động & BOOLEAN & & Không \\
+  11 & ordering\_position & Thứ tự sắp xếp & INTEGER & & Không \\
+  12 & description & Mô tả & TEXT & & Có \\
+  13 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  14 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{bank\_accounts} - Tài khoản ngân hàng}
+\begin{tabularx}{\textwidth}{@{} c P{4.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & account\_number & Số tài khoản & VARCHAR(50) & & Không \\
+  4 & bank\_name & Tên ngân hàng & VARCHAR(255) & & Không \\
+  5 & branch & Chi nhánh & VARCHAR(255) & & Có \\
+  6 & type & Loại (BANK, CASH) & VARCHAR(10) & & Không \\
+  7 & gl\_account\_code & Mã TK kế toán & VARCHAR(20) & & Có \\
+  8 & opening\_balance & Số dư đầu kỳ & NUMERIC(19,4) & & Không \\
+  9 & opening\_balance\_ locked & Khoá số dư đầu kỳ & BOOLEAN & & Không \\
+  10 & last\_reconciled\_ date & Ngày đối chiếu cuối & DATE & & Có \\
+  11 & last\_reconciled\_ balance & Số dư đối chiếu cuối & NUMERIC(19,4) & & Có \\
+  12 & active & Trạng thái hoạt động & BOOLEAN & & Không \\
+  13 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  14 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{accounting\_periods} - Kỳ kế toán}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & fiscal\_year & Năm tài chính & INTEGER & & Không \\
+  4 & period\_number & Số kỳ (1-12) & INTEGER & & Không \\
+  5 & period\_name & Tên kỳ (VD: "Tháng 01/2025") & VARCHAR(100) & & Không \\
+  6 & start\_date & Ngày bắt đầu & DATE & & Không \\
+  7 & end\_date & Ngày kết thúc & DATE & & Không \\
+  8 & status & Trạng thái (OPEN, CLOSED, LOCKED) & VARCHAR(20) & & Không \\
+  9 & closed\_by & Người đóng kỳ & BIGINT & & Có \\
+  10 & closed\_at & Thời gian đóng kỳ & TIMESTAMPTZ & & Có \\
+  11 & close\_reason & Lý do đóng kỳ & TEXT & & Có \\
+  12 & version & Phiên bản (Optimistic Locking) & BIGINT & & Không \\
+  13 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Không \\
+  14 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{vouchers} - Chứng từ kế toán}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & period\_id & Mã kỳ kế toán & UUID & FK & Có \\
+  4 & voucher\_number & Số chứng từ & VARCHAR(50) & & Không \\
+  5 & voucher\_date & Ngày chứng từ & DATE & & Không \\
+  6 & description & Diễn giải & VARCHAR(500) & & Không \\
+  7 & currency & Loại tiền & VARCHAR(3) & & Không \\
+  8 & status & Trạng thái (DRAFT, POSTED...) & VARCHAR(20) & & Không \\
+  9 & total\_debit & Tổng nợ & NUMERIC(19,4) & & Không \\
+  10 & total\_credit & Tổng có & NUMERIC(19,4) & & Không \\
+  11 & entered\_by & Người lập & BIGINT & FK & Không \\
+  12 & posted\_by & Người ghi sổ & BIGINT & FK & Có \\
+  13 & posted\_at & Thời gian ghi sổ & TIMESTAMPTZ & & Có \\
+  14 & reversal\_of & Chứng từ gốc (nếu là CT đảo) & UUID & FK & Có \\
+  15 & reversed\_by & Người đảo & BIGINT & FK & Có \\
+  16 & reversed\_by\_voucher\_id & CT đảo của CT này & UUID & FK & Có \\
+  17 & is\_locked & Đã khoá & BOOLEAN & & Không \\
+  18 & version & Phiên bản & BIGINT & & Không \\
+  19 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  20 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{voucher\_lines} - Dòng chứng từ}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & voucher\_id & Mã chứng từ & UUID & FK & Không \\
+  3 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  4 & line\_number & Số thứ tự dòng & INTEGER & & Không \\
+  5 & account\_id & Mã tài khoản & BIGINT & FK & Không \\
+  6 & debit & Số tiền Nợ & NUMERIC(19,4) & & Không \\
+  7 & credit & Số tiền Có & NUMERIC(19,4) & & Không \\
+  8 & description & Diễn giải dòng & VARCHAR(500) & & Có \\
+  9 & customer\_id & Mã khách hàng & BIGINT & FK & Có \\
+  10 & vendor\_id & Mã nhà cung cấp & BIGINT & & Có \\
+  11 & bank\_account\_id & Mã tài khoản ngân hàng & BIGINT & FK & Có \\
+  12 & cost\_center\_id & Mã trung tâm chi phí & BIGINT & & Có \\
+  % 13 & item\_id & Mã hàng hoá & BIGINT & & Có \\
+  13 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  14 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{journal\_entries} - Bút toán nhật ký}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & voucher\_id & Mã chứng từ & UUID & FK & Không \\
+  3 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  4 & period\_id & Mã kỳ kế toán & UUID & FK & Có \\
+  5 & account\_id & Mã tài khoản & BIGINT & FK & Không \\
+  6 & debit\_amount & Số tiền Nợ & NUMERIC(19,4) & & Không \\
+  7 & credit\_amount & Số tiền Có & NUMERIC(19,4) & & Không \\
+  8 & customer\_id & Mã khách hàng & BIGINT & FK & Có \\
+  9 & supplier\_id & Mã nhà cung cấp & BIGINT & FK & Có \\
+  10 & posted\_at & Thời gian ghi sổ & TIMESTAMPTZ & & Không \\
+  11 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  12 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{purchase\_bills} - Hoá đơn mua hàng}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & supplier\_id & Mã nhà cung cấp & BIGINT & FK & Không \\
+  4 & bill\_number & Số hoá đơn & VARCHAR(50) & & Không \\
+  5 & bill\_date & Ngày hoá đơn & DATE & & Không \\
+  6 & due\_date & Ngày đến hạn & DATE & & Không \\
+  7 & reference & Tham chiếu & VARCHAR(100) & & Không \\
+  8 & description & Mô tả & VARCHAR(500) & & Có \\
+  9 & status & Trạng thái & VARCHAR(20) & & Không \\
+  10 & total\_amount & Tổng tiền (bao gồm VAT) & NUMERIC(19,4) & & Không \\
+  11 & vat\_amount & Tiền thuế GTGT & NUMERIC(19,4) & & Không \\
+  12 & is\_sensitive & Hoá đơn nhạy cảm & BOOLEAN & & Không \\
+  13 & created\_by\_id & Người tạo & BIGINT & FK & Không \\
+  14 & approved\_by\_id & Người phê duyệt & BIGINT & FK & Có \\
+  15 & posted\_voucher\_id & Chứng từ ghi sổ & UUID & FK & Có \\
+  16 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  17 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{purchase\_bill\_lines} - Chi tiết hoá đơn mua}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & purchase\_bill\_id & Mã hoá đơn & UUID & FK & Không \\
+  3 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  4 & line\_number & Số thứ tự dòng & INTEGER & & Không \\
+  5 & account\_id & Mã tài khoản & BIGINT & FK & Không \\
+  6 & description & Mô tả hàng hoá/dịch vụ & VARCHAR(500) & & Không \\
+  7 & quantity & Số lượng & NUMERIC(19,4) & & Không \\
+  8 & unit\_price & Đơn giá & NUMERIC(19,4) & & Không \\
+  9 & amount & Thành tiền & NUMERIC(19,4) & & Không \\
+  10 & vat\_rate & Thuế suất & VARCHAR(10) & & Không \\
+  11 & vat\_amount & Tiền thuế & NUMERIC(19,4) & & Không \\
+  % 12 & item\_id & Mã hàng hoá & BIGINT & & Có \\
+  12 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  13 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{ap\_payments} - Thanh toán cho NCC}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & supplier\_id & Mã nhà cung cấp & BIGINT & FK & Không \\
+  4 & payment\_number & Số phiếu chi & VARCHAR(50) & & Không \\
+  5 & payment\_date & Ngày thanh toán & DATE & & Không \\
+  6 & due\_date & Ngày đến hạn & DATE & & Có \\
+  7 & payee & Người nhận & VARCHAR(255) & & Không \\
+  8 & amount & Số tiền & NUMERIC(19,4) & & Không \\
+  9 & payment\_method & Phương thức & VARCHAR(20) & & Không \\
+  10 & cash\_account\_id & TK tiền mặt & BIGINT & FK & Có \\
+  11 & bank\_account\_id & TK ngân hàng & BIGINT & FK & Có \\
+  12 & reference & Tham chiếu & VARCHAR(500) & & Có \\
+  13 & payment\_proof\_url & URL chứng từ thanh toán & VARCHAR(1000) & & Có \\
+  14 & is\_standalone & Thanh toán độc lập & BOOLEAN & & Không \\
+  15 & status & Trạng thái & VARCHAR(20) & & Không \\
+  16 & created\_by\_id & Người tạo & BIGINT & FK & Không \\
+  17 & approved\_by\_id & Người phê duyệt & BIGINT & FK & Có \\
+  18 & linked\_voucher\_id & Chứng từ liên kết & UUID & FK & Có \\
+  19 & posted\_at & Thời gian ghi sổ & TIMESTAMPTZ & & Có \\
+  20 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  21 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{sales\_invoices} - Hoá đơn bán hàng}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & customer\_id & Mã khách hàng & BIGINT & FK & Không \\
+  4 & invoice\_number & Số hoá đơn & VARCHAR(50) & & Không \\
+  5 & invoice\_date & Ngày hoá đơn & DATE & & Không \\
+  6 & due\_date & Ngày đến hạn & DATE & & Không \\
+  7 & reference & Tham chiếu & VARCHAR(100) & & Không \\
+  8 & description & Mô tả & VARCHAR(500) & & Có \\
+  9 & status & Trạng thái & VARCHAR(20) & & Không \\
+  10 & total\_amount & Tổng tiền & NUMERIC(19,4) & & Không \\
+  11 & vat\_amount & Tiền thuế GTGT & NUMERIC(19,4) & & Không \\
+  12 & amount\_paid & Đã thanh toán & NUMERIC(19,4) & & Không \\
+  13 & remaining\_balance & Còn nợ & NUMERIC(19,4) & & Không \\
+  14 & is\_sensitive & Hoá đơn nhạy cảm & BOOLEAN & & Không \\
+  15 & is\_deleted & Đã xoá (soft delete) & BOOLEAN & & Không \\
+  16 & deleted\_at & Thời gian xoá & TIMESTAMPTZ & & Có \\
+  17 & original\_invoice\_id & HĐ gốc (nếu là điều chỉnh) & UUID & FK & Có \\
+  18 & posted\_voucher\_id & Chứng từ ghi sổ & UUID & & Có \\
+  19 & created\_by\_id & Người tạo & BIGINT & FK & Không \\
+  20 & approved\_by\_id & Người phê duyệt & BIGINT & FK & Có \\
+  21 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  22 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{sales\_invoice\_lines} - Chi tiết hoá đơn bán}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & sales\_invoice\_id & Mã hoá đơn & UUID & FK & Không \\
+  3 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  4 & line\_number & Số thứ tự dòng & INTEGER & & Không \\
+  5 & account\_id & Mã tài khoản & BIGINT & FK & Không \\
+  6 & description & Mô tả hàng hoá/dịch vụ & VARCHAR(500) & & Không \\
+  7 & quantity & Số lượng & NUMERIC(19,4) & & Không \\
+  8 & unit\_price & Đơn giá & NUMERIC(19,4) & & Không \\
+  9 & amount & Thành tiền & NUMERIC(19,4) & & Không \\
+  10 & vat\_rate & Thuế suất & VARCHAR(10) & & Không \\
+  11 & vat\_amount & Tiền thuế & NUMERIC(19,4) & & Không \\
+  % 12 & item\_id & Mã hàng hoá & BIGINT & & Có \\
+  12 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  13 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{ar\_payments} - Thu tiền từ khách hàng}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & customer\_id & Mã khách hàng & BIGINT & FK & Không \\
+  4 & receipt\_number & Số phiếu thu & VARCHAR(50) & & Không \\
+  5 & receipt\_date & Ngày thu & DATE & & Không \\
+  6 & payee & Người nộp tiền & VARCHAR(255) & & Không \\
+  7 & amount & Số tiền & NUMERIC(19,4) & & Không \\
+  8 & payment\_method & Phương thức & VARCHAR(20) & & Không \\
+  9 & cash\_account\_id & TK tiền mặt & BIGINT & FK & Có \\
+  10 & bank\_account\_id & TK ngân hàng & BIGINT & FK & Có \\
+  11 & reference & Tham chiếu & VARCHAR(500) & & Có \\
+  12 & receipt\_proof\_url & URL chứng từ & VARCHAR(1000) & & Có \\
+  13 & is\_standalone & Thu tiền độc lập & BOOLEAN & & Không \\
+  14 & status & Trạng thái & VARCHAR(20) & & Không \\
+  15 & created\_by\_id & Người tạo & BIGINT & FK & Không \\
+  16 & posted\_by\_id & Người ghi sổ & BIGINT & FK & Có \\
+  17 & linked\_voucher\_id & Chứng từ liên kết & UUID & FK & Có \\
+  18 & reversal\_reason & Lý do huỷ & VARCHAR(500) & & Có \\
+  19 & original\_receipt\_id & Phiếu thu gốc (nếu huỷ) & UUID & FK & Có \\
+  20 & reversing\_receipt\_id & Phiếu huỷ & UUID & FK & Có \\
+  21 & posted\_at & Thời gian ghi sổ & TIMESTAMPTZ & & Có \\
+  22 & created\_at & Thời gian tạo & TIMESTAMPTZ & & Có \\
+  23 & updated\_at & Thời gian cập nhật & TIMESTAMPTZ & & Có \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{approval\_workflows} - Luồng phê duyệt}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & UUID & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & FK & Không \\
+  3 & purchase\_bill\_id & Mã hoá đơn mua & UUID & FK & Có \\
+  4 & sales\_invoice\_id & Mã hoá đơn bán & UUID & FK & Có \\
+  5 & status & Trạng thái & VARCHAR(20) & & Không \\
+  6 & threshold\_amount & Ngưỡng phê duyệt & NUMERIC(19,4) & & Không \\
+  7 & bill\_amount & Giá trị hoá đơn & NUMERIC(19,4) & & Không \\
+  8 & is\_sensitive & Hoá đơn nhạy cảm & BOOLEAN & & Không \\
+  9 & approval\_reason & Lý do phê duyệt & VARCHAR(1000) & & Có \\
+  10 & rejection\_reason & Lý do từ chối & VARCHAR(1000) & & Có \\
+  11 & created\_by\_id & Người tạo yêu cầu & BIGINT & FK & Không \\
+  12 & approved\_by\_id & Người phê duyệt & BIGINT & FK & Có \\
+  13 & approved\_at & Thời gian phê duyệt & TIMESTAMP & & Có \\
+  14 & rejected\_at & Thời gian từ chối & TIMESTAMP & & Có \\
+  15 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  16 & updated\_at & Thời gian cập nhật & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+% -----------------------------------------------------------
+\subsubsection{Bảng \texttt{audit\_logs} - Nhật ký thay đổi}
+\begin{tabularx}{\textwidth}{@{} c P{3.5cm} L P{2.5cm} c c @{}}
+  \toprule
+  \textbf{STT} & \textbf{Trường} & \textbf{Mô tả} & \textbf{Kiểu dữ liệu} & \textbf{Khoá} & \textbf{Null} \\
+  \midrule
+  \endhead
+  1 & id & Mã định danh & BIGINT & PK & Không \\
+  2 & company\_id & Mã công ty & BIGINT & & Có \\
+  3 & user\_id & Mã người dùng & BIGINT & & Có \\
+  4 & email & Email người dùng & VARCHAR(255) & & Có \\
+  5 & action & Hành động & VARCHAR(50) & & Không \\
+  6 & entity\_type & Loại đối tượng & VARCHAR(100) & & Có \\
+  7 & entity\_id & Mã đối tượng & VARCHAR(64) & & Có \\
+  8 & entity\_display & Tên hiển thị đối tượng & VARCHAR(255) & & Có \\
+  9 & event\_type & Loại sự kiện & VARCHAR(50) & & Có \\
+  10 & actor\_role & Vai trò người thực hiện & VARCHAR(50) & & Có \\
+  11 & success & Thành công & BOOLEAN & & Có \\
+  12 & failure\_reason & Lý do thất bại & VARCHAR(255) & & Có \\
+  13 & reason & Lý do thực hiện & VARCHAR(50) & & Có \\
+  14 & changes & Chi tiết thay đổi & JSONB & & Có \\
+  15 & metadata & Metadata bổ sung & JSONB & & Có \\
+  16 & ip\_address & Địa chỉ IP & VARCHAR(45) & & Có \\
+  17 & user\_agent & Trình duyệt & VARCHAR(512) & & Có \\
+  18 & trace\_id & Mã trace & VARCHAR(64) & & Có \\
+  19 & chain\_hash & Hash chuỗi & VARCHAR(64) & & Có \\
+  20 & retention\_until & Thời hạn lưu trữ & TIMESTAMPTZ & & Có \\
+  21 & created\_at & Thời gian tạo & TIMESTAMP & & Không \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Sơ đồ ERD}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{chapter_4/erd_diagram.png}
+  \caption{Sơ đồ ERD}\label{fig:erd_diagram}
+\end{figure}
+
+\section{Luồng workflow n8n cho việc embedding tự động và AI Chatbot}
+\subsection{Luồng workflow n8n cho việc embedding tự động}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/voucher_embedding.png}
+  \caption{Luồng workflow n8n cho việc embedding tự động và AI Chatbot}\label{fig:voucher_embedding}
+\end{figure}
+\textbf{Mô tả chi tiết luồng workflow n8n cho việc embedding tự động:}
+
+Luồng workflow n8n cho việc embedding tự động được xây dựng nhằm tự động hóa quá trình thu thập, xử lý và nhúng (embedding) dữ liệu chứng từ, báo cáo kế toán vào hệ thống quản lý vector như Pinecone. Quá trình này giúp dữ liệu kế toán sẵn sàng cho các tác vụ tìm kiếm ngữ nghĩa (semantic search) và truy vấn thông minh bởi Chatbot AI hoặc các module khai phá dữ liệu, đảm bảo tính cập nhật, toàn vẹn và bảo mật.
+
+\begin{itemize}
+  \item \textbf{Bước 1. Kích hoạt tự động hoặc định kỳ:} Workflow được khởi động định kỳ (ví dụ: mỗi ngày, hoặc khi có dữ liệu chứng từ mới, thay đổi dữ liệu) để đảm bảo dữ liệu embedding luôn cập nhật, hoặc cũng có thể được kích hoạt thủ công/qua API khi cần.
+
+  \item \textbf{Bước 2. Trích xuất dữ liệu nguồn:} Workflow n8n kết nối tới hệ thống kế toán (qua API hoặc kết nối DB trực tiếp), truy xuất các bản ghi chứng từ, sổ sách, báo cáo, file liên quan theo phạm vi công ty, bộ phận (tuân thủ phân quyền).
+
+  \item \textbf{Bước 3. Tiền xử lý dữ liệu:} Các dữ liệu thu thập được sẽ được xử lý làm sạch (loại bỏ dữ liệu nhạy cảm, chuẩn hóa văn bản, chuyển đổi định dạng...), lọc bỏ các trường không cần thiết và chuẩn bị cho bước tạo embedding.
+
+  \item \textbf{Bước 4. Sinh embedding:} Workflow sử dụng dịch vụ AI (ví dụ: OpenAI, Huggingface, Azure AI...) để chuyển các đoạn văn bản, nội dung chứng từ thành vector embedding đa chiều, phản ánh ý nghĩa ngữ nghĩa của dữ liệu.
+
+  \item \textbf{Bước 5. Đẩy dữ liệu embedding lên Pinecone:} Các vector embedding kèm thông tin metadata (ID chứng từ, loại chứng từ, ngày, user, phạm vi công ty...) được lưu trữ trong namespace phù hợp trên Pinecone (hoặc hệ thống vector DB tương ứng), phục vụ cho các tác vụ truy vấn ngôn ngữ tự nhiên sau này.
+
+  \item \textbf{Bước 6. Ghi nhận kết quả và nhật ký:} Workflow ghi nhận trạng thái, số lượng bản ghi đã nhúng thành công, lỗi (nếu có) và log đầy đủ các sự kiện (thời điểm, user, loại chứng từ, trạng thái) vào hệ thống monitoring/audit đảm bảo truy xuất nguồn gốc.
+
+  \item \textbf{Bước 7. Xử lý lỗi và cảnh báo:} Nếu quá trình embedding gặp lỗi (quá giới hạn API, dữ liệu lỗi định dạng...), workflow sẽ gửi thông báo về cho quản trị viên qua email, Slack hoặc cập nhật dashboard quản trị để kịp thời xử lý.
+
+\end{itemize}
+
+\textbf{Ý nghĩa:}
+Luồng quy trình này bảo đảm dữ liệu kế toán doanh nghiệp luôn được nhúng và cập nhật liên tục vào hệ thống tìm kiếm thông minh, sẵn sàng phục vụ các truy vấn AI, tối ưu cho doanh nghiệp trong việc hỗ trợ nghiệp vụ, tra cứu nhanh, và nâng cao trải nghiệm người dùng khi tích hợp với chatbot AI kế toán.
+
+\subsection{Luồng workflow n8n cho việc AI Chatbot}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_4/rag_query.png}
+  \caption{Luồng workflow n8n cho việc AI Chatbot}\label{fig:rag_query}
+\end{figure}
+\textbf{Mô tả chi tiết luồng workflow n8n cho việc AI Chatbot:}
+
+Luồng workflow n8n cho AI Chatbot được xây dựng nhằm tự động hóa quá trình truy vấn dữ liệu nghiệp vụ kế toán của doanh nghiệp thông qua ứng dụng chatbot AI, với mục tiêu trả lời tự động các câu hỏi kế toán, hỗ trợ tra cứu chứng từ, sổ sách, báo cáo và truy vấn nghiệp vụ trong thời gian thực, đồng thời đảm bảo tính bảo mật và phân quyền.
+
+\begin{itemize}
+  \item \textbf{Bước 1. Nhận câu hỏi từ người dùng:} Người dùng gửi câu hỏi về nghiệp vụ kế toán (ví dụ: hỏi về số dư tài khoản, chi tiết hóa đơn, kết quả kinh doanh, đối chiếu chứng từ, tình hình thực hiện ngân sách, v.v.) lên hệ thống thông qua giao diện AI Chatbot trên website.
+
+  \item \textbf{Bước 2. Xác thực và phân quyền:} Workflow n8n nhận thông tin người dùng (token phiên, định danh, vai trò, phạm vi tổ chức) đi kèm câu hỏi, kiểm tra tính hợp lệ của phiên làm việc, xác định quyền truy cập dữ liệu của người dùng dựa trên cơ chế RBAC và phạm vi dữ liệu tổ chức. Nếu không hợp lệ, Chatbot sẽ trả về thông báo lỗi.
+
+  \item \textbf{Bước 3. Tiền xử lý câu hỏi:} Workflow chuẩn hóa ngôn ngữ tự nhiên đầu vào, loại bỏ thông tin nhiễu và xác định ý định (Intent), các tham số nghiệp vụ (ví dụ: mã tài khoản, kỳ kế toán, đối tượng liên quan…). Có thể sử dụng dịch vụ AI NLP hoặc node n8n custom để phân tích ý định.
+
+  \item \textbf{Bước 4. Truy vấn embedding dữ liệu qua Pinecone (RAG):} Workflow sử dụng nội dung truy vấn đã được xử lý để tạo embedding truy vấn, tìm kiếm các vector tương ứng trong Pinecone thuộc namespace doanh nghiệp/người dùng, xác định các dữ liệu liên quan đến chứng từ, báo cáo, giao dịch.
+
+  \item \textbf{Bước 5. Lấy dữ liệu gốc từ hệ thống kế toán:} Với các kết quả đã truy xuất từ Pinecone, workflow gọi tới API hệ thống kế toán nội bộ (hoặc DB trực tiếp nếu cho phép), lấy các bản ghi cụ thể như chứng từ, thông tin báo cáo, sổ sách cho phép người dùng truy vấn - tương thích với phạm vi quyền truy cập.
+
+  \item \textbf{Bước 6. Sinh câu trả lời và trả về người dùng:} Workflow kết hợp các thông tin đã thu thập để tạo ra câu trả lời ngắn gọn, chuẩn xác cho câu hỏi của người dùng. Có thể sử dụng mô hình AI language (LLM) hoặc template để sinh kết quả thân thiện, đúng ngữ cảnh. Kết quả trả về sẽ được log đầy đủ cho mục đích kiểm toán và truy vết.
+
+  \item \textbf{Bước 7. Ghi nhật ký truy xuất và kiểm toán:} Mọi thao tác truy vấn, hành động đọc dữ liệu qua AI Chatbot sẽ được workflow ghi nhận trong module Audit Trail với chi tiết: ai hỏi, hỏi gì, dataset nào được truy cập, quyền hạn kiểm tra, thời điểm, kết quả trả lời, địa chỉ IP, v.v. Điều này bảo đảm minh bạch và khả năng truy soát.
+
+  \item \textbf{Bước 8. Xử lý lỗi và thông báo:} Nếu câu hỏi không thể xử lý, workflow chuyển hướng sang các nhánh đánh lỗi, thông báo cho người dùng lý do (ví dụ: không đủ quyền, dữ liệu không tồn tại, lỗi hệ thống, câu hỏi chưa được hỗ trợ). Có thể tự động mở ticket cho bộ phận hỗ trợ nếu cần thiết.
+\end{itemize}
+
+\textbf{Ý nghĩa:}
+Luồng workflow này giúp doanh nghiệp tự động hóa việc hỗ trợ nghiệp vụ kế toán qua AI, cho phép truy xuất và giải đáp các tình huống nhanh chóng, an toàn, tiết kiệm thời gian cho bộ phận kế toán và quản trị, đồng thời kiểm soát mọi giao dịch dữ liệu theo tiêu chuẩn bảo mật và kiểm toán hiện đại.
+
+\end{document}

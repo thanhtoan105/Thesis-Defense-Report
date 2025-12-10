@@ -1,0 +1,57 @@
+\begin{titlepage}
+  \newgeometry{top=2cm} % kéo toàn bộ tiêu đề lên gần khung đen hơn
+  \begin{center}
+    % Header section
+    {\fontsize{14pt}{16.8pt}\selectfont\bfseries
+    BỘ THÔNG TIN VÀ TRUYỀN THÔNG}\\
+    {\fontsize{16pt}{19.2pt}\selectfont\bfseries
+    \adjustbox{max width=\textwidth}{HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG}}\\[0.3em]
+    \tikz \draw[dashed, line width=1pt] (0,0) -- (5cm,0);
+    \vspace{1cm}
+    % University logo (if you have one) %
+    \begin{center}
+      \includegraphics[width=3.3cm]{images/PTIT_logo.png}
+    \end{center}
+    \vspace{0.5cm}
+    % Main title
+    {\fontsize{32}{38}\selectfont\bfseries % Giảm size một chút để
+      ĐỒ ÁN\\
+      \vspace{0.3cm} % Thêm khoảng cách giữa 2 dòng
+    TỐT NGHIỆP ĐẠI HỌC }
+
+    \vspace{0.5cm}
+    % Topic section
+    % Topic section (đã khử khoảng trắng thừa)
+    \newcommand{\autotopic}[1]{%
+      \ignorespaces%
+      \StrLen{#1}[\titlelen]%
+      \ifthenelse{\titlelen<25}{\fontsize{30}{36}\selectfont}{%
+        \ifthenelse{\titlelen<50}{\fontsize{24}{30}\selectfont}{%
+      \ifthenelse{\titlelen<75}{\fontsize{20}{24}\selectfont}{\fontsize{16}{20}\selectfont}}}%
+      \textbf{#1}%
+      \unskip%
+    }
+    \begin{center}
+      \textbf{Đề tài:} ``\autotopic{\reporttitle}''
+    \end{center}
+    \vspace{1cm}
+
+    % Student information section
+    % Student information section - CENTERED TABLE
+    \begin{center}
+      \renewcommand{\arraystretch}{1.5}
+      \newcommand{\uppername}[1]{\textbf{\MakeUppercase{#1}}}
+      \begin{tabularx}{\textwidth}{p{4cm}X}
+        \textbf{Người hướng dẫn:}    & \uppername{\supervisorname} \\
+        \textbf{Sinh viên thực hiện:} & \uppername{\studentnameone} \\ & \uppername{\studentnametwo} \\
+        \textbf{Lớp:}         & \textbf{\classname}         \\
+        % \textbf{Course:}         & \textbf{\coursename}         \\
+        % \textbf{Major:}         & \textbf{\majorname}         \\
+        \textbf{Hệ:}  & \textbf{\programtype}
+      \end{tabularx}
+    \end{center}
+    \vspace{13mm}      % thêm khoảng cách tối thiểu giữa bảng và dòng ngày/địa điểm
+    \vfill            % vẫn đẩy dòng này xuống thấp
+    \textbf{Thành phố Hồ Chí Minh, 11/2025}
+  \end{center}
+\end{titlepage}

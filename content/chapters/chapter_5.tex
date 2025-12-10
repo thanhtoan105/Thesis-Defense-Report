@@ -1,0 +1,248 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+\stopborder
+
+\chapter{Phát triển ứng dụng website}
+
+\section{Giao diện người dùng}
+
+\subsection{Màn hình đăng nhập}
+Màn hình đăng nhập là giao diện đầu tiên xuất hiện khi người dùng truy cập vào ứng dụng website. Giao diện được thiết kế với bố cục rõ ràng, tập trung vào tính năng xác thực người dùng.
+
+Ở phần trung tâm của màn hình, người dùng sẽ thấy form đăng nhập với hai trường nhập liệu chính:
+\begin{itemize}
+  \item \textbf{Trường Email}: Người dùng nhập địa chỉ email đã đăng ký tài khoản. Hệ thống sẽ kiểm tra định dạng email để đảm bảo tính hợp lệ trước khi xử lý.
+  \item \textbf{Trường Mật khẩu}: Người dùng nhập mật khẩu tương ứng với tài khoản. Mật khẩu được ẩn đi bằng ký tự để bảo mật thông tin.
+\end{itemize}
+
+Bên dưới form đăng nhập, màn hình cung cấp các chức năng bổ trợ:
+\begin{itemize}
+  \item \textbf{Nút ``Quên mật khẩu''}: Cho phép người dùng khôi phục mật khẩu trong trường hợp quên. Khi click vào, hệ thống sẽ gửi hướng dẫn đặt lại mật khẩu qua email đã đăng ký.
+  \item \textbf{Nút ``Đăng nhập''}: Sau khi điền đầy đủ thông tin, người dùng click nút này để xác thực và truy cập vào hệ thống.
+\end{itemize}
+
+Hệ thống xử lý các trường hợp lỗi một cách thân thiện:
+\begin{itemize}
+  \item Nếu email hoặc mật khẩu không đúng, hệ thống sẽ hiển thị thông báo lỗi rõ ràng và yêu cầu người dùng nhập lại.
+  \item Nếu trường nhập liệu bị để trống, hệ thống sẽ cảnh báo và yêu cầu điền đầy đủ thông tin.
+  \item Trong quá trình xác thực, hệ thống hiển thị trạng thái loading để người dùng biết yêu cầu đang được xử lý.
+\end{itemize}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/dang_nhap.png}
+  \caption{Màn hình đăng nhập}\label{fig:dang_nhap}
+\end{figure}
+\subsection{Màn hình tổng quan}
+Màn hình tổng quan (Dashboard) là giao diện chính của hệ thống, được hiển thị ngay sau khi người dùng đăng nhập thành công. Màn hình này cung cấp cái nhìn tổng thể về toàn bộ hệ thống kế toán, giúp người dùng nắm bắt nhanh chóng các thông tin quan trọng và thực hiện các thao tác quản lý một cách hiệu quả.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/dashboard.png}
+  \caption{Màn hình tổng quan}\label{fig:dashboard}
+\end{figure}
+
+\subsection{Màn hình cấu hình các tham số công ty}
+Màn hình cấu hình các tham số công ty cho phép người dùng quản lý và cập nhật thông tin cấu hình của công ty trong hệ thống. Giao diện được thiết kế dưới dạng form với các trường nhập liệu được tổ chức một cách logic và dễ sử dụng.
+
+Màn hình hiển thị các trường cấu hình chính bao gồm:
+\begin{itemize}
+  \item \textbf{Thông tin công ty}: Các trường nhập liệu để cập nhật thông tin cơ bản của công ty như tên công ty, địa chỉ, số điện thoại, email liên hệ.
+  \item \textbf{Các tham số hệ thống}: Các trường cấu hình các tham số kỹ thuật liên quan đến hoạt động của hệ thống kế toán như định dạng số tiền, loại tiền tệ, kỳ kế toán, và các thiết lập tài chính khác.
+  \item \textbf{Cài đặt chung}: Các tùy chọn cấu hình về định dạng số tiền, loại tiền tệ, múi giờ, định dạng ngày tháng, kỳ kế toán và các thiết lập kế toán khác.
+\end{itemize}
+
+Giao diện cung cấp các chức năng quản lý:
+\begin{itemize}
+  \item \textbf{Nút ``Lưu'' hoặc ``Cập nhật''}: Cho phép người dùng lưu các thay đổi cấu hình vào hệ thống. Hệ thống sẽ xác nhận và hiển thị thông báo thành công sau khi lưu.
+  \item \textbf{Nút ``Hủy'' hoặc ``Đặt lại''}: Cho phép người dùng hủy các thay đổi chưa lưu hoặc khôi phục về giá trị mặc định.
+  \item \textbf{Validation và kiểm tra}: Hệ thống tự động kiểm tra tính hợp lệ của dữ liệu nhập vào, hiển thị cảnh báo nếu có trường không hợp lệ hoặc bắt buộc bị bỏ trống.
+\end{itemize}
+
+Màn hình này đảm bảo người dùng có thể dễ dàng quản lý các thiết lập quan trọng của công ty, góp phần tùy biến hệ thống theo nhu cầu cụ thể của từng tổ chức.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/company_setting.png}
+  \caption{Màn hình cấu hình tham số công ty}\label{fig:company_setting}
+\end{figure}
+
+\subsection{Màn hình quản lý Hệ thống tài khoản (Chart Of Accounts - COA)}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/chart_of_account.png}
+  \caption{Màn hình quản lý Hệ thống tài khoản (Chart Of Accounts - COA)}\label{fig:chart_of_account}
+\end{figure}
+Màn hình quản lý Hệ thống tài khoản (Chart Of Accounts - COA) được thiết kế dưới dạng một danh sách phân cấp, cho phép hiển thị rõ ràng và trực quan toàn bộ hệ thống tài khoản kế toán của doanh nghiệp. Giao diện này bao gồm cả các cấp tài khoản tổng hợp (tài khoản cái) và các tài khoản chi tiết, phản ánh chính xác cấu trúc tài khoản theo Quyết định số 200/2014/QĐ-BTC hoặc Thông tư số 133/2016/TT-BTC, phù hợp với chế độ kế toán đang được áp dụng tại doanh nghiệp.
+
+Dữ liệu tài khoản được trình bày dưới dạng bảng với các cột thông tin chính yếu như sau:
+\begin{itemize}
+  \item \textbf{Mã tài khoản (Account Code)}: Là mã định danh duy nhất cho từng tài khoản, tuân thủ quy ước mã số tài khoản theo chuẩn kế toán Việt Nam (ví dụ: 111, 112, 131,...).
+  \item \textbf{Tên tài khoản}: Diễn giải tên gọi đầy đủ, giúp người dùng dễ dàng nhận diện chức năng của từng tài khoản.
+  \item \textbf{Loại tài khoản}: Xác định tính chất số dư của tài khoản gồm Dư nợ (Debit Balance), Dư có (Credit Balance), hoặc Lưỡng tính (Hermaphrodite), hỗ trợ công tác phân loại và kiểm soát nghiệp vụ kế toán.
+  \item \textbf{Trạng thái hoạt động}: Cho biết tài khoản đang được sử dụng (active), bị khóa hoặc đã ngừng sử dụng, phục vụ mục đích quản lý và kiểm soát dữ liệu tài khoản trong hệ thống.
+\end{itemize}
+
+Đặc biệt, hệ thống tài khoản được xây dựng dưới dạng cấu trúc cây (tree view) giúp hiển thị mối quan hệ cha-con giữa các tài khoản tổng hợp và tài khoản chi tiết. Điều này hỗ trợ kế toán viên trong việc theo dõi, quản lý và tổ chức danh mục tài khoản một cách logic và khoa học. Ngoài ra, giao diện cho phép người dùng mở rộng (expand) hoặc thu gọn (collapse) các nhánh tài khoản, giúp việc tra cứu và thao tác trở nên thuận tiện hơn, ngay cả khi danh mục tài khoản rất lớn.
+
+Nhằm nâng cao hiệu suất làm việc, hệ thống còn tích hợp chức năng tìm kiếm nhanh (search) theo mã tài khoản hoặc tên tài khoản. Tính năng này giúp người dùng lọc và xác định nhanh chóng tài khoản cần tìm trong quá trình nhập liệu, đối chiếu số liệu hay thực hiện các nghiệp vụ kế toán khác. Đồng thời, việc tuân thủ chặt chẽ chuẩn mực và quy định hiện hành về hệ thống tài khoản góp phần đảm bảo tính minh bạch, chính xác và đồng bộ số liệu kế toán của doanh nghiệp.
+
+\subsection{Màn hình quản lý danh sách khách hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/customer_management.png}
+  \caption{Màn hình quản lý danh sách khách hàng}\label{fig:customer_management}
+\end{figure}
+Màn hình quản lý danh sách khách hàng là một thành phần quan trọng trong hệ thống kế toán, cho phép người dùng thực hiện các nghiệp vụ liên quan đến quản lý đối tượng công nợ phải thu. Giao diện được thiết kế trực quan, hiển thị dữ liệu dưới dạng bảng (Grid view) với các cột thông tin chính bao gồm: Mã khách hàng, Tên công ty, Mã số thuế, Địa chỉ và Trạng thái hoạt động (Enabled/Disabled). Dữ liệu được trình bày rõ ràng, hỗ trợ kế toán trong việc tra cứu, đối chiếu và cập nhật thông tin khách hàng nhanh chóng.
+
+Thanh công cụ (toolbar) phía trên màn hình cung cấp đầy đủ các chức năng quản lý danh sách khách hàng như: thêm mới, chỉnh sửa, xóa và tìm kiếm khách hàng theo nhiều tiêu chí. Bên cạnh đó, hệ thống hỗ trợ các tác vụ nhập (Import) và xuất (Export) dữ liệu từ/ra các tệp tin định dạng phổ biến như Excel (.xlsx, .csv) nhằm nâng cao hiệu quả trong việc cập nhật dữ liệu số lượng lớn hoặc đồng bộ hóa dữ liệu với các hệ thống khác. Tính năng này đặc biệt hữu ích đối với các doanh nghiệp mới triển khai phần mềm, giúp tiết kiệm thời gian và công sức khởi tạo dữ liệu khách hàng ban đầu.
+
+Bên cạnh đó, chức năng kiểm tra và xác thực dữ liệu được tích hợp ngay trên giao diện giúp đảm bảo các thông tin quan trọng như Mã số thuế, địa chỉ, trạng thái hoạt động được nhập chính xác và đầy đủ. Mỗi khi thực hiện các thao tác thêm, sửa, xóa hoặc nhập dữ liệu, hệ thống đều hiển thị thông báo xác nhận, giúp người dùng chủ động kiểm soát thông tin và giảm thiểu rủi ro sai sót.
+\subsection{Màn hình quản lý danh sách nhà cung cấp}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/suppiler_management.png}
+  \caption{Màn hình quản lý danh sách nhà cung cấp}\label{fig:suppiler_management}
+\end{figure}
+Màn hình quản lý danh sách nhà cung cấp là một thành phần quan trọng trong hệ thống kế toán, cho phép người dùng thực hiện các nghiệp vụ liên quan đến quản lý đối tượng công nợ phải trả. Giao diện được thiết kế trực quan, hiển thị dữ liệu dưới dạng bảng (Grid view) với các cột thông tin chính bao gồm: Mã nhà cung cấp, Tên nhà cung cấp, Mã số thuế, Địa chỉ và Trạng thái hoạt động (Enabled/Disabled). Dữ liệu được trình bày rõ ràng, hỗ trợ kế toán trong việc tra cứu, đối chiếu và cập nhật thông tin nhà cung cấp nhanh chóng.
+
+\subsection{Màn hình quản lý hoá đơn mua hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/purchase_bill.png}
+  \caption{Màn hình quản lý hoá đơn mua hàng}\label{fig:purchase_bill}
+\end{figure}
+Màn hình quản lý hoá đơn mua hàng là một thành phần quan trọng trong hệ thống kế toán, cho phép người dùng thực hiện các nghiệp vụ liên quan đến quản lý hoá đơn mua hàng. Giao diện được thiết kế trực quan, hiển thị dữ liệu dưới dạng bảng (Grid view) với các cột thông tin chính bao gồm: Mã hoá đơn, Số hoá đơn, Ngày hoá đơn, Ngày đến hạn, Trạng thái hoạt động (Pending/Approved/Rejected). Dữ liệu được trình bày rõ ràng, hỗ trợ kế toán trong việc tra cứu, đối chiếu và cập nhật thông tin hoá đơn mua hàng nhanh chóng.
+
+Thanh công cụ (toolbar) phía trên màn hình cung cấp đầy đủ các chức năng quản lý hoá đơn mua hàng như: thêm mới, chỉnh sửa, xóa và tìm kiếm hoá đơn mua hàng theo nhiều tiêu chí. Bên cạnh đó, hệ thống hỗ trợ các tác vụ nhập (Import) và xuất (Export) dữ liệu từ/ra các tệp tin định dạng phổ biến như Excel (.xlsx, .csv) nhằm nâng cao hiệu quả trong việc cập nhật dữ liệu số lượng lớn hoặc đồng bộ hóa dữ liệu với các hệ thống khác. Tính năng này đặc biệt hữu ích đối với các doanh nghiệp mới triển khai phần mềm, giúp tiết kiệm thời gian và công sức khởi tạo dữ liệu hoá đơn mua hàng ban đầu.
+
+\subsection{Màn hình quản lý hoá đơn bán hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/sale_invoices.png}
+  \caption{Màn hình quản lý hoá đơn bán hàng}\label{fig:sale_invoices}
+\end{figure}
+Màn hình quản lý hoá đơn bán hàng là một phân hệ trọng yếu trong hệ thống phần mềm kế toán, hỗ trợ người dùng thực hiện các nghiệp vụ liên quan đến quản lý doanh thu và công nợ phải thu từ khách hàng. Giao diện được thiết kế trực quan với bảng dữ liệu trình bày các thông tin then chốt của hoá đơn, bao gồm: Mã hoá đơn, Số hoá đơn, Ngày hoá đơn, Tên khách hàng, Giá trị thanh toán, Tình trạng phê duyệt (Pending/Approved/Rejected) và trạng thái hoạt động.
+
+Người dùng có thể tra cứu, sắp xếp và lọc danh sách hoá đơn theo nhiều tiêu chí như thời gian lập hoá đơn, tên khách hàng hoặc trạng thái xử lý. Thanh công cụ tích hợp các chức năng quản lý điển hình như thêm mới, chỉnh sửa, xoá và in hoá đơn bán hàng. Bên cạnh đó, hệ thống còn hỗ trợ tính năng nhập (Import) và xuất (Export) danh sách hoá đơn dưới dạng tệp Excel (.xlsx, .csv), giúp việc đồng bộ và đối chiếu dữ liệu với các hệ thống bên ngoài diễn ra linh hoạt, hiệu quả hơn.
+
+Đặc điểm nổi bật của màn hình này là tính năng kiểm tra dữ liệu đầu vào, đảm bảo mọi thông tin liên quan đến hoá đơn đều được nhập đầy đủ, chính xác — như kiểm soát sự trùng lặp số hoá đơn, xác nhận mã khách hàng hợp lệ và đối chiếu tự động với công nợ. Khi thực hiện các thao tác thêm, sửa hoặc xoá hoá đơn, hệ thống luôn hiển thị thông báo xác nhận, đồng thời tự động cập nhật số liệu sang các phân hệ liên quan nhằm đảm bảo dữ liệu kế toán nhất quán, chính xác và minh bạch.
+
+\subsection{Màn hình phiếu thu tiền khách hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/AR_payment.png}
+  \caption{Màn hình phiếu thu tiền khách hàng}\label{fig:AR_payment}
+\end{figure}
+Màn hình phiếu thu tiền khách hàng là một chức năng quan trọng trong hệ thống kế toán, dùng để ghi nhận các khoản tiền mà doanh nghiệp thu được từ khách hàng cho các hóa đơn bán hàng hoặc các khoản tiền ứng trước, thanh toán nợ công nợ. Giao diện màn hình được thiết kế dạng bảng, hiển thị các thông tin chính như: Số phiếu thu, Ngày phiếu, Mã khách hàng, Tên khách hàng, Số tiền thu, Hình thức thanh toán (Tiền mặt, chuyển khoản), Số hóa đơn liên quan, Ghi chú và Trạng thái duyệt (Pending/Approved).
+
+Người dùng có thể dễ dàng thêm mới phiếu thu, chỉnh sửa hoặc xóa các phiếu thu có sai sót. Hệ thống cho phép tra cứu phiếu thu theo mã khách hàng, ngày phiếu, số hóa đơn hoặc trạng thái duyệt. Khi nhập liệu, các trường thông tin bắt buộc đều được kiểm tra, đồng thời mã khách hàng và số hóa đơn liên kết sẽ được xác thực tự động để đảm bảo tính chính xác, hạn chế phát sinh sai sót trong quá trình đối soát công nợ.
+
+\subsection{Màn hình thanh toán cho nhà cung cấp}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/ap_payment.png}
+  \caption{Màn hình thanh toán cho nhà cung cấp}\label{fig:ap_payment}
+\end{figure}
+Màn hình thanh toán cho nhà cung cấp là một phân hệ quan trọng trong hệ thống kế toán, cho phép doanh nghiệp ghi nhận các giao dịch chi trả cho nhà cung cấp một cách chính xác, đầy đủ và minh bạch. Giao diện được xây dựng theo dạng bảng (Grid view), hiển thị các thông tin then chốt như: Số phiếu chi, Ngày phiếu, Mã nhà cung cấp, Tên nhà cung cấp, Số tiền thanh toán, Phương thức thanh toán (Tiền mặt, chuyển khoản), Số hóa đơn liên quan, Diễn giải, và Tình trạng phê duyệt (Pending/Approved).
+
+Chức năng trên màn hình bao gồm: thêm mới phiếu thanh toán cho nhà cung cấp, chỉnh sửa, xóa phiếu đã lập, tra cứu nhanh qua các tiêu chí như nhà cung cấp, ngày phiếu, số hóa đơn hoặc trạng thái duyệt. Khi thêm mới hoặc cập nhật dữ liệu, hệ thống sẽ kiểm tra tự động các trường bắt buộc, xác thực mã nhà cung cấp, số hóa đơn liên quan và đảm bảo số tiền thanh toán không vượt quá công nợ phải trả.
+
+Việc thanh toán có thể gắn với một hoặc nhiều hóa đơn mua hàng, giúp doanh nghiệp quản lý trạng thái công nợ, đối chiếu từng khoản thanh toán với hóa đơn gốc. Hệ thống hỗ trợ nhập (Import) và xuất (Export) danh sách phiếu thanh toán theo định dạng Excel (.xlsx, .csv), thuận tiện cho việc tổng hợp báo cáo, đối chiếu với ngân hàng hoặc lưu trữ chứng từ.
+
+Mỗi thao tác thêm, sửa, xóa phiếu thanh toán đều được hệ thống ghi lại lịch sử thay đổi và yêu cầu xác nhận từ người dùng trước khi thực hiện nhằm hạn chế việc nhập nhầm hoặc thao tác không mong muốn. Sau khi phiếu thanh toán được duyệt, số liệu sẽ được tự động đồng bộ sang phân hệ sổ cái và nhật ký quỹ, giúp đảm bảo dữ liệu tài chính nhất quán và minh bạch.
+
+Ngoài ra, màn hình còn có chức năng in phiếu thanh toán, cho phép xuất ra file PDF hoặc in trực tiếp làm chứng từ lưu trữ theo quy định kế toán hiện hành.
+
+\subsection{Màn hình danh sách chứng từ}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/vouchers.png}
+  \caption{Màn hình danh sách chứng từ}\label{fig:vouchers}
+\end{figure}
+Màn hình danh sách chứng từ là nơi tổng hợp và quản lý toàn bộ các loại chứng từ kế toán phát sinh trong doanh nghiệp như hoá đơn, phiếu thu, phiếu chi, phiếu kế toán, phiếu nhập/xuất kho, v.v. Giao diện được thiết kế trực quan, sử dụng bảng dữ liệu với các cột thông tin cơ bản: Số chứng từ, Loại chứng từ, Ngày chứng từ, Đối tượng liên quan (khách hàng/nhà cung cấp), Số tiền, Nội dung, và Trạng thái duyệt (Pending/Approved/Rejected).
+
+Chức năng chính gồm: tìm kiếm, lọc, xem nhanh chứng từ theo loại, ngày, đối tượng hoặc trạng thái duyệt; thêm mới, chỉnh sửa, xóa chứng từ; và xem chi tiết nội dung từng chứng từ. Ngoài ra, hệ thống còn cho phép người dùng in chứng từ, xuất danh sách ra tệp Excel (.xlsx, .csv) phục vụ nhu cầu tổng hợp báo cáo hoặc lưu trữ.
+
+Các trường dữ liệu khi nhập hoặc cập nhật chứng từ đều được hệ thống kiểm tra hợp lệ tự động, đồng thời kết nối kiểm tra chéo với các phân hệ liên quan như sổ cái, công nợ, hàng tồn kho, giúp đảm bảo tính toàn vẹn và chính xác cho toàn bộ dữ liệu kế toán. Lịch sử thao tác chỉnh sửa, phê duyệt, huỷ chứng từ cũng được ghi lại rõ ràng nhằm đáp ứng yêu cầu kiểm soát nội bộ và phục vụ kiểm toán khi cần.
+
+Việc quản lý chứng từ tập trung trên một giao diện giúp kế toán dễ dàng kiểm soát toàn bộ nghiệp vụ phát sinh, đối chiếu dữ liệu, kịp thời phát hiện sai sót, loại bỏ trùng lặp hoặc thiếu sót, góp phần tăng cường sự minh bạch và hiệu quả trong công tác quản trị tài chính kế toán của doanh nghiệp.
+
+\subsection{Màn hình báo cáo công nợ phải thu}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/ar_aging_report.png}
+  \caption{Màn hình báo cáo công nợ phải thu}\label{fig:ar_aging_report}
+\end{figure}
+Báo cáo công nợ phải thu là công cụ không thể thiếu trong quản trị tài chính doanh nghiệp, giúp bộ phận kế toán cũng như ban lãnh đạo nắm bắt tổng quan tình hình công nợ và quản trị rủi ro liên quan đến việc thu hồi các khoản phải thu từ khách hàng. Màn hình báo cáo công nợ phải thu được thiết kế với giao diện trực quan, trình bày dữ liệu dưới dạng bảng tổng hợp các khoản phải thu theo từng khách hàng, từng hóa đơn cũng như theo độ tuổi nợ (Aging).
+
+Các thông tin chính hiển thị trên màn hình bao gồm: Mã khách hàng, Tên khách hàng, Số hóa đơn, Ngày hóa đơn, Hạn thanh toán, Số tiền gốc, Số tiền đã thanh toán, Số dư nợ và phân nhóm tuổi nợ (chẳng hạn: 0-30 ngày, 31-60 ngày, 61-90 ngày, trên 90 ngày). Nhờ đó, người dùng dễ dàng kiểm soát và theo dõi tình hình thu hồi công nợ tại từng thời điểm cũng như nhận diện các khoản có nguy cơ quá hạn để có hành động xử lý kịp thời.
+
+Màn hình còn hỗ trợ các chức năng lọc, tìm kiếm công nợ theo khách hàng, theo khoảng thời gian, trạng thái hóa đơn hoặc nhóm tuổi nợ. Báo cáo có thể xuất ra nhiều định dạng tệp khác nhau như Excel (.xlsx), PDF phục vụ cho việc tổng hợp, đối chiếu hoặc chia sẻ với các bộ phận liên quan.
+
+Khi người dùng click vào từng dòng dữ liệu, hệ thống sẽ hiển thị chi tiết lịch sử thanh toán, các lần thu tiền và trạng thái từng hóa đơn, giúp việc kiểm tra, đối chiếu thông tin minh bạch, thuận tiện. Ngoài ra, báo cáo còn có tuỳ chọn trích lọc các khoản nợ quá hạn, trình bày các cảnh báo để hỗ trợ bộ phận kinh doanh và thu hồi công nợ có chiến lược nhắc nhở khách hàng thanh toán đúng hạn.
+
+Toàn bộ dữ liệu báo cáo luôn được cập nhật thời gian thực từ các phân hệ bán hàng, kế toán, phiếu thu, đảm bảo độ chính xác tuyệt đối trong quá trình ra quyết định quản trị công nợ phải thu của doanh nghiệp.
+
+\subsection{Màn hình báo cáo công nợ phải trả}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/ap_aging_report.png}
+  \caption{Màn hình báo cáo công nợ phải trả}\label{fig:ap_aging_report}
+\end{figure}
+Báo cáo công nợ phải trả là công cụ quan trọng giúp doanh nghiệp kiểm soát nghĩa vụ thanh toán đối với các nhà cung cấp, đảm bảo chủ động trong kế hoạch chi trả và giữ uy tín trên thị trường. Màn hình báo cáo công nợ phải trả được thiết kế trực quan với dạng bảng tổng hợp, hiển thị các thông tin then chốt như: Mã nhà cung cấp, Tên nhà cung cấp, Số hóa đơn mua hàng, Ngày hóa đơn, Hạn thanh toán, Số tiền gốc, Số tiền đã thanh toán, Số dư nợ và phân nhóm tuổi nợ (ví dụ: 0-30 ngày, 31-60 ngày, 61-90 ngày, trên 90 ngày).
+
+Chức năng lọc tìm kiếm cho phép người dùng tra cứu công nợ theo từng nhà cung cấp, theo khoảng thời gian, trạng thái hóa đơn hoặc theo nhóm tuổi nợ, giúp bộ phận kế toán chủ động theo dõi tình hình thanh toán và chuẩn bị nguồn vốn kịp thời. Báo cáo có thể xuất ra các định dạng phổ biến như Excel (.xlsx) hoặc PDF phục vụ cho việc báo cáo cho lãnh đạo hoặc lưu trữ.
+
+Màn hình còn hỗ trợ truy xuất chi tiết từng khoản nợ, đối chiếu lịch sử các lần thanh toán, trạng thái từng phiếu chi liên quan đến các hóa đơn mua hàng để kiểm soát rủi ro sai sót, thanh toán trùng hoặc chậm trễ. Các khoản nợ quá hạn sẽ được cảnh báo, giúp doanh nghiệp tránh phát sinh chi phí lãi phạt không đáng có.
+
+Toàn bộ số liệu trong báo cáo luôn được cập nhật realtime từ các phân hệ mua hàng, kế toán và phiếu chi nhằm đảm bảo sự chính xác, minh bạch trong quản trị công nợ phải trả của doanh nghiệp.
+
+\subsection{Màn hình báo cáo sổ quỹ tiền mặt/ngân hàng}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/cash_book_summary.png}
+  \caption{Màn hình báo cáo sổ quỹ tiền mặt/ngân hàng}\label{fig:cash_book_summary}
+\end{figure}
+Màn hình báo cáo sổ quỹ tiền mặt/ngân hàng là công cụ hỗ trợ bộ phận kế toán theo dõi, tổng hợp và kiểm soát tất cả biến động liên quan đến tiền mặt và tiền gửi ngân hàng của doanh nghiệp trong từng thời kỳ. Báo cáo này trình bày các nghiệp vụ thu, chi tiền mặt, chuyển khoản ngân hàng, giúp người dùng dễ dàng kiểm soát số dư đầu kỳ, phát sinh tăng/giảm trong kỳ và số dư cuối kỳ của từng tài khoản quỹ.
+
+Báo cáo hỗ trợ xuất dữ liệu ra Excel hoặc PDF để phục vụ đối chiếu nội bộ và báo cáo cho ban lãnh đạo. Khi click vào từng dòng nghiệp vụ, người dùng có thể xem chi tiết chứng từ gốc phát sinh hoặc các tài liệu liên quan, đảm bảo minh bạch và phục vụ kiểm tra, kiểm toán khi cần thiết.
+
+Tính năng truy xuất nhanh, tìm kiếm và tổng hợp theo tài khoản, nguồn tiền giúp nâng cao hiệu quả quản trị dòng tiền và chủ động trong điều hành kế hoạch tài chính của doanh nghiệp.
+
+\subsection{Màn hình báo cáo bảng cân đối phát sinh}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_5/trial_balance.png}
+  \caption{Màn hình báo cáo bảng cân đối phát sinh}\label{fig:trial_balance}
+\end{figure}
+Báo cáo bảng cân đối phát sinh (Trial Balance) là báo cáo tài chính tổng hợp, phản ánh số dư đầu kỳ, phát sinh tăng/giảm trong kỳ và số dư cuối kỳ của tất cả các tài khoản kế toán của doanh nghiệp trong một khoảng thời gian nhất định (thường là theo tháng, quý hoặc năm). Màn hình bảng cân đối phát sinh được thiết kế hiển thị dữ liệu dạng bảng, gồm các cột thông tin chính như: Mã tài khoản, Tên tài khoản, Số dư đầu kỳ, Phát sinh Nợ, Phát sinh Có, Số dư cuối kỳ Nợ và Số dư cuối kỳ Có.
+
+Công cụ này giúp kế toán, kiểm toán viên và ban lãnh đạo doanh nghiệp nắm bắt nhanh toàn cảnh tình hình biến động tài sản, nguồn vốn cũng như các khoản mục chi tiết theo từng tài khoản. Từ đó, người dùng dễ dàng kiểm tra tính cân đối giữa tổng phát sinh Nợ và tổng phát sinh Có, phát hiện kịp thời các sai lệch, nhầm lẫn trong quá trình hạch toán, đảm bảo số liệu luôn chính xác và minh bạch.
+
+Ngoài ra, bảng cân đối phát sinh cho phép truy xuất chi tiết xuống từng giao dịch phát sinh trong kỳ, hỗ trợ kiểm tra, đối chiếu một cách thuận tiện. Báo cáo có thể xuất ra các định dạng phổ biến như Excel hoặc PDF, phục vụ nhu cầu lưu trữ, nộp báo cáo hoặc phân tích sâu hơn theo yêu cầu quản trị doanh nghiệp.
+
+\subsection{Màn hình nhật ký truy cập}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/audit_log.png}
+  \caption{Màn hình nhật ký truy cập}\label{fig:audit_log}
+\end{figure}
+Nhật ký truy cập là công cụ quan trọng giúp doanh nghiệp kiểm soát, theo dõi tất cả các hoạt động truy cập vào hệ thống kế toán, bao gồm việc đăng nhập, đăng xuất, thao tác trên các chứng từ, báo cáo, và các chức năng quản lý khác. Màn hình nhật ký truy cập được thiết kế với giao diện bảng tổng hợp, hiển thị các thông tin chính như: Ngày giờ, Người dùng, IP, Thao tác, Mô tả, Chứng từ liên quan.
+
+Công cụ này giúp bộ phận kế toán và quản trị doanh nghiệp theo dõi tất cả các hành động liên quan đến dữ liệu kế toán, phát hiện và ngăn chặn các hành vi không hợp lệ, tránh rủi ro bảo mật và đảm bảo tính minh bạch, tuân thủ pháp lý trong quản lý tài sản, vật tư, hàng hóa. Ngoài ra, nhật ký truy cập còn hỗ trợ xuất dữ liệu ra Excel hoặc PDF để phục vụ việc kiểm tra, đối chiếu và báo cáo cho ban lãnh đạo.
+
+Toàn bộ dữ liệu trong nhật ký truy cập luôn được cập nhật thời gian thực từ các phân hệ hệ thống, đảm bảo độ chính xác, minh bạch và phục vụ cho việc kiểm toán, điều tra, và giám sát hoạt động kế toán của doanh nghiệp.
+
+\subsection{Màn hình giao diện chatbot}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_5/chatbot.png}
+  \caption{Màn hình giao diện chatbot}\label{fig:chatbot_interface}
+\end{figure}
+Màn hình giao diện chatbot được thiết kế giúp người dùng dễ dàng trao đổi, đặt câu hỏi và nhận phản hồi trực tiếp từ hệ thống AI Chatbot. Giao diện mô phỏng một cửa sổ chat quen thuộc, nơi người dùng có thể nhập câu hỏi hoặc yêu cầu thông tin, đồng thời theo dõi lịch sử trò chuyện và các phản hồi từ chatbot.
+
+Các thành phần chính gồm: vùng nhập câu hỏi, khu vực hiển thị nội dung đối thoại (bao gồm cả câu hỏi của người dùng và câu trả lời từ AI), thông tin về nguồn tham khảo và thời gian phản hồi. Nhờ vậy, người dùng có thể nhanh chóng kiểm tra lại các trao đổi trước đó cũng như dễ dàng truy xuất thông tin mà mình tìm kiếm.
+
+Hệ thống đảm bảo mọi câu hỏi và câu trả lời đều được cập nhật tức thời, hỗ trợ quá trình tương tác liên tục, tiện lợi và hiệu quả cho người dùng trong doanh nghiệp khi cần khai thác tri thức hoặc trợ giúp qua chatbot.
+
+\end{document}

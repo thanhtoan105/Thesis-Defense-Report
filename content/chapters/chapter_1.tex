@@ -1,0 +1,68 @@
+% arara: lualatex: { shell: yes, synctex: yes, options: ["-output-directory=output"] }
+% arara: biber: { options: ["--output-directory=output"] }
+% arara: lualatex: { shell: yes, synctex: yes, options: ["-output-directory=output"] }
+
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+\stopborder
+
+\chapter{{TỔNG QUAN}}
+
+\section{Tính cấp thiết của đề tài}
+Trong bối cảnh nền kinh tế số toàn cầu đang phát triển với tốc độ vũ bão, Hệ thống Hoạch định Nguồn lực Doanh nghiệp (Enterprise Resource Planning - ERP) đã trở thành "hệ thần kinh trung ương" của các tổ chức hiện đại, tích hợp các chức năng kinh doanh cốt lõi từ tài chính, nhân sự, chuỗi cung ứng đến quan hệ khách hàng \autocite{mhaskeyIntegrationArtificialIntelligence2024}. Các hệ thống ERP không còn đơn thuần là công cụ ghi chép giao dịch  mà đang chuyển mình trở thành các nền tảng hỗ trợ ra quyết định thông minh. \par
+Theo báo cáo thị trường ERP năm 2024 của HG Insights, chi tiêu cho phần mềm ERP toàn cầu dự kiến đạt 171,7 tỷ USD, chiếm 16,8\% tổng chi tiêu phần mềm, khẳng định vị thế không thể thay thế của hệ thống này trong cấu trúc công nghệ doanh nghiệp \autocite{insights2024ERPMarket2023}. Tại Việt Nam, các giải pháp ERP như MISA AMIS, Bravo, Fast Business Online hay các hệ thống quốc tế như SAP, Oracle đang đóng vai trò trụ cột trong quản trị tài chính của hàng triệu doanh nghiệp. Tuy nhiên, mô hình tương tác truyền thống dựa trên giao diện đồ họa (GUI) phức tạp, với hàng trăm menu và biểu mẫu nhập liệu, đang tạo ra rào cản lớn về khả năng sử dụng (usability) và khả năng tiếp cận dữ liệu, đặc biệt đối với người dùng không chuyên về kỹ thuật tại các doanh nghiệp vừa và nhỏ (SMEs). \autocite{thuylinhDigitalTransformationSmall2025}\par
+Sự trỗi dậy của Trí tuệ nhân tạo tạo sinh (Generative AI - GenAI) và các Mô hình ngôn ngữ lớn (Large Language Models - LLMs) trong giai đoạn 2023-2025 đã mở ra một kỷ nguyên mới: kỷ nguyên của Giao diện hội thoại (Conversational User Interface - CUI). Việc tích hợp Chatbot AI vào hệ thống ERP không chỉ dừng lại ở việc tự động hóa các tác vụ lặp lại mà còn hứa hẹn khả năng "dân chủ hóa dữ liệu" (data democratization), cho phép các nhà quản lý truy xuất thông tin tài chính phức tạp thông qua ngôn ngữ tự nhiên. \par
+Mặc dù tiềm năng là rất lớn, việc triển khai Chatbot AI trong lĩnh vực kế toán tại Việt Nam đang đối mặt với một "khoảng trống nghiên cứu" nghiêm trọng. Khoảng trống này được hình thành từ sự giao thoa của các yếu tố đặc thù: sự phức tạp của ngôn ngữ tiếng Việt trong lĩnh vực tài chính \autocite{truongCrossingLinguisticHorizons2024}, sự khác biệt căn bản giữa Chuẩn mực Kế toán Việt Nam (VAS) và Quốc tế (IFRS) \autocite{VASVsIFRS} , cùng với các rào cản pháp lý mới về bảo vệ dữ liệu.
+
+\subsection{Tình hình quốc tế}
+Trong kỷ nguyên kinh tế số, Hệ thống Hoạch định Nguồn lực Doanh nghiệp (ERP) đã vượt xa vai trò của một công cụ ghi chép giao dịch truyền thống để trở thành "hệ thần kinh trung ương" của mọi tổ chức hiện đại. Theo báo cáo thị trường năm 2024 của HG Insights, chi tiêu toàn cầu cho phần mềm ERP dự kiến đạt mức kỷ lục 171,7 tỷ USD, chiếm tới 16,8\% tổng chi tiêu phần mềm của doanh nghiệp \autocite{insights2024ERPMarket2023}. Con số này khẳng định vị thế không thể thay thế của ERP trong việc tích hợp các chức năng cốt lõi từ tài chính, nhân sự đến chuỗi cung ứng \autocite{mhaskeyIntegrationArtificialIntelligence2024a}.
+
+Tuy nhiên, thế giới đang chứng kiến một bước ngoặt công nghệ quan trọng trong giai đoạn 2023-2025 với sự trỗi dậy của Trí tuệ nhân tạo tạo sinh (Generative AI) và các Mô hình ngôn ngữ lớn (LLMs). Xu hướng này đang thúc đẩy sự chuyển dịch từ các giao diện đồ họa (GUI) phức tạp sang Giao diện hội thoại (Conversational User Interface - CUI) \autocite{TransformingERPSpeed}. Đáng chú ý hơn, theo dự báo của Deloitte (Q4/2024), trọng tâm đầu tư đang chuyển sang "Agentic AI" (AI đại lý) \autocite{StateGenerativeAI}. Khác với các chatbot thụ động thế hệ cũ, Agentic AI có khả năng tự chủ lập kế hoạch và thực thi chuỗi tác vụ phức tạp, như tự động truy xuất dữ liệu kế toán, so sánh ngân sách và soạn thảo báo cáo giải trình . Các "ông lớn" công nghệ như Microsoft (Dynamics 365 Copilot), Oracle và NetSuite đều đang tích cực tích hợp các khả năng này để tối ưu hóa quy trình kinh doanh \autocite{8ERPTrends}.
+
+Về mặt hiệu quả, các nghiên cứu thực nghiệm công bố trên tạp chí Applied Sciences (2024) đã chứng minh rằng các tác nhân AI có thể giúp giảm tới 75\% thời gian thực hiện các quy trình kế toán thủ công và giảm thiểu sai sót do con người \autocite{resendeAIAgentsNoCode2025}. Trong lĩnh vực kiểm toán, Hiệp hội Kiểm toán viên Hành nghề (CAQ) nhấn mạnh khả năng của AI trong việc phân tích 100\% dữ liệu giao dịch thay vì chọn mẫu, giúp nâng cao chất lượng phát hiện gian lận \autocite{AuditorsAINew}.
+
+Mặc dù tiềm năng là rất lớn, cộng đồng tài chính quốc tế cũng đưa ra những cảnh báo nghiêm khắc. Quỹ Tiền tệ Quốc tế (IMF) và Hội đồng Ổn định Tài chính (FSB) đã chỉ ra rủi ro hệ thống từ hiện tượng "ảo giác" (hallucination) của AI \autocite{boardFinancialStabilityImplications2024}. Các nghiên cứu trên arXiv (2023-2025) phân loại rõ ba loại ảo giác nguy hiểm trong tài chính: ảo giác thực tế (bịa đặt số liệu), ảo giác logic (sai lầm trong tính toán) và ảo giác ngữ cảnh (tư vấn sai chiến lược) \autocite{zhangFAITHFrameworkAssessing2025,dengExplainableHallucinationMitigation2025}.
+
+\subsection{Tình hình trong nước}
+\subsubsection{Cơ hội và Áp lực cạnh tranh trong khu vực}
+Việt Nam đang đứng trước cơ hội lịch sử trong quá trình chuyển đổi số. Theo báo cáo e-Conomy SEA 2025 của Google, Temasek và Bain \& Company, nền kinh tế số Việt Nam dự báo đạt quy mô 39 tỷ USD vào năm 2025, dẫn đầu khu vực Đông Nam Á về tốc độ tăng trưởng \autocite{vnexpressVietnamLeadsSoutheast}. Đáng chú ý, mức độ sẵn sàng và niềm tin của người dùng Việt Nam đối với AI rất cao, vượt qua cả Malaysia và Thái Lan, với 81\% người dùng tương tác với công cụ AI hàng ngày \autocite{VietNamLeads}.
+
+Tuy nhiên, áp lực cạnh tranh là rất lớn. Malaysia đang trỗi dậy mạnh mẽ nhờ đầu tư vào trung tâm dữ liệu và hạ tầng thương mại điện tử, cũng đặt mục tiêu kinh tế số đạt 39 tỷ USD \autocite{kaurEConomySEA20252025}. Để duy trì lợi thế, các doanh nghiệp Việt Nam buộc phải tăng tốc độ ra quyết định dựa trên dữ liệu. Chính phủ đã ban hành Quyết định số 749/QĐ-TTg về "Chương trình Chuyển đổi số quốc gia", xác định mục tiêu kinh tế số chiếm 20\% GDP và năng suất lao động tăng 7\%/năm \autocite{5VietnamDigitalEconomy2024,briefingVietnamsDigitalTransformation2021}.
+
+\subsubsection{"Nút thắt cổ chai" tại khu vực SMEs}
+Mặc dù mục tiêu vĩ mô rất rõ ràng, nhưng thực tế triển khai gặp khó khăn lớn tại khối Doanh nghiệp Vừa và Nhỏ (SMEs) – chiếm 98\% tổng số doanh nghiệp. Theo Hiệp hội Thương mại Điện tử Việt Nam (VECOM), chỉ khoảng 14\% SMEs sử dụng phần mềm quản lý doanh nghiệp (ERP), thấp hơn nhiều so với mức 40\% ở các doanh nghiệp lớn \autocite{thuylinhDigitalTransformationSmall2025}. Các giải pháp ERP nội địa phổ biến như MISA AMIS, Bravo, Fast Business Online dù có chi phí hợp lý nhưng vẫn dựa trên giao diện nhập liệu truyền thống phức tạp, tạo rào cản lớn về khả năng sử dụng (usability) cho các chủ doanh nghiệp không chuyên về kế toán.
+
+\subsubsection{Các rào cản đặc thù không thể bỏ qua}
+Việc triển khai các giải pháp AI quốc tế trong lĩnh vực kế toán tại Việt Nam hiện đối diện với ba rào cản đặc thù quan trọng:
+
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Xung đột chuẩn mực (VAS vs. IFRS):} Phần lớn các mô hình ngôn ngữ lớn (LLM) quốc tế được đào tạo trên dữ liệu tuân theo hệ thống chuẩn mực kế toán quốc tế IFRS (dựa trên nguyên tắc giá trị hợp lý), trong khi đó, chuẩn mực của Việt Nam (VAS) lại áp dụng nguyên tắc giá gốc và tuân thủ nghiêm ngặt các quy định về thuế (rules-based) \autocite{VASVsIFRS}. Sự khác biệt này, đặc biệt ở các quy định liên quan đến hóa đơn, khấu hao, và phân bổ chi phí, có thể khiến AI đưa ra các tư vấn không phù hợp với pháp luật Việt Nam \autocite{nguyenMeasurementFormalConvergence2014}.
+
+  \item \textbf{Rào cản pháp lý về dữ liệu:} Nghị định 13/2023/NĐ-CP yêu cầu doanh nghiệp thực hiện đánh giá tác động bảo vệ dữ liệu cá nhân (DPIA) và đặt ra nhiều hạn chế về việc chuyển dữ liệu nhạy cảm ra nước ngoài \autocite{LegalAlertDecree2024}. Điều này gây khó khăn khi sử dụng các dịch vụ AI công cộng hoặc API quốc tế cho xử lý nghiệp vụ tài chính.
+
+  \item \textbf{Thách thức ngôn ngữ:} Ngôn ngữ tiếng Việt, đặc biệt trong lĩnh vực tài chính - kế toán, chứa nhiều thuật ngữ đa nghĩa và đặc thù (ví dụ: “kết chuyển”, “công nợ”), gây trở ngại cho các mô hình xử lý ngôn ngữ tự nhiên (NLP) quốc tế nếu chưa được tùy chỉnh hoặc tinh chỉnh phù hợp với ngữ cảnh và đặc điểm chuyên ngành tại Việt Nam \autocite{truongCrossingLinguisticHorizons2024}.
+\end{enumerate}
+
+\section{Vấn đề đặt ra và mục tiêu cần thực hiện}
+\subsection{Đặt vấn đề}
+Xuất phát từ bối cảnh thực tiễn, đề tài nhận thấy các vấn đề cốt lõi và thách thức lớn cần giải quyết như sau.
+
+Trước tiên, khoảng trống lớn về giao diện và trải nghiệm người dùng là tình trạng phổ biến khi các hệ thống ERP truyền thống hầu hết vẫn dựa vào giao diện đồ họa phức tạp, đòi hỏi người dùng phải thao tác thủ công qua nhiều tầng menu khi muốn nhập liệu hoặc tra cứu thông tin. Điều này khiến việc tiếp cận dữ liệu trở nên khó khăn, giảm tính linh hoạt và hiệu quả trong ra quyết định. Nhu cầu chuyển đổi sang một giao diện hội thoại tự nhiên, nơi dữ liệu chủ động phục vụ người dùng thay vì ngược lại, trở thành một đòi hỏi cấp thiết trong bối cảnh hiện đại hóa chuyển đổi số \autocite{sarferazImplementingConversationalAI2025}.
+
+Bên cạnh đó, bài toán về tính chính xác và kiểm soát hiện tượng "ảo giác" của AI trong lĩnh vực kế toán Việt Nam là thách thức không nhỏ. Kết quả của việc thiếu dữ liệu huấn luyện chuẩn hóa cho tiếng Việt ngành tài chính – kế toán khiến các mô hình AI hiện tại dễ mắc lỗi diễn giải thuật ngữ, tạo ra thông tin sai lệch hoặc dẫn chiếu nhầm quy định. Nếu không xây dựng các cơ chế kiểm soát chặt chẽ (như ứng dụng RAG), các lỗi này có thể dẫn đến những rủi ro pháp lý đáng kể cho doanh nghiệp khi AI trả lời sai nội dung liên quan đến quy định VAS hoặc hệ thống pháp luật hiện hành \autocite{linhVLSP2025Challenge2025}.
+
+Một thách thức khác là khả năng tích hợp giữa các công nghệ AI hiện đại với các hệ thống ERP cũ đang vận hành tại nhiều doanh nghiệp Việt Nam. Phần lớn những hệ thống này được xây dựng với kiến trúc đóng, thiếu các chuẩn giao tiếp lập trình mới (vd. RESTful API), nên việc kết nối hoặc đồng bộ dữ liệu với chatbot AI đòi hỏi phát triển các lớp trung gian phức tạp, vừa đảm bảo không gián đoạn hoạt động vừa giữ được tính toàn vẹn của dữ liệu.
+
+Cuối cùng, tất yếu phải đối mặt là vấn đề đảm bảo an ninh dữ liệu và thực hiện nghiêm túc các yêu cầu pháp lý theo Nghị định 13/2023/NĐ-CP. Trong khi các nền tảng AI mạnh thường dựa trên dịch vụ đám mây và xử lý nhiều dữ liệu lớn, quy định pháp luật lại yêu cầu kiểm soát dữ liệu nghiêm ngặt, tiến hành đánh giá tác động bảo mật (DPIA), và giới hạn việc chuyển dữ liệu nhạy cảm ra nước ngoài. Điều này đặt ra yêu cầu cấp bách về giải pháp kiến trúc, vừa đảm bảo khả năng xử lý thông minh, vừa tuân thủ quy định bảo mật, chống rò rỉ và sử dụng dữ liệu tài chính một cách trái phép \autocite{phuNghiDinh13}.
+\subsection{Mục tiêu thực hiện}
+Trên cơ sở các vấn đề và thách thức đã nhận diện, mục tiêu của đề tài được xác định cụ thể như sau:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{Xây dựng cơ sở lý luận:} Tổng hợp và hệ thống hóa các lý thuyết liên quan đến việc tích hợp trí tuệ nhân tạo (AI) vào hệ thống ERP, đặc biệt nhấn mạnh tới mô hình Agentic AI và các phương pháp xử lý ngôn ngữ tự nhiên (NLP) cho tiếng Việt trong lĩnh vực tài chính - kế toán.
+  \item \textbf{Đề xuất kiến trúc giải pháp:} Thiết kế kiến trúc tổng thể cho hệ thống Chatbot AI tích hợp với ERP, ứng dụng kỹ thuật RAG (Retrieval-Augmented Generation) nhằm giảm thiểu hiện tượng “ảo giác” và bảo đảm tuân thủ các chuẩn mực kế toán Việt Nam (VAS).
+  \item \textbf{Giải quyết bài toán tích hợp:} Đưa ra phương án kỹ thuật cho việc kết nối giữa Chatbot AI và các hệ thống ERP legacy, thông qua lớp trung gian an toàn để bảo đảm sự toàn vẹn và bảo mật dữ liệu.
+  \item \textbf{Đánh giá thực nghiệm:} Xây dựng và thực hiện các kịch bản thử nghiệm thực tế nhằm đánh giá hiệu quả của Chatbot trong việc rút ngắn thời gian truy xuất thông tin cũng như mức độ chấp nhận của người dùng kế toán tại Việt Nam.
+\end{enumerate}
+
+\end{document}

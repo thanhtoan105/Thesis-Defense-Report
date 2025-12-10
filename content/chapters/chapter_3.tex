@@ -1,0 +1,478 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+\stopborder
+
+\chapter{Tổng quan RAG và kiến trúc mô hình}
+
+\section{Giới thiệu RAG}
+\subsection{Vấn đề của LLM truyền thống}
+Các mô hình ngôn ngữ lớn (Large Language Models - LLMs) truyền thống đã chứng minh khả năng ấn tượng trong nhiều tác vụ xử lý ngôn ngữ tự nhiên. Tuy nhiên, chúng vẫn phải đối mặt với một số hạn chế nghiêm trọng ảnh hưởng đến độ tin cậy và khả năng ứng dụng thực tế.
+
+\textbf{Hiện tượng ảo giác (Hallucination)}
+
+Một trong những thách thức lớn nhất của LLMs là hiện tượng "hallucination" - khả năng tạo ra thông tin không chính xác hoặc không có cơ sở thực tế nhưng vẫn có vẻ hợp lý về mặt ngữ pháp và ngữ nghĩa (Gao et al., 2023). Các nghiên cứu cho thấy hallucination là một đặc điểm không thể tránh khỏi xuất phát từ cấu trúc toán học và logic cơ bản của LLMs (Madaan et al., 2024). Hiện tượng này xảy ra khi mô hình tạo ra nội dung không được hỗ trợ bởi đầu vào hoặc kiến thức bên ngoài, mâu thuẫn với ngữ cảnh đã tạo trước đó, hoặc không phù hợp với kiến thức được thiết lập về thế giới (Huang et al., 2023).
+
+Nguyên nhân của hallucination bắt nguồn từ việc LLMs dựa vào kiến thức tham số được lưu trữ trong các trọng số mô hình trong quá trình huấn luyện. Mặc dù các mô hình pre-trained lớn đã được chứng minh là có khả năng lưu trữ kiến thức thực tế trong các tham số của chúng, nhưng khả năng truy cập và thao tác chính xác kiến thức này vẫn còn hạn chế (Lewis et al., 2020).
+
+\textbf{Kiến thức lỗi thời và hạn chế}
+
+LLMs chỉ có thể truy cập kiến thức từ dữ liệu huấn luyện, điều này dẫn đến hai vấn đề chính. Thứ nhất, kiến thức của mô hình bị cố định tại thời điểm huấn luyện và không thể tự động cập nhật để phản ánh thông tin mới nhất (Gao et al., 2023). Thứ hai, đối với các truy vấn đòi hỏi kiến thức chuyên sâu hoặc cụ thể theo lĩnh vực, hiệu suất của LLMs thường kém hơn so với các kiến trúc đặc thù cho tác vụ (Lewis et al., 2020).
+
+\textbf{Thiếu khả năng truy xuất nguồn và giải thích}
+
+Các LLMs truyền thống không thể cung cấp nguồn tham chiếu rõ ràng cho thông tin được tạo ra, khiến việc xác minh độ chính xác và truy xuất nguồn gốc thông tin trở nên khó khăn (Lewis et al., 2020). Điều này đặc biệt quan trọng trong các ứng dụng nhạy cảm như y tế, pháp lý và tài chính, nơi mà tính minh bạch và khả năng kiểm chứng là điều bắt buộc.
+
+\textbf{Hạn chế với các tác vụ đòi hỏi kiến thức chuyên sâu}
+
+Đối với các câu hỏi phức tạp đòi hỏi suy luận đa bước hoặc kiến thức chuyên môn sâu, các LLMs truyền thống thường gặp khó khăn do không có cơ chế hiệu quả để tích hợp thông tin từ nhiều nguồn hoặc thực hiện suy luận logic dựa trên kiến thức bên ngoài (Trivedi et al., 2024).
+
+\subsection{Định nghĩa RAG}
+Retrieval-Augmented Generation (RAG) là một kỹ thuật tiên tiến được thiết kế để giải quyết các hạn chế cố hữu của các mô hình ngôn ngữ lớn bằng cách tích hợp cơ chế truy xuất thông tin từ các cơ sở dữ liệu kiến thức bên ngoài vào quá trình sinh văn bản (Lewis et al., 2020).
+\subsubsection{Khái niệm cơ bản}
+
+RAG là một phương pháp kết hợp giữa bộ nhớ tham số (parametric memory) của các mô hình seq2seq pre-trained với bộ nhớ phi tham số (non-parametric memory) dưới dạng chỉ mục vector dày đặc (dense vector index) của cơ sở kiến thức, được truy cập thông qua một neural retriever đã được pre-trained (Lewis et al., 2020). Theo định nghĩa, RAG kết hợp hai thành phần chính:
+
+\begin{enumerate}
+  \item \textbf{Thành phần truy xuất (Retrieval Component)}: Tìm kiếm và lấy các tài liệu hoặc đoạn văn bản có liên quan từ cơ sở dữ liệu bên ngoài dựa trên truy vấn đầu vào.
+
+  \item \textbf{Thành phần sinh (Generation Component)}: Sử dụng LLM để tạo ra câu trả lời dựa trên ngữ cảnh được tăng cường từ các tài liệu đã truy xuất.
+\end{enumerate}
+
+\subsubsection{\textbf{Nguyên lý hoạt động}}
+
+RAG hoạt động theo nguyên lý tăng cường khả năng sinh ngôn ngữ của LLMs bằng cách cung cấp ngữ cảnh có liên quan từ nguồn kiến thức bên ngoài. Khi nhận được một truy vấn, hệ thống RAG sẽ:
+
+\begin{enumerate}
+  \item Truy xuất các đoạn văn bản có liên quan nhất từ cơ sở tri thức thông qua tìm kiếm tương tự vector
+  \item Kết hợp thông tin đã truy xuất với truy vấn ban đầu
+  \item Cung cấp ngữ cảnh đã được tăng cường này cho LLM để tạo ra phản hồi chính xác và có căn cứ
+\end{enumerate}
+
+\textbf{Phân loại RAG}
+
+Theo Gao et al. (2023), RAG đã phát triển qua ba giai đoạn chính:
+
+\begin{enumerate}
+  \item \textbf{Naive RAG}: Mô hình RAG cơ bản theo quy trình "retrieve-then-generate" đơn giản, bao gồm ba bước: lập chỉ mục (indexing), truy xuất (retrieval) và sinh (generation).
+
+  \item \textbf{Advanced RAG}: Cải thiện các hạn chế của Naive RAG thông qua các kỹ thuật tiền xử lý (pre-retrieval) như tối ưu hóa truy vấn, mở rộng truy vấn, và hậu xử lý (post-retrieval) như tái xếp hạng (reranking) và lọc ngữ cảnh.
+
+  \item \textbf{Modular RAG}: Kiến trúc linh hoạt và có thể tái cấu hình, cho phép tích hợp các module chuyên biệt và các operator như routing, scheduling, và fusion để xử lý các tác vụ phức tạp hơn (Jiang et al., 2024).
+\end{enumerate}
+
+\textbf{Ưu điểm so với LLM truyền thống}
+
+RAG mang lại nhiều lợi thế vượt trội:
+
+\begin{itemize}
+  \item \textbf{Giảm hallucination}: Bằng cách cung cấp thông tin thực tế từ nguồn đáng tin cậy, RAG giúp LLM tạo ra câu trả lời có căn cứ hơn (Gao et al., 2023).
+  \item \textbf{Cập nhật kiến thức liên tục}: Không cần huấn luyện lại mô hình, kiến thức có thể được cập nhật thông qua việc bổ sung tài liệu mới vào cơ sở dữ liệu (Lewis et al., 2020).
+  \item \textbf{Tích hợp kiến thức chuyên ngành}: Có thể dễ dàng thêm kiến thức cụ thể theo lĩnh vực để tăng độ chính xác trong các ứng dụng chuyên môn (Gao et al., 2023).
+  \item \textbf{Tính minh bạch và khả năng truy xuất nguồn}: RAG cho phép cung cấp trích dẫn và nguồn tham chiếu cho thông tin được tạo ra (Lewis et al., 2020).
+\end{itemize}
+\subsubsection{Ứng dụng thực tế trong doanh nghiệp}
+
+RAG đã chứng minh giá trị to lớn trong nhiều ứng dụng doanh nghiệp, đặc biệt trong các lĩnh vực đòi hỏi độ chính xác cao và khả năng truy xuất thông tin chuyên sâu.
+
+\textbf{Hệ thống hỏi đáp và quản lý tri thức doanh nghiệp}
+
+Các hệ thống RAG được triển khai rộng rãi để xây dựng các chatbot hỗ trợ nhân viên và khách hàng truy cập thông tin doanh nghiệp một cách nhanh chóng và chính xác. Nghiên cứu của Acharya và Naik (2024) tại một tổ chức viễn thông đa quốc gia cho thấy việc tích hợp RAG với mô hình DeepSeek-v3 API giúp cải thiện độ chính xác truy xuất lên trên 98\% và giảm thời gian phản hồi trung bình xuống 2,1±0,2 giây, cải thiện 35\% so với hệ thống helpdesk truyền thống.
+
+Trong môi trường doanh nghiệp, RAG đặc biệt hiệu quả cho việc truy vấn tài liệu nội bộ, hướng dẫn sử dụng sản phẩm, chính sách công ty, và các quy trình kỹ thuật (Basu et al., 2024). Hệ thống có khả năng xử lý đa định dạng tài liệu và cung cấp câu trả lời chính xác dựa trên nội dung được truy xuất từ các nguồn tài liệu đã được tổ chức.
+
+\textbf{Hỗ trợ khách hàng và chatbot thương mại điện tử}
+
+RAG đã được ứng dụng thành công trong các hệ thống chatbot hỗ trợ khách hàng cho thương mại điện tử. Nghiên cứu về Retail-GPT cho thấy việc sử dụng RAG giúp nâng cao khả năng tương tác của người dùng thông qua việc hướng dẫn đề xuất sản phẩm và hỗ trợ các thao tác giỏ hàng một cách thông minh (Pathania et al., 2024). Hệ thống có khả năng tích hợp đa nền tảng và thích ứng với nhiều lĩnh vực thương mại điện tử khác nhau.
+
+Tại Việt Nam, các nghiên cứu về hành vi sử dụng chatbot trong bán lẻ điện tử cho thấy chatbot với khả năng cung cấp thông tin chính xác và phù hợp (dựa trên công nghệ RAG) có tác động tích cực đến niềm tin người dùng và ý định sử dụng (Lê, 2025).
+
+\textbf{Ứng dụng trong lĩnh vực y tế}
+
+RAG đã chứng minh hiệu quả đặc biệt trong các ứng dụng y tế, nơi độ chính xác và khả năng truy xuất nguồn là yếu tố quan trọng. Nghiên cứu MedRAG của Xiong et al. (2024) cho thấy việc sử dụng RAG cải thiện độ chính xác của sáu LLM khác nhau lên tới 18% so với phương pháp chain-of-thought prompting truyền thống, nâng hiệu suất của GPT-3.5 và Mixtral lên ngang với GPT-4.
+
+Các ứng dụng cụ thể trong y tế bao gồm:
+- Hỗ trợ chẩn đoán bệnh
+- Tóm tắt hồ sơ bệnh án điện tử (EHR)
+- Trả lời câu hỏi y khoa chuyên sâu
+- Theo dõi và phân tích triệu chứng
+
+AlzheimerRAG, một ứng dụng RAG đa phương thức cho các ca sử dụng lâm sàng, đã cho thấy khả năng tạo ra phản hồi với độ chính xác không kém con người và tỷ lệ hallucination thấp (Martini et al., 2024).
+
+\textbf{Quản lý tài liệu pháp lý và tuân thủ quy định}
+
+Trong lĩnh vực pháp lý, RAG hỗ trợ phân tích tài liệu pháp lý phức tạp và đảm bảo tuân thủ quy định. Hệ thống RAG có khả năng truy xuất các điều khoản pháp luật có liên quan, so sánh với các quy định hiện hành, và cung cấp phân tích chi tiết cho các câu hỏi pháp lý (Elshaboury et al., 2025).
+
+Đặc biệt trong ngành dược phẩm, việc tuân thủ quy định đòi hỏi phải điều hướng qua các hướng dẫn phức tạp và đồ sộ. Nghiên cứu về QA-RAG đã giới thiệu một mô hình chatbot sử dụng RAG để tìm kiếm tài liệu hướng dẫn có liên quan và cung cấp câu trả lời dựa trên các hướng dẫn đã truy xuất, giúp giảm đáng kể nguồn lực con người cần thiết (Han et al., 2024).
+
+\textbf{
+Hỗ trợ kỹ thuật và xử lý sự cố}
+
+RAG đã được triển khai thành công trong việc hỗ trợ kỹ thuật cho các hệ thống doanh nghiệp. Nghiên cứu về Agentic AI-Driven Technical Troubleshooting giới thiệu một giải pháp RAG có trọng số (Weighted RAG Framework) được thiết kế riêng cho xử lý sự cố kỹ thuật doanh nghiệp (Gupta et al., 2024). Framework này tự động cân nhắc các nguồn truy xuất như hướng dẫn sản phẩm, cơ sở tri thức nội bộ, FAQ, và hướng dẫn xử lý sự cố dựa trên ngữ cảnh truy vấn, ưu tiên dữ liệu có liên quan nhất.
+
+\textbf{Tài chính và phân tích thị trường}
+
+Trong lĩnh vực tài chính, các cơ sở dữ liệu vector dựa trên đám mây và RAG đã tạo ra các hệ thống mạnh mẽ vượt qua các hạn chế của LLM độc lập bằng cách bắt buộc đầu ra dựa trên thông tin tài chính cụ thể và có liên quan (Sharma, 2025). Các ứng dụng bao gồm:
+- Tìm kiếm ngữ nghĩa của tài liệu tài chính
+- Đánh giá sentiment thị trường nâng cao
+- Tự động tạo báo cáo
+- Dự báo tài chính đáng tin cậy hơn
+
+\textbf{Nguồn nhân lực và quản lý nội bộ}
+
+RAG được sử dụng rộng rãi trong các chatbot hỗ trợ nhân viên về chính sách công ty, phúc lợi, và quy trình nội bộ. Nghiên cứu về FACTS framework tại NVIDIA đã trình bày kinh nghiệm xây dựng các giải pháp RAG cấp doanh nghiệp cho IT/HR, thu nhập tài chính, và nội dung chung (Rackauckas et al., 2024).
+
+\section{Kiến trúc mô hình RAG}
+\subsection{Sự kết hợp mô hình sinh ngôn ngữ và hệ thống truy xuất}
+Kiến trúc RAG được xây dựng dựa trên sự kết hợp hài hòa giữa hai thành phần chính: mô hình sinh ngôn ngữ (Language Generation Model) và hệ thống truy xuất thông tin (Information Retrieval System). Sự kết hợp này tạo ra một framework mạnh mẽ có khả năng tận dụng cả kiến thức tham số của LLM và kiến thức phi tham số từ các nguồn bên ngoài.
+
+\textbf{Mô hình sinh ngôn ngữ (Language Generation Model)}
+
+Thành phần sinh trong RAG thường sử dụng các mô hình transformer pre-trained như BERT, GPT, T5, hoặc các biến thể của chúng. Các mô hình này đóng vai trò là bộ nhớ tham số, lưu trữ kiến thức ngôn ngữ và thế giới được học trong quá trình huấn luyện trên các tập dữ liệu lớn (Lewis et al., 2020).
+
+Theo Lewis et al. (2020), RAG sử dụng mô hình seq2seq pre-trained như parametric memory. Mô hình này có khả năng:
+\begin{itemize}
+  \item Hiểu ngữ cảnh và ý nghĩa của truy vấn người dùng
+  \item Tổng hợp thông tin từ nhiều nguồn
+  \item Tạo ra câu trả lời tự nhiên và mạch lạc
+  \item Thực hiện suy luận và tư duy logic
+\end{itemize}
+
+Các nghiên cứu gần đây cho thấy việc sử dụng các mô hình transformer với cơ chế attention đa đầu (multi-head attention) giúp nâng cao khả năng hiểu ngữ cảnh và biểu diễn ngữ nghĩa của văn bản (Devlin et al., 2019). BERT (Bidirectional Encoder Representations from Transformers) sử dụng cơ chế học hai chiều để tạo ra các embedding động dựa trên ngữ cảnh, giúp nắm bắt các sắc thái ngữ nghĩa phức tạp trong văn bản.
+
+\textbf{Hệ thống truy xuất thông tin (Information Retrieval System)}
+
+Hệ thống truy xuất trong RAG được thiết kế để tìm kiếm và lấy các tài liệu hoặc đoạn văn bản có liên quan từ cơ sở kiến thức bên ngoài. Thành phần này hoạt động như bộ nhớ phi tham số, cho phép truy cập động vào kiến thức mới nhất mà không cần huấn luyện lại mô hình (Lewis et al., 2020).
+
+Hệ thống truy xuất trong RAG thường bao gồm hai thành phần chính:
+
+\begin{enumerate}
+  \item \textbf{Dense Retriever}: Sử dụng neural network để mã hóa cả truy vấn và tài liệu thành các vector dày đặc trong không gian embedding chung. Độ tương tự giữa truy vấn và tài liệu được tính toán thông qua các phép đo như cosine similarity hoặc inner product (Lewis et al., 2020).
+
+  \item \textbf{Sparse Retriever}: Sử dụng các phương pháp truyền thống như BM25 dựa trên tần suất từ và thống kê văn bản để tính điểm liên quan giữa truy vấn và tài liệu.
+\end{enumerate}
+
+\textbf{Cơ chế kết hợp và tương tác}
+
+Sự kết hợp giữa mô hình sinh và hệ thống truy xuất trong RAG có thể được thực hiện theo nhiều cách khác nhau:
+
+\begin{enumerate}
+  \item \textbf{RAG-Sequence}: Mô hình truy xuất k tài liệu và sử dụng cùng một tập tài liệu để sinh toàn bộ chuỗi đầu ra. Xác suất của câu trả lời được tính bằng cách marginalize trên tất cả các tài liệu được truy xuất (Lewis et al., 2020).
+
+  \item \textbf{RAG-Token}: Mô hình có thể sử dụng các tài liệu khác nhau cho mỗi token được sinh ra. Điều này cho phép linh hoạt hơn trong việc tích hợp thông tin từ nhiều nguồn khác nhau cho các phần khác nhau của câu trả lời (Lewis et al., 2020).
+\end{enumerate}
+
+\textbf{Hybrid Search - Tìm kiếm kết hợp}
+Các hệ thống RAG hiện đại thường sử dụng phương pháp hybrid search kết hợp cả dense retrieval (tìm kiếm vector) và sparse retrieval (BM25) để cải thiện độ chính xác truy xuất (Sarma et al., 2025). Nghiên cứu cho thấy việc kết hợp hai phương pháp này giúp tận dụng ưu điểm của cả tìm kiếm ngữ nghĩa (semantic search) và tìm kiếm từ khóa chính xác (exact keyword matching).
+
+Trong thực nghiệm trên hệ thống SymptoTrackAI, phương pháp hybrid search kết hợp FAISS (Facebook AI Similarity Search) cho tìm kiếm vector và BM25 cho tìm kiếm từ khóa đã cho thấy hiệu quả vượt trội trong việc truy xuất thông tin y tế (Mahboobi et al., 2025).
+
+\textbf{Query Expansion và Reranking}
+
+Để cải thiện chất lượng truy xuất, các hệ thống RAG tiên tiến thường tích hợp các kỹ thuật query expansion (mở rộng truy vấn) và reranking (tái xếp hạng):
+\begin{itemize}
+  \item \textbf{Query Expansion}: Sử dụng LLM để tạo ra các truy vấn mở rộng hoặc các câu hỏi giả định (hypothetical questions) giúp cải thiện độ chính xác truy xuất (Fan et al., 2024).
+
+  \item \textbf{Reranking}: Sau khi truy xuất ban đầu, một mô hình reranker chuyên dụng đánh giá lại mức độ liên quan của các tài liệu được truy xuất và sắp xếp lại thứ tự để đưa các tài liệu có giá trị nhất lên đầu (Jian et al., 2024).
+\end{itemize}
+
+Nghiên cứu của Kumar et al. (2024) cho thấy việc sử dụng NV-RerankQA-Mistral-4B-v3 làm mô hình reranking đạt được sự gia tăng độ chính xác đáng kể khoảng ~14\% so với các pipeline sử dụng reranker khác.
+
+\textbf{Multi-Hop Reasoning}
+
+Đối với các câu hỏi phức tạp đòi hỏi suy luận đa bước, các hệ thống RAG tiên tiến sử dụng cơ chế multi-hop retrieval. Nghiên cứu về MultiHop-RAG của Abu-Salih et al. (2024) cho thấy việc truy xuất và suy luận trên nhiều phần bằng chứng hỗ trợ giúp cải thiện đáng kể khả năng trả lời các câu hỏi đa bước.
+
+HopRAG, một framework được đề xuất bởi Liu et al. (2025), sử dụng khả năng multi-hop reasoning để đạt được độ chính xác câu trả lời cao hơn 76,78\% và điểm F1 truy xuất cao hơn 65,07\% so với các phương pháp thông thường.
+
+\subsection{Vector Database trong kiến trúc tổng thể}
+
+Vector database (cơ sở dữ liệu vector) đóng vai trò then chốt trong kiến trúc RAG, đóng vai trò là nền tảng để lưu trữ và truy xuất hiệu quả các embedding vector biểu diễn tri thức từ tài liệu.
+
+\subsubsection{\textbf{Vai trò của Vector Database trong RAG}}
+
+Vector database là một hệ thống lưu trữ chuyên biệt được tối ưu hóa để lưu trữ, quản lý và truy vấn dữ liệu dưới dạng vector nhiều chiều (high-dimensional vectors). Trong ngữ cảnh RAG, vector database đóng vai trò quan trọng:
+
+\begin{itemize}
+  \item \textbf{Lưu trữ embedding}: Lưu trữ các biểu diễn vector của các đoạn văn bản (text chunks) từ cơ sở tri thức
+  \item \textbf{Tìm kiếm tương tự nhanh}: Thực hiện tìm kiếm nearest neighbor để tìm các vector gần nhất với query vector
+  \item \textbf{Khả năng mở rộng}: Xử lý hiệu quả các tập dữ liệu lớn với hàng triệu hoặc hàng tỷ vector
+  \item \textbf{Cập nhật động}: Cho phép thêm, cập nhật hoặc xóa dữ liệu mà không cần xây dựng lại toàn bộ chỉ mục
+\end{itemize}
+
+Theo nghiên cứu của Brucato et al. (2024), vector database là building block quan trọng cho RAG, đảm bảo khả năng truy xuất embedding nhiều chiều một cách hiệu quả để đảm bảo tính liên quan và độ chính xác cho các ứng dụng generative AI. Các vector database có thể được phân loại thành bốn nhóm chính dựa trên kiến trúc và mục đích sử dụng:
+\begin{enumerate}
+  \item \textbf{Lightweight và Local Solutions}: Như FAISS (Facebook AI Similarity Search), thích hợp cho nghiên cứu và prototype với khả năng triển khai nhanh chóng trên máy cục bộ.
+
+  \item \textbf{Open-source và Distributed Platforms}: Như Milvus, cung cấp khả năng mở rộng cao và phân tán, thích hợp cho các ứng dụng quy mô lớn.
+
+  \item \textbf{Cloud-native và Commercial Services}: Như Pinecone, cung cấp giải pháp quản lý hoàn toàn (fully managed) trên đám mây với khả năng mở rộng tự động.
+
+  \item \textbf{Semantic/Contextual Search-oriented Systems}: Như Weaviate, tối ưu hóa cho tìm kiếm ngữ nghĩa và ngữ cảnh với các tính năng AI tích hợp.
+\end{enumerate}
+
+Để chuyển đổi văn bản thành vector, RAG sử dụng các mô hình embedding chuyên biệt. Các mô hình phổ biến bao gồm:
+
+\begin{enumerate}
+  \item \textbf{Sentence Transformers}: Họ các mô hình BERT được fine-tune đặc biệt để tạo ra sentence embeddings có ý nghĩa ngữ nghĩa, cho phép so sánh độ tương tự giữa các câu và đoạn văn (Reimers \& Gurevych, 2019).
+
+  \item \textbf{OpenAI Embeddings}: Như text-embedding-ada-002, tạo ra các biểu diễn nhiều chiều cao nắm bắt ý nghĩa ngữ nghĩa sâu sắc (Pathak et al., 2025).
+
+  \item \textbf{Multilingual Embeddings}: Như Cohere's embed-multilingual-v3.0 và multilingual-E5, hỗ trợ nhiều ngôn ngữ khác nhau, đặc biệt hữu ích cho các ứng dụng đa ngôn ngữ (Elshaboury et al., 2025).
+\end{enumerate}
+
+Vector database sử dụng các phép đo khoảng cách để xác định độ tương tự giữa các vector:
+
+\begin{enumerate}
+  \item \textbf{Cosine Similarity}: Đo góc giữa hai vector, phổ biến nhất trong tìm kiếm ngữ nghĩa vì không bị ảnh hưởng bởi độ dài vector.
+
+  \item \textbf{Euclidean Distance}: Đo khoảng cách thẳng trong không gian Euclidean.
+
+  \item \textbf{Inner Product}: Tính tích vô hướng giữa hai vector, hữu ích khi độ lớn của vector có ý nghĩa.
+\end{enumerate}
+
+Nghiên cứu về word sense disambiguation trong tiếng Marathi cho thấy cosine similarity vượt trội trong việc xác định nghĩa đúng của từ dựa trên ngữ cảnh khi sử dụng BERT embedding (Waghmare et al., 2022).
+
+\subsubsection{\textbf{Indexing và Optimization}
+}
+Để đảm bảo hiệu suất truy vấn nhanh trên các tập dữ liệu lớn, vector database sử dụng các cấu trúc chỉ mục đặc biệt:
+
+\begin{enumerate}
+  \item \textbf{Approximate Nearest Neighbor (ANN)}: Thay vì tìm kiếm chính xác, sử dụng các thuật toán xấp xỉ như HNSW (Hierarchical Navigable Small World) để cân bằng giữa độ chính xác và tốc độ.
+
+  \item \textbf{Product Quantization}: Nén vector để giảm yêu cầu bộ nhớ trong khi vẫn duy trì độ chính xác tìm kiếm chấp nhận được.
+
+  \item \textbf{Partitioning}: Chia không gian vector thành các phần nhỏ hơn để tăng tốc tìm kiếm.
+\end{enumerate}
+
+Trong các ứng dụng doanh nghiệp, việc lựa chọn vector database phù hợp phụ thuộc vào nhiều yếu tố như quy mô dữ liệu, yêu cầu hiệu suất, và khả năng tích hợp. Sharma (2025) nhấn mạnh rằng các vector database như Pinecone, Weaviate, và Milvus cho phép lưu trữ và truy xuất hiệu quả các embedding biểu diễn dữ liệu tài chính phức tạp, trong khi các RAG framework cải thiện đáng kể độ chính xác, giảm hallucination, và duy trì tính liên quan tạm thời trong thị trường biến động nhanh.
+
+Nghiên cứu về TigerVector cho thấy việc tích hợp khả năng tìm kiếm vector vào graph database mang lại khả năng hybrid search vượt trội, đạt hiệu suất cao hơn so với các graph database khác như Neo4j và Amazon Neptune, cũng như vector database chuyên dụng như Milvus (Huang et al., 2025).
+
+\textbf{Cập nhật và bảo trì}
+
+Một ưu điểm lớn của việc sử dụng vector database trong RAG là khả năng cập nhật kiến thức một cách linh hoạt. Khi có tài liệu mới hoặc thông tin cập nhật:
+\begin{enumerate}
+  \item Tài liệu mới được xử lý và chia thành các chunks
+  \item Các chunks được chuyển đổi thành embeddings bằng mô hình embedding
+  \item Embeddings mới được thêm vào vector database
+  \item Hệ thống RAG ngay lập tức có thể truy xuất thông tin mới mà không cần huấn luyện lại LLM
+\end{enumerate}
+
+Điều này giải quyết vấn đề kiến thức lỗi thời của LLM truyền thống và cho phép các hệ thống RAG doanh nghiệp luôn cập nhật với thông tin mới nhất (Gao et al., 2023).
+
+\subsubsection{Luồng dữ liệu từ document đến response}
+
+Luồng xử lý dữ liệu trong hệ thống RAG bao gồm một chuỗi các bước được tổ chức cẩn thận, từ việc thu thập và xử lý tài liệu ban đầu đến việc tạo ra câu trả lời cuối cùng cho người dùng. Hiểu rõ luồng này là chìa khóa để tối ưu hóa hiệu suất của hệ thống RAG.
+
+\textbf{Giai đoạn 1: Document Ingestion và Preprocessing}
+
+Giai đoạn đầu tiên trong pipeline RAG là thu thập và tiền xử lý tài liệu từ nhiều nguồn khác nhau.
+
+Tài liệu có thể đến từ nhiều nguồn và định dạng khác nhau:
+\begin{itemize}
+  \item File văn bản (PDF, Word, TXT)
+  \item Trang web và HTML
+  \item Cơ sở dữ liệu cấu trúc
+  \item Email và tài liệu nội bộ
+  \item Tài liệu đa phương thức (hình ảnh, bảng biểu)
+\end{itemize}
+
+Nghiên cứu của Li et al. (2024) về advanced ingestion process cho thấy việc sử dụng LLM-powered OCR để trích xuất nội dung từ các loại tài liệu đa dạng, bao gồm cả các file có mật độ văn bản cao và các tài liệu được quét (scanned documents).
+
+Tiền xử lý là bước quan trọng để chuẩn bị dữ liệu cho các giai đoạn tiếp theo:
+
+\begin{enumerate}
+  \item \textbf{OCR (Optical Character Recognition)}: Đối với tài liệu ảnh hoặc PDF được quét, OCR được sử dụng để trích xuất văn bản. Nghiên cứu của Momen et al. (2024) cho thấy các mô hình transformer-based OCR với generative data augmentation có thể cải thiện đáng kể độ chính xác nhận dạng văn bản trong tài liệu kỹ thuật.
+
+  \item \textbf{Làm sạch văn bản (Text Cleaning)}: Loại bỏ các ký tự đặc biệt, normalize unicode, xử lý encoding issues.
+
+  \item \textbf{Phát hiện cấu trúc (Structure Detection)}: Nhận diện các thành phần cấu trúc như tiêu đề, đoạn văn, bảng biểu, danh sách. Nghiên cứu của Vathsala et al. (2025) về heading-aware chunking cho thấy việc bảo tồn cấu trúc tài liệu như directory structure và nested headings giúp cải thiện đáng kể chất lượng truy xuất.
+\end{enumerate}
+
+\textbf{Giai đoạn 2: Chunking và Text Splitting}
+
+Chunking (phân đoạn văn bản) là một trong những bước quan trọng nhất trong pipeline RAG, ảnh hưởng trực tiếp đến chất lượng truy xuất và sinh câu trả lời.
+
+Có nhiều phương pháp chunking khác nhau, mỗi phương pháp có ưu và nhược điểm riêng:
+
+\begin{enumerate}
+  \item \textbf{Fixed-size Chunking}: Chia văn bản thành các đoạn có kích thước cố định (ví dụ: 512 tokens). Đơn giản nhưng có thể cắt ngang ngữ cảnh quan trọng.
+
+  \item \textbf{Semantic Chunking}: Chia văn bản dựa trên ranh giới ngữ nghĩa như câu, đoạn văn, hoặc sections. Giữ nguyên tính toàn vẹn ngữ nghĩa nhưng có thể tạo ra các chunks có kích thước không đồng đều.
+
+  \item \textbf{Sliding Window với Overlap}: Sử dụng cửa sổ trượt với phần chồng lấp để đảm bảo không mất thông tin tại ranh giới. Nghiên cứu của Vathsala et al. (2025) đề xuất Overlap-based Heading-aware Chunking giúp bảo tồn cấu trúc tài liệu.
+
+  \item \textbf{Hierarchical Chunking}: Tạo cấu trúc phân cấp của chunks từ coarse-grained (đoạn lớn) đến fine-grained (câu chi tiết).
+\end{enumerate}
+
+Theo Yoon et al. (2025), việc lựa chọn chiến lược chunking và kích thước chunk phù hợp có tác động lớn đến hiệu suất của cả dense passage retrieval và end-to-end RAG pipeline.
+
+Việc xác định kích thước chunk tối ưu phụ thuộc vào nhiều yếu tố:
+\begin{itemize}
+  \item Độ dài ngữ cảnh của embedding model
+  \item Độ phức tạp của domain
+  \item Loại câu hỏi cần trả lời
+\end{itemize}
+
+Nghiên cứu thực nghiệm cho thấy chunk size từ 256-512 tokens thường cho kết quả tốt cho nhiều use case, nhưng cần được điều chỉnh dựa trên đặc điểm cụ thể của dữ liệu và ứng dụng (Pathak et al., 2025).
+
+Để cải thiện khả năng truy xuất, mỗi chunk thường được bổ sung với metadata và thông tin ngữ cảnh:
+\begin{itemize}
+  \item Tiêu đề document và section
+  \item Vị trí trong document
+  \item Ngày tháng và tác giả
+  \item Thẻ phân loại (tags)
+  \item Hypothetical questions mà chunk có thể trả lời
+\end{itemize}
+
+Nghiên cứu QuOTE của Yao et al. (2025) đề xuất việc augment chunks với các hypothetical questions giúp cải thiện alignment giữa document embeddings và query semantics.
+
+\textbf{Giai đoạn 3: Embedding Generation và Indexing}
+
+Sau khi chunking, các đoạn văn bản được chuyển đổi thành biểu diễn vector và lưu trữ trong vector database.
+
+Mỗi text chunk được đưa qua mô hình embedding để tạo ra vector biểu diễn:
+
+\begin{center}
+\begin{verbatim}
+text_chunk → embedding_model → dense_vector
+\end{verbatim}
+\end{center}
+
+Quá trình này sử dụng các mô hình như Sentence-BERT, OpenAI embeddings, hoặc các mô hình embedding chuyên biệt cho domain cụ thể. Nghiên cứu của Srivastava et al. (2024) về Tabular Embedding Model (TEM) cho thấy việc fine-tune embedding models cho dữ liệu bảng biểu trong RAG applications có thể cải thiện đáng kể hiệu suất.
+
+Các embeddings được index vào vector database để cho phép tìm kiếm nhanh:
+
+\begin{enumerate}
+  \item Vector embeddings được thêm vào index cùng với metadata
+  \item Cấu trúc index được tối ưu hóa (HNSW, IVF, etc.)
+  \item Kiểm tra và validation index
+\end{enumerate}
+
+Quá trình này có thể được thực hiện offline cho dữ liệu tĩnh hoặc incrementally cho dữ liệu động.
+
+\textbf{Giai đoạn 4: Query Processing và Retrieval}
+
+Khi người dùng đưa ra truy vấn, hệ thống RAG bắt đầu quá trình xử lý để tìm thông tin liên quan.
+
+Truy vấn người dùng thường cần được xử lý trước khi truy xuất:
+
+\begin{enumerate}
+  \item \textbf{Query Cleaning}: Chuẩn hóa và làm sạch truy vấn
+  \item \textbf{Query Expansion}: Mở rộng truy vấn bằng các từ đồng nghĩa hoặc khái niệm liên quan
+\end{enumerate}
+
+Truy vấn được chuyển đổi thành embedding vector sử dụng cùng mô hình embedding đã dùng cho documents:
+
+\begin{verbatim}
+text_chunk → embedding_model → dense_vector
+\end{verbatim}
+
+Vector database thực hiện tìm kiếm k-nearest neighbors để tìm các chunks có embedding gần nhất với query vector:
+
+\begin{verbatim}
+query_vector + vector_database → top_k_similar_chunks
+\end{verbatim}
+
+Các phương pháp tìm kiếm bao gồm:
+
+\textbf{Query Embedding}
+
+Truy vấn được chuyển đổi thành embedding vector sử dụng cùng mô hình embedding đã dùng cho documents:
+
+\begin{verbatim}
+user_query → embedding_model → query_vector
+\end{verbatim}
+
+\textbf{Similarity Search}
+
+Vector database thực hiện tìm kiếm k-nearest neighbors để tìm các chunks có embedding gần nhất với query vector:
+
+Các phương pháp tìm kiếm bao gồm:
+\begin{itemize}
+  \item \textbf{Dense Retrieval}: Tìm kiếm dựa trên vector similarity
+  \item \textbf{Sparse Retrieval}: Tìm kiếm từ khóa (BM25)
+  \item \textbf{Hybrid Search}: Kết hợp cả hai phương pháp
+\end{itemize}
+
+\textbf{Reranking}
+
+Các chunks được truy xuất ban đầu thường được đưa qua một mô hình reranking để cải thiện thứ tự xếp hạng. Nghiên cứu của Kumar et al. (2024) cho thấy việc sử dụng neural reranking models có thể cải thiện accuracy lên ~14\% so với không sử dụng reranking.
+
+\textbf{Giai đoạn 5: Context Augmentation và Prompt Construction}
+
+Các chunks được truy xuất được kết hợp với truy vấn người dùng để tạo ra prompt cho LLM.
+
+Các chunks được chọn từ bước reranking được chuẩn bị:
+
+\begin{enumerate}
+  \item Sắp xếp theo thứ tự liên quan hoặc logic
+  \item Format theo template phù hợp
+  \item Thêm metadata và citations
+  \item Kiểm soát độ dài context để phù hợp với context window của LLM
+\end{enumerate}
+
+Nghiên cứu của Li et al. (2024) đề xuất việc sử dụng Multimodal Assembler Agent để kết hợp thông tin từ các chunks đa phương thức một cách hiệu quả.
+
+Prompt được xây dựng theo cấu trúc:
+
+\begin{verbatim}
+[System Instructions]
+[Retrieved Context]
+[User Query]
+[Output Format Instructions]
+\end{verbatim}
+
+Các kỹ thuật prompt engineering như few-shot learning, chain-of-thought, và step-back prompting được sử dụng để cải thiện chất lượng output. Nghiên cứu của Acharya và Naik (2025) cho thấy Step Back Prompting kết hợp với RankGPT đạt được cải thiện 19.9\% về Answer Relevancy so với Naive RAG.
+
+\textbf{Giai đoạn 6: Response Generation}
+LLM sử dụng prompt đã được augment để tạo ra câu trả lời cuối cùng. LLM xử lý prompt và tạo ra response thông qua autoregressive generation:
+
+\begin{enumerate}
+  \item LLM đọc và hiểu context từ retrieved chunks
+  \item Tích hợp thông tin từ nhiều nguồn
+  \item Suy luận và tổng hợp thông tin
+  \item Tạo ra câu trả lời tự nhiên và mạch lạc
+\end{enumerate}
+
+Sau khi LLM tạo ra response, có thể có các bước hậu xử lý:
+\begin{enumerate}
+  \item \textbf{Citation Addition}: Thêm trích dẫn và tham chiếu đến source documents
+  \item \textbf{Fact-checking}: Xác minh tính chính xác của thông tin được tạo ra
+  \item \textbf{Safety Filtering}: Lọc nội dung không phù hợp hoặc không an toàn
+  \item \textbf{Format Refinement}: Định dạng output theo yêu cầu (markdown, JSON, etc.)
+\end{enumerate}
+
+Các metrics được sử dụng để đánh giá chất lượng response:
+\begin{itemize}
+  \item \textbf{Answer Relevancy}: Mức độ liên quan của câu trả lời với câu hỏi
+  \item \textbf{Faithfulness}: Mức độ trung thực với context được cung cấp
+  \item \textbf{Context Precision}: Độ chính xác của context được truy xuất
+  \item \textbf{Context Recall}: Độ đầy đủ của context liên quan
+\end{itemize}
+
+Framework RAGAS cung cấp các metrics chuẩn để đánh giá các khía cạnh này của hệ thống RAG (Acharya \& Naik, 2025).
+
+\textbf{Giai đoạn 7: Continuous Learning và Optimization}
+
+Hệ thống RAG không ngừng được cải thiện thông qua feedback loop:
+
+\begin{enumerate}
+  \item \textbf{User Feedback Collection}: Thu thập phản hồi từ người dùng về chất lượng câu trả lời
+  \item \textbf{Performance Monitoring}: Theo dõi các metrics hiệu suất
+  \item \textbf{Index Update}: Cập nhật vector database với documents mới
+  \item \textbf{Model Fine-tuning}: Fine-tune retriever hoặc generator dựa trên feedback
+\end{enumerate}
+
+Nghiên cứu của Seo et al. (2024) về RaFe (Ranking Feedback Improves Query Rewriting) cho thấy việc sử dụng feedback từ reranker để cải thiện query rewriting mà không cần annotations giúp nâng cao hiệu suất RAG đáng kể.
+
+Tổng hợp lại, luồng dữ liệu hoàn chỉnh từ document đến response trong RAG có thể được mô tả như sau:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{chapter_3/rag_achitecture.png}
+  \caption{Luồng xử lý hoàn chỉnh trong RAG}\label{fig:rag_flow}
+\end{figure}
+
+Sự phối hợp mượt mà giữa các giai đoạn này là chìa khóa để xây dựng một hệ thống RAG hiệu quả, chính xác và đáng tin cậy cho các ứng dụng thực tế.
+\end{document}

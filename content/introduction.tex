@@ -1,0 +1,44 @@
+\chapter*{Mở Đầu}
+\addcontentsline{toc}{chapter}{Mở Đầu}
+
+\section*{Lý do chọn đề tài}
+Trong bối cảnh chuyển đổi số diễn ra mạnh mẽ, hệ thống ERP (Enterprise Resource Planning) trở thành hạ tầng trọng yếu giúp doanh nghiệp chuẩn hoá quy trình, thống nhất dữ liệu và nâng cao năng lực ra quyết định. Trong kiến trúc ERP, phân hệ kế toán giữ vai trò “xương sống dữ liệu tài chính”, tiếp nhận phát sinh từ các phân hệ bán hàng (Sales/AR), mua hàng (Procurement/AP), kho (Inventory/COGS), tài sản cố định (Fixed Assets), tiền mặt–ngân hàng (Cash/Bank), để tổng hợp vào Sổ cái (General Ledger—GL) và lập báo cáo tài chính.
+
+Tuy nhiên, ở thực tiễn vận hành, tra cứu chế độ kế toán, diễn giải nghiệp vụ, và hướng dẫn định khoản vẫn đang dựa nhiều vào tài liệu rời rạc (thông tư, quy trình nội bộ, biểu mẫu), công cụ tìm kiếm từ khoá và kinh nghiệm cá nhân. Điều này dẫn đến: (i) mất thời gian tìm kiếm, (ii) rủi ro diễn giải sai quy định, (iii) khó truy vết nguồn gốc câu trả lời, (iv) thiếu nhất quán giữa các bộ phận. Bên cạnh đó, các trợ giúp truyền thống (FAQ tĩnh, chatbot kịch bản) thường khó cập nhật tri thức và không giải thích theo bối cảnh dữ liệu doanh nghiệp.
+
+Sự phát triển của mô hình ngôn ngữ lớn (LLM) và kỹ thuật RAG (Retrieval-Augmented Generation) mở ra cơ hội xây dựng trợ lý AI có khả năng trả lời theo ngữ cảnh, dẫn nguồn rõ ràng, và gợi ý thao tác phù hợp trong ERP. Đặc biệt với lĩnh vực kế toán—nơi yêu cầu tính đúng đắn, khả năng kiểm tra, truy vết và tuân thủ quy định—một kiến trúc AI dựa trên truy hồi tri thức đáng tin cậy là rất cần thiết.
+
+\section*{Mục tiêu đề tài}
+Mục tiêu chính của đề tài là xây dựng một hệ thống ERP kế toán tích hợp AI với công nghệ RAG, nhằm cung cấp giao diện kép (UI truyền thống và chatbot ngôn ngữ tự nhiên) để hỗ trợ quản lý kế toán hiệu quả, tuân thủ quy định Việt Nam.
+Cụ thể:
+\begin{itemize}
+  \item \textbf{Mục tiêu ngắn hạn:} Phát triển nền tảng ERP cốt lõi với phân hệ kế toán (quản lý công nợ, báo cáo tài chính, hóa đơn điện tử) và chatbot RAG cơ bản để truy vấn dữ liệu, giảm thời gian truy vấn lên đến 60\%.
+  \item \textbf{Mục tiêu dài hạn:} Tích hợp RAG nâng cao để hỗ trợ phân tích đa mô-đun, hội thoại đa lượt và tự động hóa đóng kỳ kế toán, đạt độ chính xác ≥99\% trên bộ kiểm thử và tuân thủ Thông Tư 200/2014/TT-BTC. Đề tài nhằm giảm thời gian đào tạo nhân viên, nâng cao insights chiến lược và hỗ trợ doanh nghiệp Việt Nam cạnh tranh toàn cầu.
+\end{itemize}
+
+\section*{Đối tượng nghiên cứu}
+Đối tượng nghiên cứu chính là phân hệ kế toán trong hệ thống ERP, tập trung vào tích hợp AI RAG để xử lý dữ liệu tài chính (hóa đơn, công nợ, báo cáo). Cụ thể bao gồm:
+\begin{itemize}
+  \item \textbf{Nghiệp vụ kế toán doanh nghiệp:} Kế toán tài chính, công nợ, tiền mặt/ngân hàng và báo cáo theo chuẩn Việt Nam.
+  \item \textbf{Công nghệ RAG:} Indexing dữ liệu bằng vector database (FAISS/Pinecone/Supabase Vector), truy vấn và sinh câu trả lời dựa trên LLM (GPT/Claude).
+  \item \textbf{Đối tượng người dùng:} Nhân viên kế toán, quản lý tài chính và CFO tại doanh nghiệp Việt Nam, đặc biệt SMEs.
+\end{itemize}
+
+\section*{Phương pháp nghiên cứu}
+Đề tài sử dụng phương pháp kết hợp lý thuyết và thực hành, dựa trên mô hình nghiên cứu hành động (action research) để phát triển và kiểm chứng hệ thống.
+\begin{itemize}
+  \item \textbf{Phương pháp lý thuyết:} Tìm hiểu tài liệu về nghiệp vụ kế toán (theo Thông Tư 200/2014/TT-BTC), cơ sở dữ liệu PostgreSQL, công cụ BI (Metabase/Power BI) và công nghệ RAG qua phân tích tài liệu từ các nguồn uy tín.
+  \item \textbf{Phương pháp thực hành:} Thiết kế cơ sở dữ liệu cho phân hệ kế toán, xây dựng backend (Spring Boot), frontend (ReactJS) và tích hợp chatbot RAG; kiểm tra qua demo và pilot với 5-10 người dùng.
+  \item \textbf{Phương pháp đánh giá:} Sử dụng chỉ số groundedness ≥0.80 và correctness ≥0.75 qua bộ kiểm thử 100+ truy vấn, kết hợp phản hồi người dùng (CSAT ≥4.0/5.0). Phương pháp này đảm bảo tính khả thi và ứng dụng thực tiễn.
+\end{itemize}
+
+\section*{Cấu trúc đề tài}
+Đề tài được tổ chức thành các phần chính sau:
+\begin{itemize}
+  \item Chương 1: Tổng quan
+  \item Chương 2: Cơ sở lý thuyết
+  \item Chương 3: Tổng quan mô hình RAG và kiến trúc mô hình
+  \item Chương 4: Phân tích và thiết kế hệ thống
+  \item Chương 5: Phát triển ứng dụng
+  \item Chương 6: Kết luận và hướng phát triển
+\end{itemize}

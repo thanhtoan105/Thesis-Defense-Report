@@ -1,0 +1,66 @@
+\documentclass[13pt]{report}
+
+\usepackage{ptit-report-template}
+\usepackage{multicol}
+\addbibresource{\subfix{references.bib}}
+% Optional: graphic path
+\graphicspath{{images/}}
+
+% Define course name, report name and report title.
+% \newcommand{\supervisorname}{Ths.Nguyễn Trung Hiếu}
+% \newcommand{\studentnameone}{Dương Thanh Toàn - N21DCCN085}
+% \newcommand{\studentnametwo}{Vũ Đức Toàn - N21DCVT105}
+% \newcommand{\classname}{E21CQCNTT01-N}
+% \newcommand{\coursename}{2021-2026}
+% \newcommand{\majorname}{Công Nghệ Thông Tin}
+% \newcommand{\programtype}{Đại học Chính quy - Chương Trình Chất Lượng Cao}
+% \newcommand{\reporttitle}{Xây dựng ứng dụng AI hỗ trợ phân hệ kế toán trong hệ thống ERP}
+
+\input{content/abbreviation}
+\selectlanguage{vietnamese}
+
+% ============ DOCUMENT ============
+\begin{document}
+
+\pagenumbering{roman}
+% \input{content/title}
+% \input{content/title} % Inner title page
+\stopborder
+
+% - chơi ăn gian -
+\includepdf[pages=1-2]{cover.pdf}
+\addtocounter{page}{-2} % Trừ đi 2 vì includepdf đã tự động tăng
+% -----------------------
+\pagestyle{noheader}
+\input{content/acknowlegement}
+
+\tableofcontents
+\pagebreak
+\include{content/list_of_symbols_abberivation}
+\pagebreak
+\listoftables
+\pagebreak
+\listoffigures
+\pagebreak
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ============ CONTENT ============
+\include{content/introduction}
+
+\subfile{content/chapters/chapter_1}
+\subfile{content/chapters/chapter_2}
+\subfile{content/chapters/chapter_3}
+\subfile{content/chapters/chapter_4}
+\subfile{content/chapters/chapter_5}
+\subfile{content/chapters/chapter_6}
+
+\pagebreak
+
+\printbibliography[heading=bibliography]
+% Appendix
+\appendix
+\cleardoublepage
+\input{content/appendix}
+\end{document}

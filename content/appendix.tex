@@ -1,0 +1,127 @@
+\chapter*{Phụ Lục}
+\addcontentsline{toc}{chapter}{Phụ Lục}
+% Work Assignment Table
+\section*{Phụ Lục A: Bảng phân công công việc}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{0.04\textwidth}|p{0.18\textwidth}|p{0.32\textwidth}|p{0.15\textwidth}|p{0.25\textwidth}|}
+  \hline
+  \textbf{STT} & \textbf{Hạng mục công việc} & \textbf{Chi tiết nhiệm vụ cụ thể} & \textbf{Người thực hiện} & \textbf{Sản phẩm bàn giao} \\
+  \hline
+  \endfirsthead
+
+  \hline
+  \textbf{STT} & \textbf{Hạng mục công việc} & \textbf{Chi tiết nhiệm vụ cụ thể} & \textbf{Người thực hiện} & \textbf{Sản phẩm bàn giao} \\
+  \hline
+  \endhead
+
+  \hline
+  \endfoot
+
+  \multicolumn{5}{|c|}{\textbf{I. NGHIÊN CỨU LÝ THUYẾT}} \\
+  \hline
+
+  1 & Nghiệp vụ Kế toán \& Báo cáo &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Tìm hiểu nghiệp vụ Kế toán tài chính, Kế toán công nợ, Tiền mặt/Ngân hàng
+    \item Nghiên cứu cấu trúc Báo cáo tài chính (Bảng cân đối kế toán, KQKD, Lưu chuyển tiền tệ)
+  \end{itemize} &
+  Vũ Đức Toàn &
+  Báo cáo về lý thuyết kế toán \\
+  \hline
+
+  2 & Cơ sở dữ liệu \& Công nghệ AI/BI &
+  \begin{itemize}
+    \item Tìm hiểu PostgreSQL quản lý dữ liệu lớn
+    \item Nghiên cứu AI Chatbot với công nghệ RAG (Indexing, Retrieval, Generation)
+    \item Tìm hiểu công cụ BI (Metabase/Power BI)
+  \end{itemize} &
+  Dương Thanh Toàn &
+  Tài liệu thiết kế kiến trúc hệ thống \& AI \\
+  \hline
+
+  \multicolumn{5}{|c|}{\textbf{II. NGHIÊN CỨU THỰC HÀNH (TRIỂN KHAI)}} \\
+  \hline
+
+  3 & Thiết kế Cơ sở dữ liệu (PostgreSQL) &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Thiết kế Schema các bảng lõi: General Ledger (Sổ cái), Voucher (Chứng từ)
+    \item Thiết kế các bảng nghiệp vụ: Invoices (Hóa đơn), AR/AP (Công nợ), Receipts/Payments (Thu/Chi)
+  \end{itemize} &
+  Dương Thanh Toàn &
+  File SQL Script khởi tạo Database \& ERD Diagram \\
+  \hline
+
+  4 & Phát triển Backend (Core Kế toán) &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Xây dựng API ghi nhận giao dịch (Transaction Recording)
+    \item Viết logic tính toán công nợ tự động
+    \item Xử lý logic sinh chứng từ và ghi sổ cái (Posting Engine)
+  \end{itemize} &
+  Dương Thanh Toàn &
+  Source code Backend (Controllers, Services, Repositories) \\
+  \hline
+
+  5 & Phát triển Frontend (Giao diện) &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Xây dựng giao diện nhập liệu chứng từ (Voucher Entry UI)
+    \item Giao diện danh sách \& theo dõi công nợ (AR/AP Tracking UI)
+    \item Giao diện xem báo cáo động
+  \end{itemize} &
+  Cả hai thành viên &
+  Source code Frontend (ReactJS Components) \\
+  \hline
+
+  6 & Xây dựng Báo cáo Tài chính &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Lập trình xuất Bảng cân đối kế toán, Báo cáo KQKD từ dữ liệu Sổ cái
+    \item Tính năng kết xuất ra file Excel/PDF đúng mẫu quy định
+  \end{itemize} &
+  Dương Thanh Toàn &
+  Module Báo cáo (Reporting Service) \\
+  \hline
+
+  7 & Tích hợp BI Dashboard &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Kết nối Metabase/Power BI với PostgreSQL
+    \item Xây dựng các biểu đồ: Doanh thu, Chi phí, Dòng tiền, Aging Report (Tuổi nợ)
+    \item Nhúng (Embed) Dashboard vào ứng dụng Frontend
+  \end{itemize} &
+  Vũ Đức Toàn &
+  Dashboard quản trị trực quan \\
+  \hline
+
+  8 & Triển khai AI Chatbot (RAG) &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Indexing Pipeline: Xây dựng luồng vector hóa dữ liệu hóa đơn, công nợ, báo cáo
+    \item Vector DB: Tích hợp Pinecone/FAISS để lưu trữ Embeddings
+    \item Chatbot UI: Xây dựng giao diện chat, xử lý luồng hỏi đáp (Truy vấn $\rightarrow$ Truy xuất $\rightarrow$ Sinh câu trả lời)
+  \end{itemize} &
+  Dương Thanh Toàn &
+  Module AI Chatbot hoạt động \& Video demo \\
+  \hline
+
+  \multicolumn{5}{|c|}{\textbf{III. TỔNG HỢP \& BÁO CÁO}} \\
+  \hline
+
+  9 & Kiểm thử \& Đóng gói &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Kiểm thử luồng nghiệp vụ (UAT)
+    \item Đóng gói ứng dụng (Dockerize) và viết hướng dẫn cài đặt
+  \end{itemize} &
+  Dương Thanh Toàn &
+  Bộ source code hoàn chỉnh \& File Docker Compose \\
+  \hline
+
+  10 & Viết Báo cáo Tổng kết &
+  \begin{itemize}[leftmargin=*,nosep,topsep=0pt]
+    \item Tổng hợp các phần Lý thuyết \& Thực hành đã làm
+    \item Viết báo cáo khóa luận theo mẫu nhà trường
+  \end{itemize} &
+  Cả 2 thành viên  &
+  Quyển báo cáo đồ án tốt nghiệp \\
+  \hline
+\end{longtable}
+
+\section*{Phụ Lục B\@: Tài nguyên và liên kết dự án}
+\textbf{GitHub Repository:} \href{https://github.com/thanhtoan105/Accounting\_ERP\_Chatbot.git}{thanhtoan105/Accounting\_ERP\_Chatbot}

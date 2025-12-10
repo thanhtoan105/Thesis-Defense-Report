@@ -1,0 +1,400 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+
+\chapter{CƠ SỞ LÝ THUYẾT}
+\stopborder
+
+\section{Tổng quan về hệ thống ERP và phân hệ kế toán}
+\subsection{Khái niệm về ERP, vai trò tích hợp quy trình}
+ERP (Enterprise Resource Planning) - Hệ thống Hoạch định Nguồn lực Doanh nghiệp - là một nền tảng thông tin tích hợp toàn diện, có chức năng điều phối và quản lý tập trung các nguồn lực tổ chức, từ tài chính, nhân lực đến sản xuất và quản trị chuỗi cung ứng. Từ góc độ học thuật, ERP vượt xa khái niệm một công cụ công nghệ thông thường; nó đại diện cho một chiến lược quản trị tổng thể. Thông qua ERP, các doanh nghiệp có khả năng hợp nhất thông tin từ nhiều phòng ban khác nhau, từ đó khắc phục vấn đề dữ liệu bị chia cắt và nâng cao hiệu quả hoạt động. Xét về nguồn gốc lịch sử, ERP xuất phát từ hệ thống MRP (Material Requirements Planning) ra đời vào thập kỷ 1960, sau đó tiến hóa thành cấu trúc ERP đương đại vào đầu thập niên 1990, với trọng tâm là tích hợp dữ liệu tức thời phục vụ cho việc đưa ra quyếttt địnhhhhhh.
+
+Chức năng cốt lõi của ERP được thể hiện thông qua việc tích hợp và tiêu chuẩn hóa các quy trình kinh doanh thiết yếu của tổ chức.
+
+Các quy trình này bao gồm, nhưng không giới hạn ở:
+\begin{itemize}
+  \item \textbf{Quản trị mua hàng (Procurement):} Quản lý quy trình từ yêu cầu mua hàng đến thanh toán (Procure-to-Pay), theo dõi hợp đồng nhà cung cấp, và liên kết với phân hệ quản lý kho để đảm bảo tính sẵn có của vật tư.
+  \item \textbf{Quản trị bán hàng (Sales):} Xử lý vòng đời đơn hàng (Order-to-Cash), tích hợp dữ liệu quản lý quan hệ khách hàng (CRM) và tự động hạch toán doanh thu vào sổ cái tài chính.
+  \item \textbf{Quản lý tồn kho (Inventory Management):} Giám sát mức tồn kho theo thời gian thực, hỗ trợ dự báo nhu cầu và tối ưu hóa chuỗi cung ứng nhằm giảm thiểu chi phí lưu kho và đảm bảo hoạt động sản xuất, kinh doanh liên tục.
+  \item \textbf{Quản trị tài chính (Finance):} Đóng vai trò là trụ cột tích hợp, tổng hợp dữ liệu tài chính từ mọi quy trình nghiệp vụ để lập báo cáo tài chính, quản lý dòng tiền và đảm bảo tuân thủ các quy định pháp lý.
+\end{itemize}
+Lợi ích then chốt của kiến trúc tích hợp này là việc tự động hóa và chuẩn hóa luồng công việc. Các nghiên cứu đã chỉ ra rằng ERP có thể giảm đáng kể thời gian xử lý dữ liệu thủ công, với tỷ lệ ước tính từ 50\% đến 70\%, đồng thời nâng cao tính chính xác và toàn vẹn của thông tin thông qua một cơ sở dữ liệu tập trung. Ví dụ minh họa, trong một doanh nghiệp sản xuất, dữ liệu từ phân hệ mua hàng (như nhận vật tư) có thể tự động cập nhật trạng thái kho và kích hoạt bút toán nợ phải trả trong phân hệ tài chính, loại bỏ độ trễ và sai sót do nhập liệu kép. Hơn nữa, các nghiên cứu gần đây (ví dụ, các công bố trên ScienceDirect) cũng nhấn mạnh vai trò của ERP như một nền tảng thúc đẩy chuyển đổi số, đặc biệt khi tích hợp với công nghệ trí tuệ nhân tạo (AI) để tăng cường khả năng phân tích và dự báo. \par
+Hình \ref{fig:Quy trình ERP} dưới đây minh họa kiến trúc tổng quan của một hệ thống ERP, mô tả sự liên kết giữa các phân hệ (modules) nghiệp vụ chính và vai trò của cơ sở dữ liệu trung tâm trong việc tích hợp thông tin.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_2/ERP.png}
+  \caption{Quy trình ERP}\label{fig:Quy trình ERP}
+\end{figure}
+\subsection{Chức năng, vai trò và vị trí của phân hệ kế toán trong một hệ thống ERP tổng thể.}
+Phân hệ kế toán (Accounting Module) được xem là trụ cột (backbone) và là phân hệ lõi trong kiến trúc ERP tổng thể. Vai trò trung tâm của phân hệ này là tiếp nhận, xử lý, tổng hợp và hợp nhất toàn bộ dữ liệu tài chính phát sinh từ các phân hệ nghiệp vụ khác (như bán hàng, mua hàng, kho, sản xuất). Chức năng cốt lõi của nó là đảm bảo tính toàn vẹn, nhất quán của dữ liệu và sự tuân thủ các chuẩn mực kế toán hiện hành (ví dụ: IFRS hoặc Chuẩn mực Kế toán Việt Nam - VAS).\par
+Đặc tính quan trọng nhất của phân hệ kế toán là tính tích hợp chặt chẽ. Phân hệ này không hoạt động biệt lập mà liên kết trực tiếp với các phân hệ khác như Quản trị Bán hàng (Sales), Quản trị Mua hàng (Purchase) và Quản lý Tồn kho (Inventory) để tạo thành một dòng chảy dữ liệu đồng bộ và tự động. \par
+Sự tích hợp liên phân hệ này được thể hiện qua các luồng dữ liệu nghiệp vụ (business data flows) tự động như sau:
+\begin{itemize}
+  \item \textbf{Từ Bán hàng đến Kế toán Phải thu (Sales $\to$ Accounts Receivable - AR):} Khi một giao dịch bán hàng (ví dụ: xuất hóa đơn) được hoàn tất tại phân hệ Sales, hệ thống sẽ tự động kích hoạt một bút toán ghi nhận doanh thu và công nợ phải thu (AR) trong phân hệ kế toán. Dữ liệu này đồng thời cập nhật sổ cái tổng hợp và sổ chi tiết công nợ khách hàng mà không cần can thiệp thủ công.
+  \item \textbf{Từ Mua hàng đến Kế toán Phải trả (Purchase $\to$ Accounts Payable - AP):} Tương tự, khi phân hệ Mua hàng xác nhận việc nhận hàng hoặc tiếp nhận hóa đơn từ nhà cung cấp (quy trình Procure-to-Pay), thông tin này được chuyển tiếp để hạch toán công nợ phải trả (AP), ghi nhận chi phí hoặc giá trị hàng tồn kho, và hỗ trợ lập kế hoạch thanh toán.
+  \item \textbf{Từ Quản lý kho đến Sổ cái (Inventory $\to$ General Ledger/COGS):}Mọi biến động hàng tồn kho (như xuất kho bán hàng, nhập kho thành phẩm) tại phân hệ Inventory sẽ tự động kích hoạt các bút toán hạch toán giá trị tồn kho và tính toán Giá vốn hàng bán (COGS) tương ứng trong phân hệ kế toán. Sự tích hợp này đảm bảo rằng báo cáo tài chính luôn phản ánh chính xác giá trị tài sản và chi phí.
+\end{itemize}
+Các luồng dữ liệu tự động này đảm bảo rằng mọi giao dịch kinh tế phát sinh đều được ghi nhận theo thời gian thực (real-time). Điều này giúp loại bỏ rủi ro sai sót và độ trễ do nhập liệu thủ công, đồng thời cung cấp dữ liệu tức thời, đáng tin cậy cho công tác phân tích tài chính và quản trị. Như nhiều nghiên cứu đã chỉ ra, mức độ tích hợp sâu giữa các phân hệ là yếu tố then chốt giúp ERP tối ưu hóa quy trình vận hành.
+\subsection{Các Yêu cầu Cốt lõi của Phân hệ Kế toán trong ERP}
+Để đảm bảo tính toàn vẹn dữ liệu (data integrity) và tuân thủ các quy định pháp lý, một phân hệ kế toán trong hệ thống ERP bắt buộc phải đáp ứng các yêu cầu nghiệp vụ và kỹ thuật cốt lõi sau:
+\begin{itemize}
+  \item \textbf{Kiểm soát nội bộ (Internal Control):} Hệ thống phải tích hợp các cơ chế kiểm soát và quy trình phê duyệt (approval workflows) để ngăn chặn các hành vi gian lận hoặc sai sót trọng yếu. Điều này bao gồm việc triển khai cơ chế Phân quyền dựa trên vai trò (RBAC - Role-Based Access Control) và các quy tắc kiểm tra đối ứng (ví dụ: Nợ/Có phải cân bằng). Yêu cầu này là nền tảng để doanh nghiệp giảm thiểu rủi ro tài chính và tuân thủ các khung pháp lý như Đạo luật Sarbanes-Oxley (SOX) hoặc các quy định cụ thể như Thông tư 200/2014/TT-BTC tại Việt Nam.
+  \item \textbf{Quản lý kỳ và Khóa sổ (Period Management and Closing):} Phân hệ phải cung cấp chức năng cho phép mở và đóng các kỳ kế toán (tháng, quý, năm) một cách có kiểm soát. Quá trình khóa sổ bao gồm các bút toán kết chuyển (closing entries) chi phí, doanh thu để xác định lợi nhuận. Quan trọng nhất, sau khi một kỳ đã được khóa, hệ thống phải ngăn chặn mọi hành vi sửa đổi hoặc xóa dữ liệu thuộc kỳ đó, đảm bảo \textbf{tính bất biến (immutability)} của sổ sách kế toán.
+  \item \textbf{Dấu vết kiểm toán (Audit Trail):} Hệ thống bắt buộc phải duy trì một nhật ký kiểm toán chi tiết, ghi lại toàn bộ lịch sử thay đổi trên các giao dịch và dữ liệu chủ (master data). Nhật ký này phải bao gồm thông tin về người thực hiện, thời gian thay đổi, và nội dung dữ liệu trước và sau khi thay đổi. Tính năng này đóng vai trò sống còn trong công tác kiểm toán nội bộ và độc lập, cho phép truy vết và xác minh tính minh bạch của dữ liệu.
+\end{itemize}
+Việc đáp ứng các yêu cầu trên đảm bảo phân hệ kế toán ERP không chỉ là một công cụ vận hành hiệu quả mà còn là một hệ thống kiểm soát an toàn và đáng tin cậy, tạo nền tảng vững chắc cho việc tích hợp các công nghệ tiên tiến như AI trong tương lai.
+\section{Nguyên lý Kế toán Tài chính }
+Kế toán tài chính tại Việt Nam được điều chỉnh bởi một hệ thống các nguyên tắc và quy định, chủ chốt là các Chuẩn mực Kế toán Việt Nam (VAS) và Thông tư 200/2014/TT-BTC (TT200) \autocite[2]{phuThongTu200}. Các quy định này thiết lập khuôn khổ pháp lý nhằm đảm bảo Báo cáo Tài chính (BCTC) được trình bày một cách minh bạch, chính xác và đáng tin cậy. Nội dung dưới đây sẽ hệ thống hóa các nguyên tắc kế toán cơ bản, phương pháp hạch toán kép, và cấu trúc hệ thống tài khoản (COA) – vốn là những trụ cột logic được tích hợp trong các phân hệ kế toán ERP.
+\subsection{Nguyên tắc Kế toán Cơ bản}
+VAS và TT200 quy định bảy nguyên tắc kế toán cơ bản, đóng vai trò là kim chỉ nam cho việc ghi nhận, đo lường và trình bày thông tin tài chính, nhằm đảm bảo tính nhất quán và phù hợp của thông tin. Các nguyên tắc chính bao gồm:
+\begin{itemize}
+  \item \textbf{Nguyên tắc dồn tích (Accrual Basis):} Mọi nghiệp vụ kinh tế liên quan đến tài sản, nợ phải trả, vốn chủ sở hữu, doanh thu, chi phí phải được ghi nhận vào thời điểm phát sinh, không căn cứ vào thời điểm thực tế thu hoặc chi tiền. Ví dụ, doanh thu được ghi nhận khi chuyển giao quyền sở hữu hàng hóa hoặc hoàn thành dịch vụ, bất kể đã thu tiền hay chưa. Nguyên tắc này phản ánh trung thực tình hình tài chính của doanh nghiệp, thay vì chỉ tập trung vào biến động dòng tiền.
+  \item \textbf{Nguyên tắc nhất quán (Consistency):} Các chính sách và phương pháp kế toán mà doanh nghiệp đã lựa chọn phải được áp dụng thống nhất trong ít nhất một kỳ kế toán năm. Bất kỳ sự thay đổi nào (nếu có) đều phải được thuyết minh rõ ràng trong BCTC. Điều này đảm bảo \textbf{tính khả dụng so sánh} của thông tin tài chính giữa các kỳ.
+  \item \textbf{Nguyên tắc thận trọng (Prudence):} Nguyên tắc này yêu cầu kế toán viên xem xét, cân nhắc và đưa ra các phán đoán cần thiết để lập các khoản dự phòng. Thận trọng là việc không đánh giá cao hơn giá trị của các tài sản và các khoản thu nhập, cũng như không đánh giá thấp hơn giá trị của các khoản nợ phải trả và chi phí. Ví dụ điển hình là việc trích lập dự phòng nợ phải thu khó đòi, nhằm tránh việc ghi nhận quá cao giá trị tài sản và lợi nhuận.
+  \item \textbf{Nguyên tắc trọng yếu (Materiality):} Thông tin được coi là trọng yếu nếu việc thiếu hụt hoặc sai sót của nó có thể làm ảnh hưởng đến quyết định kinh tế của người sử dụng BCTC. Kế toán được phép tổng hợp các khoản mục có giá trị nhỏ, không trọng yếu hoặc có tính chất tương đồng để đơn giản hóa việc trình bày báo cáo, miễn là tuân thủ các quy định chung.
+\end{itemize}
+\subsection{Phương pháp Hạch toán Kép (Double-Entry Bookkeeping)}
+Phương pháp hạch toán kép là kỹ thuật nền tảng của kế toán tài chính hiện đại. Nguyên lý này quy định rằng mọi giao dịch kinh tế phát sinh đều phải được ghi nhận đồng thời vào ít nhất hai tài khoản kế toán (liên quan đến các đối tượng kế toán khác nhau), thông qua hai bút toán đối ứng: Nợ (Debit - Dr) và Có (Credit - Cr).
+
+Tính cân bằng của hệ thống luôn được duy trì thông qua phương trình kế toán cơ bản:
+$$\text{Tài sản} = \text{Nợ phải trả} + \text{Vốn chủ sở hữu}$$
+
+Do đó, tại mọi thời điểm, tổng giá trị phát sinh bên Nợ phải luôn bằng tổng giá trị phát sinh bên Có. Ví dụ, nghiệp vụ bán hàng chịu được hạch toán đồng thời: Nợ tài khoản Phải thu khách hàng (Tài sản tăng) và Có tài khoản Doanh thu (Vốn chủ sở hữu tăng). Trong VAS/TT200, hạch toán kép là yêu cầu bắt buộc, đóng vai trò là cơ chế kiểm soát tính chính xác và toàn vẹn của dữ liệu. Đây cũng chính là logic xử lý cốt lõi của mọi phân hệ kế toán trong hệ thống ERP.
+
+\subsection{Hệ thống Tài khoản (Chart of Accounts)}
+Hệ thống tài khoản (COA) theo Thông tư 200 là một danh mục được mã hóa và phân loại một cách có hệ thống, dùng để ghi nhận và theo dõi toàn bộ các nghiệp vụ kinh tế phát sinh. COA đóng vai trò là "ngôn ngữ chung" của kế toán, phân loại tài sản, nợ phải trả, vốn chủ sở hữu, doanh thu, chi phí và các đối tượng khác.
+
+Cấu trúc của COA theo TT200 được tổ chức theo các loại tài khoản, được mã hóa bằng chữ số. Mỗi loại tài khoản được chia thành các nhóm và tài khoản chi tiết để phản ánh chính xác các nghiệp vụ kinh tế. Cụ thể:
+\begin{itemize}
+  \item \textbf{Loại 1 và 2 (ví dụ: 111, 131, 211):} Phản ánh Tài sản (ngắn hạn và dài hạn), ví dụ: Tiền mặt, Phải thu khách hàng, Tài sản cố định.
+  \item \textbf{Loại 3 và 4 (ví dụ: 331, 411):} Phản ánh Nguồn vốn, bao gồm Nợ phải trả (ví dụ: Phải trả người bán) và Vốn chủ sở hữu (ví dụ: Nguồn vốn kinh doanh).
+  \item \textbf{Loại 5 và 7 (ví dụ: 511, 711):} Phản ánh Doanh thu và Thu nhập khác.
+  \item \textbf{Loại 6 và 8 (ví dụ: 632, 641):} Phản ánh Chi phí (ví dụ: Giá vốn hàng bán, Chi phí bán hàng).
+  \item \textbf{Loại 9}: Xác định kết quả kinh doanh (Lợi nhuận hoặc Lỗ).
+\end{itemize}
+TT200 cung cấp một khung COA chuẩn, đồng thời cho phép doanh nghiệp được phép chi tiết hóa (mở các tài khoản cấp 2, cấp 3,...) để phù hợp với yêu cầu quản trị đặc thù, nhưng phải đảm bảo tuân thủ cấu trúc cơ bản đã quy định. Trong các hệ thống ERP, COA là một trong những thành phần cấu hình nền tảng, là cơ sở để tự động hóa các bút toán hạch toán và hỗ trợ khả năng phân tích dữ liệu đa chiều. \par
+Bảng \ref{tab:he_thong_tai_khoan}  dưới đây trình bày cấu trúc tóm tắt của hệ thống tài khoản theo TT200:
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|p{4cm}|p{6cm}|}
+    \hline
+    \textbf{Nhóm Tài khoản} & \textbf{Mô tả} & \textbf{Ví dụ} \\
+    \hline
+    1xx & Tài sản lưu động & 111: Tiền mặt \newline 131: Phải thu khách hàng \\
+    \hline
+    2xx & Tài sản dài hạn & 211: TSCĐ hữu hình\newline 242: Chi phí trả trước dài hạn \\
+    \hline
+    3xx & Nợ phải trả & 311: Vay ngắn hạn\newline 331: Phải trả người bán \\
+    \hline
+    4xx & Nguồn vốn chủ sở hữu & 411: Vốn đầu tư\newline 421: Lợi nhuận chưa phân phối \\
+    \hline
+    5xx & Doanh thu & 511: Doanh thu bán hàng\newline 515: Doanh thu tài chính \\
+    \hline
+    6xx & Chi phí sản xuất, kinh doanh & 627: Chi phí sản xuất chung\newline 642: Chi phí quản lý doanh nghiệp \\
+    \hline
+    7xx & Thu nhập khác &  \\
+    \hline
+    8xx & Chi phí khác & 811: Chi phí khác \newline 821: Chi phí thuế thu nhập doanh nghiệp  \\
+    \hline
+    9xx & Xác định kết quả kinh doanh & 911: Xác định kết quả kinh doanh \\
+    \hline
+  \end{tabular}
+  \caption{Khung hệ thống tài khoản rút gọn theo TT200}
+  \label{tab:he_thong_tai_khoan}
+
+\end{table}
+\subsection{Các Phân hệ Kế toán Cốt lõi và Mô hình Tích hợp ERP}
+Hệ thống kế toán trong doanh nghiệp được cấu trúc thành các phân hệ chính, tương ứng với các đối tượng kế toán cơ bản. Trong kiến trúc của hệ thống Hoạch định Nguồn lực Doanh nghiệp (ERP), các phân hệ này không hoạt động độc lập mà được tích hợp chặt chẽ để đảm bảo tính nhất quán, toàn vẹn dữ liệu và tự động hóa các luồng thông tin.\par
+Các phân hệ kế toán nền tảng bao gồm:
+\begin{itemize}
+  \item \textbf{Sổ cái Tổng hợp (General Ledger - GL):} Là hạt nhân của hệ thống tài chính, lưu trữ tập trung và tổng hợp mọi giao dịch kinh tế phát sinh thông qua hệ thống tài khoản và tuân thủ nguyên tắc hạch toán kép. GL là nguồn dữ liệu đầu vào trực tiếp để lập các Báo cáo tài chính.
+  \item \textbf{Quản lý Phải thu (Accounts Receivable - AR):} Theo dõi và quản lý toàn bộ công nợ phát sinh từ hoạt động bán hàng và cung cấp dịch vụ. Phân hệ AR thường được tích hợp trực tiếp với phân hệ Bán hàng, tự động hóa việc ghi nhận doanh thu và các khoản phải thu tương ứng.
+  \item \textbf{Quản lý Phải trả (Accounts Payable - AP):} Theo dõi và quản lý các nghĩa vụ nợ của doanh nghiệp đối với nhà cung cấp. Phân hệ AP tích hợp chặt chẽ với phân hệ Mua hàng, kiểm soát quy trình từ khi tiếp nhận hóa đơn  đến khi thực hiện thanh toán.
+  \item \textbf{Quản lý Tiền (Cash/Bank Management):} Chịu trách nhiệm quản lý dòng tiền, thực hiện các giao dịch thu/chi và tiến hành đối chiếu ngân hàng tự động hoặc bán tự động.
+  \item \textbf{Quản lý Hàng tồn kho (Inventory):} Theo dõi chi tiết số lượng và giá trị của hàng tồn kho. Phân hệ này có vai trò then chốt trong việc tính toán và ghi nhận Giá vốn hàng bán khi hàng hóa được xuất bán.
+\end{itemize}
+
+Sự tích hợp giữa các phân hệ này trong ERP tạo ra một luồng dữ liệu liền mạch, loại bỏ việc nhập liệu trùng lặp, giảm thiểu sai sót do con người và cung cấp khả năng truy xuất báo cáo quản trị theo thời gian thực.
+
+\section{Cơ sở Chứng từ và Mô hình hóa Quy trình Nghiệp vụ}
+Mọi giao dịch kế toán đều phải dựa trên các chứng từ hợp lệ (valid source documents) làm bằng chứng, tuân thủ các quy định của Chuẩn mực Kế toán Việt Nam (VAS) và Chế độ Kế toán Doanh nghiệp (hiện hành là Thông tư 200/2014/TT-BTC). Phần này phân tích các loại chứng từ cốt lõi và ánh xạ chúng vào các quy trình nghiệp vụ chuẩn hóa.
+\subsection{Hệ thống Chứng từ Kế toán}
+Chứng từ đầu vào (source documents) là cơ sở pháp lý và là nguồn dữ liệu (data source) ban đầu cho mọi bút toán hạch toán. Trong bối cảnh chuyển đổi số, việc chuẩn hóa và số hóa chứng từ là yêu cầu nền tảng:
+
+\begin{itemize}
+  \item \textbf{Hóa đơn (Invoice):} Đặc biệt là hóa đơn Giá trị gia tăng (GTGT). Theo Điều 8, Thông tư số 78/2021/TT-BTC việc sử dụng hóa đơn điện tử khởi tạo từ máy tính tiền không bắt buộc. Tuy nhiên, việc tích hợp xử lý hoá đơn điện tử tạo điều kiện pháp lý cho việc tích hợp và xử lý tự động trong các hệ thống thông tin.
+  \item \textbf{Chứng từ Thanh toán:} Bao gồm Phiếu thu, Phiếu chi (cho tiền mặt) và các Ủy nhiệm chi, Giấy báo Có/Nợ (cho giao dịch ngân hàng).
+  \item \textbf{Chứng từ Kho:} Bao gồm Phiếu nhập kho, Phiếu xuất kho, dùng làm căn cứ ghi nhận tăng/giảm hàng tồn kho và tính giá vốn.
+  \item \textbf{Bảng sao kê ngân hàng (Bank Statement):} Dùng làm cơ sở dữ liệu độc lập để thực hiện đối chiếu, đảm bảo tính chính xác của sổ phụ tiền gửi.
+\end{itemize}
+\subsection{Mô hình hóa Quy trình nghiệp vụ Cốt lõi}
+Các chứng từ được luân chuyển và xử lý theo các quy trình nghiệp vụ (business processes) cụ thể. Việc mô hình hóa các quy trình này, thường sử dụng các ký hiệu chuẩn như BPMN (Business Process Model and Notation) hoặc Sơ đồ tuần tự (Sequence Diagram), là bước thiết yếu để phân tích và thiết kế hệ thống.
+
+\begin{itemize}
+  \item \textbf{Quy trình Bán hàng (Order-to-Cash - O2C):} Là luồng nghiệp vụ tích hợp từ khi nhận đơn hàng (Sales Order), xử lý giao hàng (Delivery), xuất hóa đơn (Billing) và kết thúc khi thu được tiền (Incoming Payment).
+    \begin{itemize}
+      \item \textit{Hạch toán then chốt:} Khi xuất hóa đơn, hệ thống tự động tạo bút toán ghi nhận doanh thu và công nợ phải thu (Ví dụ: Nợ TK 131 / Có TK 511, Có TK 3331). Khi thu tiền, hệ thống ghi giảm công nợ (Ví dụ: Nợ TK 112 / Có TK 131).
+    \end{itemize}
+
+  \item \textbf{Quy trình Mua hàng (Procure-to-Pay - P2P):} Là luồng nghiệp vụ bắt đầu từ yêu cầu mua hàng (Purchase Requisition), tạo đơn mua hàng (Purchase Order), nhận hàng (Goods Receipt) và nhận hóa đơn (Invoice Receipt), cho đến khi hoàn tất thanh toán cho nhà cung cấp (Outgoing Payment).
+    \begin{itemize}
+      \item \textit{Hạch toán then chốt:} Khi nhận hàng (nếu nhập kho), hệ thống ghi tăng tồn kho (Ví dụ: Nợ TK 156 / Có TK 331). Khi thanh toán, hệ thống ghi giảm công nợ (Ví dụ: Nợ TK 331 / Có TK 112).
+    \end{itemize}
+\end{itemize}
+
+Các yếu tố phức tạp như chiết khấu thương mại, thuế GTGT (đầu vào được khấu trừ, đầu ra phải nộp), và xử lý chênh lệch tỷ giá hối đoái (đối với các giao dịch ngoại tệ) đều được tích hợp xử lý trong các bước của những quy trình này.
+\section{Cơ sở Dữ liệu \& Nền tảng Công nghệ}
+\subsection{PostgreSQL}
+Trong các hệ thống hoạch định nguồn lực doanh nghiệp (ERP), việc lựa chọn hệ quản trị cơ sở dữ liệu (RDBMS) đóng vai trò then chốt, ảnh hưởng trực tiếp đến tính toàn vẹn dữ liệu, hiệu suất xử lý và khả năng mở rộng. PostgreSQL, một RDBMS mã nguồn mở tiên tiến, thường được ưu tiên lựa chọn nhờ vào kiến trúc vững chắc, sự tuân thủ nghiêm ngặt các tiêu chuẩn SQL và khả năng xử lý hiệu quả các tác vụ phức tạp.
+
+Để đảm bảo tính nhất quán và độ tin cậy trong môi trường đa người dùng, đặc biệt với các nghiệp vụ nhạy cảm như kế toán, PostgreSQL triển khai cơ chế Transaction (giao dịch) một cách toàn diện. Mỗi giao dịch được xem là một đơn vị thực thi nguyên tử (atomic), tuân thủ đầy đủ các đặc tính ACID (Atomicity, Consistency, Isolation, Durability). Cơ chế này đảm bảo rằng một nghiệp vụ phức tạp, chẳng hạn như một bút toán hạch toán kép, phải được hoàn thành trọn vẹn; nếu xảy ra lỗi, toàn bộ các thay đổi sẽ được khôi phục về trạng thái ban đầu, bảo toàn tính toàn vẹn của dữ liệu.
+
+Đi kèm với đó là cơ chế Isolation (cô lập giao dịch), giúp kiểm soát mức độ ảnh hưởng lẫn nhau giữa các giao dịch đồng thời. PostgreSQL cung cấp các mức cô lập theo tiêu chuẩn ANSI/ISO, trong đó mức mặc định "Read Committed" giúp ngăn chặn hiệu quả hiện tượng "dirty read" (đọc phải dữ liệu chưa được cam kết), cân bằng giữa tính nhất quán và hiệu suất hệ thống.
+
+Tính toàn vẹn dữ liệu còn được củng cố ở cấp độ cấu trúc bảng thông qua hệ thống Constraint (ràng buộc). Các ràng buộc phổ biến như Primary Key (khóa chính), Foreign Key (khóa ngoại), Unique (duy nhất) và Check (kiểm tra điều kiện) là các công cụ thiết yếu để thực thi các quy tắc nghiệp vụ ngay tại tầng cơ sở dữ liệu, ví dụ như ngăn chặn việc nhập dữ liệu công nợ âm hoặc đảm bảo tính liên kết tham chiếu giữa các bảng.
+
+Để tối ưu hóa hiệu suất truy vấn trên các tập dữ liệu quy mô lớn của ERP, PostgreSQL cung cấp hai cơ chế quan trọng là Index và Partition.
+
+\begin{enumerate}
+  \item \textbf{Index (Chỉ mục):} Là các cấu trúc dữ liệu (phổ biến nhất là B-tree) được xây dựng trên một hoặc nhiều cột, cho phép tăng tốc đáng kể các hoạt động tìm kiếm và truy xuất dữ liệu. Ví dụ, việc tạo index trên cột mã hóa đơn hoặc mã khách hàng giúp rút ngắn thời gian phản hồi khi thực hiện truy vấn công nợ.
+
+  \item \textbf{Partition (Phân vùng):} Kỹ thuật này cho phép chia nhỏ một bảng logic có kích thước rất lớn thành nhiều bảng vật lý nhỏ hơn dựa trên một tiêu chí cụ thể (như khoảng giá trị - range, danh sách - list). Trong kế toán, việc phân vùng bảng sổ cái chi tiết theo kỳ kế toán (ví dụ: theo tháng hoặc quý) giúp cải thiện hiệu suất truy vấn báo cáo và đơn giản hóa công tác quản lý, lưu trữ dữ liệu cũ.
+\end{enumerate}
+
+Ngoài ra, PostgreSQL còn hỗ trợ Trigger (trình kích hoạt), là các thủ tục được tự động thực thi trước hoặc sau một sự kiện thay đổi dữ liệu (INSERT, UPDATE, DELETE). Trigger thường được sử dụng để triển khai các logic nghiệp vụ phức tạp, kiểm tra tính hợp lệ nâng cao (ví dụ: tự động kiểm tra tính cân đối Nợ/Có của một bút toán) hoặc ghi lại nhật ký thay đổi (audit log).
+
+Với những đặc tính kỹ thuật nêu trên, PostgreSQL cung cấp một nền tảng cơ sở dữ liệu mạnh mẽ và linh hoạt cho các hệ thống ERP. Đặc biệt, trong bối cảnh của nghiên cứu này, khả năng mở rộng của PostgreSQL thông qua các "extension" là vô cùng giá trị. Tiện ích mở rộng pgvector cho phép lưu trữ, lập chỉ mục và truy vấn hiệu quả các vector embedding (vector nhúng) mật độ cao, vốn là đầu ra của các mô hình ngôn ngữ lớn (NLP). Đây là công nghệ nền tảng, cho phép tích hợp PostgreSQL vào kiến trúc Retrieval-Augmented Generation (RAG) để xây dựng các ứng dụng AI hỗ trợ nghiệp vụ.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chapter_2/postgresql.jpg}
+  \caption{PostgreSQL}\label{fig:postgresql}
+\end{figure}
+
+\subsection{Spring Boot}
+Spring Boot là một framework mã nguồn mở dựa trên Java, được thiết kế để đơn giản hóa việc phát triển ứng dụng backend, đặc biệt là các ứng dụng web và microservices. Được phát hành bởi Pivotal Software (nay thuộc VMware) vào năm 2014, Spring Boot xây dựng trên nền tảng Spring Framework truyền thống nhưng tập trung vào việc giảm thiểu cấu hình thủ công, cho phép các lập trình viên nhanh chóng tạo ra các ứng dụng sẵn sàng sản xuất (production-grade) mà không cần viết nhiều mã boilerplate (mã lặp lại). Framework này hỗ trợ tích hợp dễ dàng với các công cụ như PostgreSQL, RESTful APIs và các dịch vụ đám mây, làm cho nó phù hợp với các hệ thống ERP phức tạp yêu cầu xử lý dữ liệu lớn và bảo mật cao.
+Các ưu điểm chính của Spring Boot trong phát triển backend bao gồm:
+
+\begin{itemize}
+  \item \textbf{Giảm thiểu mã boilerplate và thời gian phát triển:} Spring Boot sử dụng "opinionated defaults" để tự động cấu hình các thành phần, giúp giảm 40\% lượng mã cấu hình so với Spring truyền thống, từ đó tăng tốc độ phát triển và giảm lỗi con người. Ngoài ra, nó hỗ trợ tích hợp nhanh chóng với các thư viện bên thứ ba, giúp xây dựng RESTful APIs một cách hiệu quả.
+  \item \textbf{Hỗ trợ sản xuất cấp độ cao:} Framework cung cấp các tính năng tích hợp sẵn như giám sát sức khỏe ứng dụng (health checks), metrics và bảo mật, cho phép triển khai ứng dụng độc lập mà không phụ thuộc vào container bên ngoài, phù hợp cho môi trường đám mây. Nghiên cứu cho thấy tỷ lệ sử dụng Spring Boot trong ngành phần mềm đạt khoảng 62\%, nhờ khả năng tạo ứng dụng độc lập và đáng tin cậy.
+  \item \textbf{Tính linh hoạt và mở rộng:} Spring Boot hỗ trợ phát triển microservices, dễ dàng tích hợp với các công cụ như Docker và Kubernetes, đồng thời giảm độ dài mã và nỗ lực phát triển tổng thể. Điều này làm cho nó lý tưởng cho các dự án lớn, nơi cần xử lý dữ liệu thời gian thực và tích hợp AI.
+\end{itemize}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{chapter_2/spring_boot.png}
+  \caption{Spring Boot}\label{fig:SpringBoot}
+\end{figure}
+\subsection{ReactJs}
+ReactJS (thường gọi là React) là một thư viện JavaScript mã nguồn mở do Facebook phát triển và ra mắt năm 2013, chuyên dùng để xây dựng giao diện người dùng (UI) cho các ứng dụng web đơn trang (Single-Page Applications - SPA). React sử dụng mô hình component-based, nơi các phần tử UI được chia thành các thành phần tái sử dụng, kết hợp với Virtual DOM để tối ưu hóa việc cập nhật giao diện mà không cần tải lại toàn bộ trang. Thư viện này thường được kết hợp với các công cụ như Redux cho quản lý trạng thái hoặc Next.js cho server-side rendering, làm cho nó trở thành lựa chọn phổ biến trong phát triển frontend hiện đại.
+Các ưu điểm chính của ReactJS trong phát triển frontend bao gồm:
+
+\begin{itemize}
+  \item \textbf{Tái sử dụng component và dễ học:} React cho phép xây dựng các component độc lập, dễ dàng tái sử dụng mã, giúp giảm thời gian phát triển và tăng tính nhất quán trong UI. Nó cũng đơn giản để học, đặc biệt với các lập trình viên JavaScript, và hỗ trợ tích hợp dễ dàng với các thư viện khác. Nghiên cứu nhấn mạnh rằng React cải thiện hiệu quả xây dựng giao diện tương tác, đặc biệt cho các ứng dụng web phức tạp.
+  \item \textbf{Hiệu suất cao và linh hoạt:} Với Virtual DOM, React tối ưu hóa việc render, giảm tải cho trình duyệt và tăng tốc độ ứng dụng. Nó hỗ trợ phát triển SPA với tính linh hoạt cao, cho phép tích hợp với các framework như Next.js để cải thiện SEO và hiệu suất. React được sử dụng rộng rãi bởi các công ty lớn như Amazon và PayPal nhờ khả năng xây dựng UI dựa trên JavaScript.
+  \item \textbf{Cộng đồng lớn và mở rộng:} Là một thư viện phổ biến, React có hệ sinh thái phong phú với các công cụ hỗ trợ, giúp phát triển nhanh chóng các ứng dụng frontend hiện đại, từ giao diện đơn giản đến các hệ thống phức tạp như dashboard ERP. Các nghiên cứu cho thấy React giúp xây dựng ứng dụng web với tính tương tác cao và khả năng mở rộng tốt.
+\end{itemize}
+% \subsection{n8n}
+% n8n là một nền tảng tự động hóa workflow mã nguồn mở, được phát triển bởi công ty n8n GmbH (Đức) và ra mắt năm 2019. Nó hoạt động như một công cụ low-code/no-code, cho phép người dùng xây dựng các quy trình tự động hóa bằng cách kết nối các ứng dụng và dịch vụ qua giao diện trực quan (visual interface). n8n hỗ trợ tích hợp với hơn 200 ứng dụng, bao gồm API, cơ sở dữ liệu và công cụ AI, làm cho nó phù hợp để tự động hóa các nhiệm vụ lặp lại như đồng bộ dữ liệu, gửi thông báo hoặc xử lý e-invoice trong hệ thống ERP.
+% Các ưu điểm chính của n8n trong tự động hóa workflow bao gồm:
+
+% \begin{itemize}
+%   \item \textbf{Linh hoạt và mở nguồn:} Là nền tảng mã nguồn mở, n8n tránh được tình trạng khóa chặt (vendor lock-in) và chi phí cao so với các công cụ như Zapier, đồng thời hỗ trợ xây dựng workflow phức tạp một cách nhanh chóng và mở rộng. Nó được chọn cho các dự án yêu cầu tùy chỉnh cao, như mô phỏng y tế, nhờ tính linh hoạt và khả năng tích hợp đa dạng.
+%   \item \textbf{Tiết kiệm chi phí và tích hợp mạnh mẽ:} n8n giúp giảm chi phí vận hành bằng cách tự động hóa quy trình, đồng thời hỗ trợ tích hợp AI và bảo mật cấp doanh nghiệp, phù hợp cho các doanh nghiệp nhỏ và vừa. Nghiên cứu cho thấy nó cải thiện hiệu quả hoạt động trong các hợp tác xã và doanh nghiệp nhỏ bằng cách số hóa quy trình mà không cần kỹ năng lập trình sâu.
+%   \item \textbf{Dễ sử dụng và tùy chỉnh:} Với giao diện visual, n8n cho phép xây dựng workflow tùy chỉnh, hỗ trợ nghiên cứu học thuật và doanh nghiệp, đồng thời xử lý các giới hạn của tự động hóa kế toán. Nó đặc biệt hữu ích cho các quy trình như đồng bộ dữ liệu ERP và thông báo tự động.
+% \end{itemize}
+
+\section{Trí tuệ kinh doanh (Business Intelligence - BI)}
+\subsection{Khái niệm về BI}
+Trí tuệ kinh doanh (Business Intelligence - BI) là một tập hợp các quy trình, kiến trúc, và công nghệ được sử dụng để chuyển đổi dữ liệu thô thành các thông tin có ý nghĩa, nhằm thúc đẩy các hoạt động kinh doanh hiệu quả và hỗ trợ đưa ra các quyết định chiến lược. Theo định nghĩa của Solomon Negash và Paul Gray, BI là những hệ thống kết hợp giữa thu thập dữ liệu, lưu trữ kiến thức, quản lý thông tin với việc phân tích để đánh giá các thông tin phức tạp về doanh nghiệp và thị trường cạnh tranh, nhằm phục vụ cho các nhà lập kế hoạch và những người ra quyết định, với mục đích cải thiện tính kịp thời và chất lượng của các đầu vào cho quá trình ra quyết định.
+
+Từ Forrester Research, BI được định nghĩa là một bộ các phương pháp luận, quy trình, kiến trúc, và công nghệ biến đổi dữ liệu thô thành các thông tin có ý nghĩa và hữu ích, được sử dụng để cho phép các insight chiến lược, chiến thuật và hoạt động hiệu quả hơn cũng như quá trình ra quyết định. Theo định nghĩa này, trí tuệ kinh doanh bao gồm cả quản lý thông tin (tích hợp dữ liệu, đảm bảo chất lượng dữ liệu, kho dữ liệu, quản lý dữ liệu chủ, phân tích văn bản và nội dung, v.v.).
+
+Về bản chất, BI là một lĩnh vực công nghệ thông tin được áp dụng trong phân tích dữ liệu và quản trị doanh nghiệp, có khả năng tổng hợp, kiểm soát hệ thống thông tin và giúp doanh nghiệp tận dụng triệt để nguồn thông tin một cách hiệu quả, dù có sự biến động không ngừng của các yếu tố bên ngoài.
+
+\subsection{Vai Trò Của Việc Phân Tích Và Trực Quan Hóa Dữ Liệu}
+Phân tích dữ liệu trong BI liên quan đến việc sử dụng các thuật toán và mô hình để khám phá patterns, xu hướng và mối quan hệ ẩn trong dữ liệu, giúp doanh nghiệp dự báo rủi ro và tối ưu hóa quy trình. Vai trò chính của phân tích là hỗ trợ ra quyết định dựa trên dữ liệu (data-driven decision-making), ví dụ như phân tích công nợ để dự báo dòng tiền, giảm thiểu nợ xấu và cải thiện hiệu quả tài chính. Trực quan hóa dữ liệu, thông qua biểu đồ, dashboard và báo cáo hình ảnh, giúp trình bày thông tin phức tạp một cách dễ hiểu, tăng cường khả năng nhận thức và hành động nhanh chóng. Các nghiên cứu từ ScienceDirect chỉ ra rằng trực quan hóa đóng vai trò quan trọng trong việc cải thiện kết quả kinh doanh, bằng cách làm cho dữ liệu trở nên dễ tiếp cận hơn, đặc biệt trong phân tích big data.\par
+Trong ERP kế toán, phân tích và trực quan hóa giúp theo dõi chỉ số như doanh thu, chi phí và công nợ theo thời gian thực, giảm thời gian lập báo cáo lên đến 60\% và nâng cao độ chính xác. Tổng thể, vai trò của BI là biến dữ liệu thành lợi thế cạnh tranh, hỗ trợ doanh nghiệp thích ứng với môi trường kinh doanh động.
+\subsection{Giới Thiệu Công Cụ Metabase Và Power BI}
+Metabase là một công cụ BI mã nguồn mở, tập trung vào việc tạo dashboard và phân tích dữ liệu mà không cần kỹ năng lập trình phức tạp, hỗ trợ kết nối với các cơ sở dữ liệu như PostgreSQL để trực quan hóa dữ liệu. Metabase nổi bật với giao diện thân thiện, cho phép người dùng tạo báo cáo tùy chỉnh và chia sẻ insights, phù hợp cho doanh nghiệp nhỏ và vừa (SMEs) trong ERP kế toán. \par
+Power BI, do Microsoft phát triển, là công cụ BI mạnh mẽ với khả năng tích hợp dữ liệu từ nhiều nguồn, phân tích nâng cao và trực quan hóa tương tác qua dashboard động. Power BI hỗ trợ AI tích hợp để dự báo xu hướng, phù hợp cho doanh nghiệp lớn trong ERP, với tính năng như DAX (Data Analysis Expressions) để tính toán phức tạp. Các nghiên cứu từ ScienceDirect so sánh Power BI với các công cụ khác, nhấn mạnh vai trò của nó trong báo cáo thời gian thực và cải thiện kết quả kinh doanh.
+
+\section{Tự động hoá Quy trình và nền tảng n8n}
+Trong bối cảnh Cách mạng Công nghiệp 4.0, việc ứng dụng các phần mềm dưới dạng dịch vụ (SaaS) đã trở thành xu thế tất yếu trong quản trị doanh nghiệp. Tuy nhiên, sự gia tăng về số lượng các ứng dụng chuyên biệt (CRM, ERP, Project Management) đã dẫn đến tình trạng phân mảnh dữ liệu (data silos), nơi thông tin bị cô lập trong các hệ thống riêng lẻ. Để giải quyết bài toán này, các nền tảng Tích hợp dưới dạng dịch vụ (iPaaS - Integration Platform as a Service) đã ra đời, đóng vai trò lớp trung gian (middleware) nhằm kết nối và đồng bộ hóa dữ liệu giữa các hệ thống không đồng nhất .
+
+\subsection*{Tổng quan n8n: Tư duy mới về tự động hóa quy trình}
+
+\vspace{0.5em}
+
+\noindent
+\textbf{Nền tảng:} \textbf{n8n} (nghĩa là ``n-eight-n'') là công cụ tự động hóa workflow mở rộng, phát triển năm 2019 tại Berlin bởi Jan Oberhauser. Điểm nổi bật:
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Kiến trúc node-based:} Mọi chức năng chia nhỏ thành thành phần ``nút'' linh hoạt kết nối với nhau.
+  \item \textbf{Hỗ trợ self-hosting \& open:} Người dùng tự quản lý dữ liệu, tránh khóa chặt nhà cung cấp (vendor lock-in).
+  \item \textbf{Low-code, không chỉ no-code:} Dành cho cả người dùng phổ thông lẫn lập trình viên cần tuỳ chỉnh sâu (JavaScript, Python).
+\end{itemize}
+
+\vspace{0.8em}
+\noindent
+\colorbox{lightgray}{\parbox{\dimexpr\linewidth-2\fboxsep}{%
+    \textbf{Mô hình cấp phép Fair-code:} \\
+    n8n áp dụng giấy phép Sustainable Use License (SUL): mở mã nguồn, dùng miễn phí nội bộ, nhưng kiểm soát việc thương mại hóa như một giải pháp cạnh tranh với chính n8n.
+}}
+
+\vspace{1em}
+\subsubsection*{Kiến trúc hệ thống n8n – Nhìn nhanh qua sơ đồ}
+\begin{center}
+  \begin{tikzpicture}[node distance=2.4cm, auto, every node/.style={font=\footnotesize}]
+    \node[draw, rounded corners, fill=blue!10, minimum width=2.5cm, align=center] (ui) {Editor UI\\(Frontend)};
+    \node[draw, rounded corners, fill=green!10, right=of ui, minimum width=2.5cm, align=center] (engine) {Workflow Engine};
+    \node[draw, rounded corners, fill=orange!10, right=of engine, minimum width=2.5cm, align=center] (logic) {Node\\Execution Logic};
+
+    \draw[->, thick] (ui)--(engine) node[midway,above] {REST API, WebSocket};
+    \draw[->, thick] (engine)--(logic) node[midway,above] {Trigger, Action, ...};
+  \end{tikzpicture}
+\end{center}
+
+\vspace{0.5em}
+
+\noindent
+\textbf{Triển khai linh hoạt:}
+\begin{multicols}{2}
+  \raggedcolumns
+  \textbf{Monolithic:} Chạy tất cả trên một instance --- đơn giản, nhanh gọn (dùng Docker, thử nghiệm/nhóm nhỏ).
+
+  \columnbreak
+
+  \textbf{Distributed:} Chia nhỏ tiến trình (main, worker, webhook), dùng Redis làm message queue, dễ mở rộng cho doanh nghiệp.
+\end{multicols}
+
+\vspace{0.6em}
+
+\subsubsection*{Nền tảng dữ liệu \& tư duy xử lý của n8n}
+
+\begin{tcolorbox}[colback=gray!6!white, colframe=cyan!60!black, title={Cấu trúc dữ liệu trung tâm}]
+  \vspace{-0.3em}
+  \textbf{Array of Objects} – Mỗi workflow nhận/đẩy ra mảng các ``items'' gồm:
+  \begin{enumerate}[noitemsep]
+    \item \textbf{JSON key:} Dữ liệu dạng cấu trúc (chuỗi, số, ...).
+    \item \textbf{Binary key:} Chứa tham chiếu tới file, ảnh... (tối ưu bộ nhớ, không lưu file trực tiếp vào heap).
+  \end{enumerate}
+\end{tcolorbox}
+
+\vspace{0.2em}
+\noindent
+\textbf{Nguyên lý thực thi: \textcolor{violet}{Execution per Item}}
+\begin{itemize}[leftmargin=1.5em]
+  \item Với mỗi node, nếu đầu vào là mảng $N$ item, node sẽ tự động thực thi logic $N$ lần cho từng phần tử, không cần tự viết vòng lặp. Chỉ ngoại lệ cho các node tổng hợp (aggregation).
+\end{itemize}
+
+\vspace{0.5em}
+\noindent
+\textbf{Sức mạnh biểu thức động (\textit{Expression System}):}
+\begin{itemize}[leftmargin=1.5em]
+  \item Sử dụng cú pháp JavaScript, cho phép truy cập mọi dữ liệu từ các node khác
+  \item Hỗ trợ xây dựng các workflow phức tạp, điều kiện động, truy xuất dữ liệu ``vượt cấp''.
+\end{itemize}
+
+\vspace{0.6em}
+\begin{center}
+  \begin{tikzpicture}[
+      node distance=1.7cm,
+    every node/.style={font=\small,draw,rounded corners,fill=gray!10,align=center,inner sep=2pt}]
+    \node (input) {Input Array:\\\texttt{[item1, item2, ...]}};
+    \node[right=2cm of input] (node) {Node xử lý};
+    \node[right=2cm of node] (output) {Output Array:\\\texttt{[item1', item2', ...]}};
+    \draw[->, thick] (input)--(node)--(output);
+  \end{tikzpicture}
+\end{center}
+
+\vspace{0.5em}
+
+\begin{tcolorbox}[colback=yellow!10!white,colframe=yellow!70!black]
+  \textbf{Tóm tắt:} n8n là nền tảng tự động hóa linh hoạt, cho phép tự kiểm soát, mở rộng theo nhu cầu, áp dụng kiến trúc dữ liệu hiện đại, đơn giản hóa luồng xử lý bằng cơ chế “mỗi item – một lần chạy”, đồng thời cung cấp hệ biểu thức động mạnh mẽ giúp xây dựng workflow phức tạp mà vẫn trực quan.
+\end{tcolorbox}
+
+\subsection{Hệ thống Node và Phân loại Chức năng}
+
+Hệ sinh thái node trong n8n được tổ chức thành ba nhóm chức năng chính, mỗi nhóm đóng vai trò cụ thể trong việc xây dựng và vận hành các quy trình tự động hóa:
+
+\subsubsection*{Trigger Nodes (Nút kích hoạt)}
+
+Trigger Nodes đóng vai trò là điểm khởi đầu của mọi workflow, chịu trách nhiệm kích hoạt quy trình tự động hóa dựa trên các sự kiện hoặc điều kiện cụ thể. n8n cung cấp hai mô hình kích hoạt chính:
+
+\begin{itemize}
+  \item \textbf{Webhook (Push-based):} Mô hình kích hoạt theo thời gian thực, trong đó workflow được kích hoạt ngay khi nhận được yêu cầu HTTP từ hệ thống bên ngoài. Mô hình này phù hợp cho các tình huống cần phản ứng tức thời, chẳng hạn như xử lý webhook từ các dịch vụ bên thứ ba hoặc tích hợp với API của hệ thống ERP [25].
+
+  \item \textbf{Polling (Pull-based):} Mô hình kích hoạt định kỳ, trong đó hệ thống chủ động kiểm tra nguồn dữ liệu để phát hiện các thay đổi mới dựa trên việc so sánh trạng thái (state comparison). Mô hình này phù hợp cho các tình huống cần đồng bộ dữ liệu định kỳ hoặc khi hệ thống nguồn không hỗ trợ webhook [25].
+\end{itemize}
+
+\subsubsection*{Logic Nodes (Nút điều khiển)}
+
+Logic Nodes thực hiện các thao tác điều hướng luồng dữ liệu và biến đổi cấu trúc dữ liệu trong quá trình xử lý. Nhóm node này bao gồm các thành phần cốt lõi sau:
+
+\begin{itemize}
+  \item \textbf{Cấu trúc rẽ nhánh:} Các node IF và Switch cho phép thực hiện logic điều kiện phức tạp, định hướng luồng dữ liệu dựa trên các điều kiện động được xác định thông qua hệ thống biểu thức.
+
+  \item \textbf{Hợp nhất dữ liệu:} Node Merge hỗ trợ kết hợp dữ liệu từ nhiều nguồn khác nhau, tạo điều kiện cho việc xây dựng các quy trình tích hợp đa hệ thống.
+
+  \item \textbf{Quản lý vòng lặp:} Node Split In Batches  cho phép xử lý dữ liệu theo từng lô (batch processing), tối ưu hóa hiệu suất khi làm việc với khối lượng dữ liệu lớn.
+\end{itemize}
+
+\subsubsection*{Integration \& Code Nodes}
+
+Nhóm node này cung cấp khả năng tích hợp với các hệ thống bên ngoài và mở rộng chức năng thông qua mã tùy chỉnh:
+
+\begin{itemize}
+  \item \textbf{HTTP Request Node:} Cho phép tương tác trực tiếp với mọi API tuân thủ chuẩn REST/HTTP, hỗ trợ đầy đủ các phương thức HTTP (GET, POST, PUT, DELETE) và tự động hóa phân trang (pagination) để xử lý các phản hồi lớn. Node này đóng vai trò quan trọng trong việc tích hợp n8n với các hệ thống ERP, CRM và các dịch vụ web khác.
+
+  \item \textbf{Code Node:} Cung cấp môi trường thực thi mã tùy chỉnh, hỗ trợ JavaScript/Node.js và Python, cho phép thực hiện các thuật toán phức tạp và xử lý dữ liệu chuyên biệt mà các node có sẵn không đáp ứng được. Tính năng này mở rộng đáng kể khả năng tùy biến của nền tảng, đặc biệt hữu ích cho các tác vụ như xử lý dữ liệu tài chính, tính toán phức tạp, hoặc tích hợp với các thư viện chuyên ngành.
+\end{itemize}
+
+\subsection{Bảo mật và Quản lý Lỗi}
+
+\subsubsection{Cơ chế Bảo mật Dữ liệu}
+
+Bảo mật thông tin xác thực (Credentials) là một trong những yêu cầu quan trọng nhất trong các hệ thống tự động hóa, đặc biệt khi làm việc với dữ liệu tài chính nhạy cảm. n8n giải quyết vấn đề này thông qua cơ chế mã hóa dữ liệu khi nghỉ (Encryption at Rest), đảm bảo rằng các thông tin nhạy cảm như API keys, mật khẩu và tokens được mã hóa trước khi lưu trữ trong cơ sở dữ liệu.
+
+Khóa mã hóa (Encryption Key) được quản lý độc lập thông qua biến môi trường, tách biệt hoàn toàn khỏi cơ sở dữ liệu chính. Kiến trúc này đảm bảo rằng ngay cả trong trường hợp cơ sở dữ liệu bị xâm nhập, dữ liệu nhạy cảm vẫn được bảo vệ do không thể giải mã mà không có khóa mã hóa. Ngoài ra, phiên bản doanh nghiệp của n8n còn hỗ trợ kiểm soát truy cập dựa trên vai trò (RBAC - Role-Based Access Control) để quản lý quyền hạn chi tiết trên từng workflow, đảm bảo tuân thủ nguyên tắc phân quyền tối thiểu (principle of least privilege).
+
+\subsubsection{Quản lý Lỗi và Phục hồi}
+
+Để đảm bảo tính ổn định và độ tin cậy của các quy trình tự động hóa trong môi trường sản xuất, n8n cung cấp cơ chế xử lý lỗi đa tầng:
+
+\begin{itemize}
+  \item \textbf{Tầng Node:} Tùy chọn "Continue On Fail" cho phép workflow tiếp tục thực thi các node tiếp theo hoặc rẽ nhánh sang luồng xử lý lỗi chuyên biệt khi một node gặp sự cố. Tính năng này đặc biệt quan trọng trong các quy trình phức tạp, nơi việc dừng toàn bộ workflow do một lỗi đơn lẻ có thể gây gián đoạn nghiêm trọng.
+
+  \item \textbf{Tầng Workflow:} Error Workflow được kích hoạt tự động khi có lỗi ngoại lệ không được xử lý, phục vụ cho việc giám sát tập trung và cảnh báo. Cơ chế này cho phép ghi nhận, phân tích và thông báo về các sự cố, tạo điều kiện cho việc phản ứng nhanh chóng và cải thiện liên tục.
+
+  \item \textbf{Cơ chế Retry:} Hệ thống tự động thực thi lại các tác vụ thất bại do lỗi mạng thoáng qua (transient errors), với khả năng cấu hình số lần thử lại và khoảng thời gian chờ giữa các lần thử. Cơ chế này tăng đáng kể tính ổn định của hệ thống trong môi trường mạng không ổn định hoặc khi làm việc với các dịch vụ bên thứ ba có độ tin cậy biến động.
+\end{itemize}
+
+\subsection{So sánh n8n với các Giải pháp iPaaS khác}
+
+Để làm rõ tính ưu việt và phù hợp của công nghệ được lựa chọn cho dự án, n8n được so sánh với các đối thủ phổ biến trong thị trường iPaaS như Zapier và Make dựa trên các tiêu chí kỹ thuật và nghiệp vụ quan trọng \autocite{carterN8nVsZapier2025}. Bảng \ref{tab:n8n-comparison} dưới đây trình bày chi tiết sự so sánh:
+
+\begin{table}[H]
+  \centering
+  \caption{So sánh n8n với các giải pháp iPaaS phổ biến}
+  \label{tab:n8n-comparison}
+  \begin{tabular}{|p{3cm}|p{5.5cm}|p{5.5cm}|}
+    \hline
+    \textbf{Tiêu chí} & \textbf{n8n} & \textbf{Zapier / Make} \\
+    \hline
+    \textbf{Kiến trúc} & Self-hosted / Hybrid (Kiểm soát toàn diện hạ tầng và dữ liệu, phù hợp với yêu cầu bảo mật cao) & SaaS Cloud-only (Phụ thuộc hoàn toàn vào hạ tầng nhà cung cấp, hạn chế khả năng tùy biến) \\
+    \hline
+    \textbf{Mô hình xử lý} & JSON Array Object (Xử lý theo lô, tự động lặp qua từng phần tử, hiệu quả với dữ liệu lớn) & Single Item (Zapier) hoặc Bundle (Make) - yêu cầu xử lý thủ công cho nhiều mục \\
+    \hline
+    \textbf{Khả năng mở rộng} & Cao (Code Node hỗ trợ JS/Python đầy đủ, truy cập thư viện ngoài, không giới hạn chức năng) & Hạn chế (Môi trường Sandbox giới hạn, không thể sử dụng thư viện tùy ý) \\
+    \hline
+    \textbf{Bảo mật} & Cao (Dữ liệu có thể nằm hoàn toàn trong mạng nội bộ, mã hóa end-to-end, kiểm soát truy cập chi tiết) & Phụ thuộc vào chính sách bảo mật của bên thứ ba, dữ liệu phải đi qua hạ tầng cloud của nhà cung cấp \\
+    \hline
+    \textbf{Chi phí vận hành} & Dựa trên tài nguyên máy chủ (Self-hosted) hoặc số lần thực thi quy trình - chi phí dự đoán được và tối ưu cho quy mô lớn & Tính phí dựa trên số lượng tác vụ (Task/Operation), chi phí tăng cao nhanh chóng với quy trình phức tạp hoặc khối lượng lớn \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\vspace{0.5em}
+
+\textbf{Kết luận:} Với khả năng tùy biến cao, mô hình dữ liệu linh hoạt và quyền kiểm soát hạ tầng tuyệt đối, n8n là nền tảng phù hợp để xây dựng các hệ thống tự động hóa phức tạp, đòi hỏi bảo mật cao và tối ưu chi phí trong dài hạn. Đặc biệt, trong bối cảnh xây dựng phân hệ kế toán ERP với yêu cầu xử lý dữ liệu tài chính nhạy cảm, khả năng self-hosting và kiểm soát dữ liệu của n8n trở thành lợi thế cạnh tranh quan trọng so với các giải pháp SaaS truyền thống.
+\end{document}

@@ -1,0 +1,80 @@
+\documentclass[../../main.tex]{subfiles}
+
+\begin{document}
+\stopborder
+
+\chapter{Kết luận và định hướng phát triển}
+\section{Tổng hợp những kết quả đạt được}
+\subsection{Về mặt lý thuyết}
+Hệ thống được xây dựng trên nền tảng những kiến thức chuyên sâu và tổng hợp từ nhiều lĩnh vực liên quan, bao gồm hệ thống thông tin kế toán, công nghệ web, quản lý truy cập, xử lý ngôn ngữ tự nhiên (NLP), cũng như các phương pháp hiện đại trong lưu trữ và truy xuất tri thức. Cụ thể:
+
+\begin{itemize}
+  \item \textbf{Hệ thống thông tin kế toán:} Áp dụng các lý thuyết về tổ chức, lưu trữ và xử lý dữ liệu kế toán, đảm bảo đúng quy trình nghiệp vụ và tuân thủ các quy định pháp lý. Triển khai các phân hệ quản lý tài khoản, ghi chép, lập báo cáo tài chính, kiểm toán và kiểm soát truy cập đầy đủ.
+  \item \textbf{Kiến trúc web hiện đại:} Vận dụng các mô hình thiết kế tiên tiến như MVC (Model-View-Controller), RESTful API giúp phân tách rõ ràng giữa các lớp giao diện, xử lý logic nghiệp vụ và quản lý dữ liệu, tạo điều kiện thuận lợi cho việc mở rộng, tích hợp và bảo mật hệ thống khi bổ sung các thành phần AI/Chatbot.
+  \item \textbf{Cơ sở dữ liệu và lưu trữ dữ liệu lớn:} Thiết kế kết hợp giữa cơ sở dữ liệu quan hệ (RDBMS) phục vụ nghiệp vụ kế toán truyền thống với các hệ thống quản lý dữ liệu vector (Vector Database), hỗ trợ hiệu quả cho các tác vụ tìm kiếm ngữ nghĩa và triển khai giải pháp RAG.
+  \item \textbf{Kiểm soát truy cập và bảo mật (RBAC):} Áp dụng lý thuyết kiểm soát truy cập dựa trên vai trò, đảm bảo phân quyền hợp lý cho từng chức năng nghiệp vụ và từng loại người dùng, đồng thời tăng cường an toàn bảo mật cho dữ liệu tài chính.
+  \item \textbf{Truy xuất tri thức và tìm kiếm ngữ nghĩa:} Ứng dụng công nghệ embedding, truy xuất thông tin ngữ nghĩa thông qua Vector Database, giúp hệ thống có khả năng “hiểu” và lấy đúng các dữ liệu kế toán phù hợp với truy vấn tự nhiên của người dùng.
+  \item \textbf{Xử lý ngôn ngữ tự nhiên (NLP):} Ứng dụng các mô hình ngôn ngữ lớn (LLM), phương pháp xử lý truy vấn tiếng Việt, phân tích ý định (Intent Detection) và sinh câu trả lời tự động, đảm bảo khả năng giao tiếp tự nhiên, chính xác, mạch lạc trong lĩnh vực nghiệp vụ kế toán.
+  \item \textbf{Tích hợp khả năng sinh và truy xuất tri thức (Generative AI + Retrieval):} Kết hợp thế mạnh của truy xuất thông tin thực tế với khả năng tổng hợp, diễn đạt của mô hình AI sinh, giúp Chatbot đưa ra câu trả lời vừa chính xác nghiệp vụ vừa thân thiện với người dùng cuối.
+  \item \textbf{Quản lý nhật ký và truy vết (Audit Trail):} Áp dụng lý thuyết về nhật ký kiểm soát và giám sát hoạt động, ghi nhận toàn bộ lịch sử truy xuất và thao tác của người dùng nhằm phục vụ kiểm toán, đảm bảo an toàn và phát hiện các dấu hiệu bất thường.
+\end{itemize}
+
+Những nền tảng lý thuyết này không chỉ đóng vai trò định hướng, mà còn bảo đảm để hệ thống đáp ứng đầy đủ các yêu cầu nghiệp vụ thực tiễn, độ an toàn dữ liệu cao, hỗ trợ hiệu quả cho người dùng trong việc tra cứu và giải đáp thông tin kế toán, đồng thời cung cấp nền tảng vững chắc để phát triển và mở rộng thêm các tính năng AI kế toán trong tương lai.
+
+\subsection{Về mặt ứng dụng thực tiễn}
+Đề tài đã triển khai thành công hệ thống website kế toán tích hợp Chatbot AI, mang lại nhiều giá trị nổi bật:
+\begin{itemize}
+  \item Người dùng có thể dễ dàng tra cứu số liệu, chứng từ, báo cáo bằng ngôn ngữ tự nhiên thông qua Chatbot, tiết kiệm thời gian so với thao tác truyền thống.
+  \item Hệ thống Chatbot không chỉ trả lời nghiệp vụ mà còn có khả năng trích dẫn nguồn gốc dữ liệu (Data Citation), giúp người dùng dễ dàng đối chiếu câu trả lời với các chứng từ hoặc quy định TT200 gốc, tăng độ tin cậy trong công tác kế toán.
+  \item Tích hợp hệ thống Dashboard quản trị (BI) cung cấp các biểu đồ trực quan về dòng tiền, doanh thu và chi phí theo thời gian thực, hỗ trợ đắc lực cho việc ra quyết định của ban lãnh đạo. ...
+  \item Quy trình kiểm soát truy cập và lưu vết thao tác đảm bảo tính bảo mật, minh bạch và đáp ứng yêu cầu kiểm toán hiện đại.
+  \item Hệ thống có thể mở rộng, tích hợp thêm nhiều dịch vụ AI kế toán chuyên sâu trong tương lai theo nhu cầu thực tế, minh chứng cho khả năng ứng dụng của các công nghệ hiện đại như NLP, RAG và AI trong lĩnh vực kế toán doanh nghiệp Việt Nam.
+\end{itemize}
+
+Tổng kết lại, sản phẩm của đề tài không chỉ đáp ứng những yêu cầu nghiệp vụ đặt ra, mà còn là minh chứng sinh động cho khả năng ứng dụng các lý thuyết và công nghệ tiên tiến vào thực tiễn, thúc đẩy quá trình chuyển đổi số và hiện đại hóa công tác kế toán tại các doanh nghiệp.
+
+\section{Các hạn chế tồn tại}
+Mặc dù hệ thống website kế toán tích hợp Chatbot với công nghệ RAG (Retrieval-Augmented Generation) đã vận hành tốt các nghiệp vụ cơ bản như mua hàng, bán hàng, lập và truy vấn các báo cáo tài chính, tuy nhiên đề tài vẫn còn một số hạn chế nhất định do giới hạn về thời gian và nguồn lực thực hiện:
+
+\begin{itemize}
+  \item \textbf{Hạn chế về nghiệp vụ chuyên sâu:} Các phân hệ phức tạp như quản lý xuất hoá đơn điện tử, module quản lý lương, quản lý và tính khấu hao tài sản cố định chưa được triển khai đầy đủ.
+  \item \textbf{Hạn chế về công nghệ hỗ trợ:} Khả năng tích hợp công nghệ OCR để tự động đọc và trích xuất dữ liệu từ hoá đơn, chứng từ giấy/ảnh chụp chưa được hoàn thiện trong phạm vi đề tài này.
+  \item \textbf{Nguyên nhân:} Các tính năng nâng cao kể trên đòi hỏi quá trình phân tích, thiết kế chi tiết và thời gian phát triển dài hơn để đảm bảo tính ổn định cũng như tuân thủ các chuẩn mực bảo mật và pháp lý khắt khe.
+\end{itemize}
+
+Do thời gian triển khai thực tế của đề tài giới hạn trong 3 tháng, nhóm thực hiện đã ưu tiên tập trung phát triển khung hệ thống kế toán tổng quát, xây dựng nền tảng dữ liệu vững chắc và tích hợp thành công Chatbot AI. Đây là bước đệm quan trọng để đảm bảo sản phẩm có tính khả dụng cao và tạo tiền đề tốt cho các hướng mở rộng tính năng trong giai đoạn tiếp theo.
+
+\section{Định hướng phát triển}
+Mặc dù đề tài đã đạt được những thành tựu nhất định về mặt lý thuyết cũng như ứng dụng thực tiễn, tuy nhiên để hệ thống ngày càng hoàn thiện, đáp ứng tốt hơn nhu cầu thực tế của doanh nghiệp, nhóm định hướng phát triển theo các hướng cụ thể, logic và mạch lạc như sau:
+
+\begin{itemize}
+  \item \textbf{Bổ sung các phân hệ nghiệp vụ chuyên sâu:} Trên nền tảng khung hệ thống kế toán hiện tại, đề tài sẽ tiếp tục phát triển thêm các module nghiệp vụ phục vụ sát hơn các nhu cầu của doanh nghiệp như:
+    \begin{itemize}
+      \item Quản lý xuất hóa đơn điện tử, tích hợp ký số và lưu trữ điện tử theo chuẩn của cơ quan thuế.
+      \item Xây dựng module quản lý lương, tính toán thuế thu nhập cá nhân, bảo hiểm xã hội và các loại phụ cấp, khấu trừ đầy đủ.
+      \item Phát triển chức năng quản lý và tính khấu hao tài sản cố định theo nhiều phương pháp, hỗ trợ kiểm soát tài sản trên toàn doanh nghiệp.
+      \item Tích hợp quản lý thuế, đối chiếu chứng từ và kết nối với hệ thống kê khai, nộp thuế điện tử.
+      \item Ứng dụng công nghệ OCR để tự động trích xuất dữ liệu từ hóa đơn, chứng từ đầu vào, giảm thiểu nhập liệu thủ công và rủi ro sai sót.
+    \end{itemize}
+
+  \item \textbf{Phát triển, mở rộng năng lực tìm kiếm ngữ nghĩa với AI:} Hệ thống cần liên tục nghiên cứu và ứng dụng các mô hình ngôn ngữ mới, giải pháp vector search, cải tiến pipeline xử lý ngôn ngữ tự nhiên nhằm:
+    \begin{itemize}
+      \item Nâng cao độ chính xác khi truy vấn các nghiệp vụ/ngữ cảnh kế toán phức tạp.
+      \item Đa dạng hóa câu trả lời của Chatbot để phù hợp hơn với các vai trò người dùng khác nhau (nhân viên, kế toán trưởng, lãnh đạo).
+      \item Cải thiện khả năng hiểu và xử lý tiếng Việt tự nhiên, đặc biệt các thuật ngữ chuyên ngành và ngôn ngữ đặc thù doanh nghiệp.
+    \end{itemize}
+
+  \item \textbf{Mở rộng tích hợp với các dịch vụ và hệ thống khác:} Để tối ưu hóa hiệu quả sử dụng, đề tài hướng đến tích hợp hệ thống với:
+    \begin{itemize}
+      \item Các phần mềm quản trị doanh nghiệp (ERP, CRM), hệ thống quản lý nhân sự, tài sản.
+      \item Cổng thông tin thuế điện tử, ngân hàng và các nền tảng thanh toán, nhằm tự động hóa quy trình kế toán và thanh quyết toán.
+      \item Triển khai các API, webhook để cho phép doanh nghiệp hoặc đối tác bên ngoài dễ dàng truy cập, đồng bộ dữ liệu hoặc phát triển các dịch vụ bổ sung.
+    \end{itemize}
+
+  \item \textbf{Nâng cao bảo mật, kiểm soát truy cập và giám sát hệ thống:} Tiếp tục nghiên cứu, chuẩn hóa và hoàn thiện hệ thống kiểm soát truy cập theo vai trò (RBAC) và nhật ký kiểm toán (Audit Trail), đảm bảo hệ thống an toàn, minh bạch, phù hợp với tiêu chuẩn bảo mật hiện đại. Đặc biệt, phát triển thêm cơ chế nhận diện, ứng phó sớm với các rủi ro bảo mật hoặc hoạt động bất thường.
+
+  \item \textbf{Xây dựng lộ trình cập nhật, nâng cấp công nghệ AI:} Chủ động cập nhật các tiến bộ về công nghệ AI, NLP, RAG và vector database, thử nghiệm và sớm triển khai các mô hình mới hỗ trợ tốt hơn cho nghiệp vụ kế toán, đồng thời giảm thiểu độ trễ giữa lý thuyết và ứng dụng vào thực tế doanh nghiệp.
+\end{itemize}
+
+Định hướng này mang lại nền tảng vững chắc để tiếp tục mở rộng hệ thống, đáp ứng đa dạng bài toán nghiệp vụ kế toán cũng như hỗ trợ doanh nghiệp Việt Nam trong quá trình chuyển đổi số và tạo dựng lợi thế cạnh tranh bằng các công nghệ hiện đại.
+\end{document}

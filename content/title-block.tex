@@ -1,0 +1,86 @@
+
+% content/title-block.tex
+% Reusable cover-page macros for PTIT report
+% Usage in main.tex:
+%   \input{content/title-block}
+%   \PTITTitlePage{HO CHI MINH CITY, 07/2025}
+%   \PTITInnerTitlePage{HO CHI MINH CITY, 07/2025}
+
+% ---------------- Core common cover ----------------
+% #1 = custom big title block (e.g., "INTERNSHIP ..."), #2 = city/date line
+\newcommand{\PTITCommonCover}[2]{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \newgeometry{top=2cm}% pull block closer to top
+    \begin{center}
+      % Header section
+      {\fontsize{14pt}{16.8pt}\selectfont\bfseries
+      MINISTRY OF INFORMATION AND COMMUNICATIONS}\\
+      {\fontsize{16pt}{19.2pt}\selectfont\bfseries
+      \adjustbox{max width=\textwidth}{POST AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY}}\\[0.3em]
+      \tikz \draw[dashed, line width=1pt] (0,0) -- (5cm,0);
+      \vspace{1cm}
+
+      % University logo
+      \includegraphics[width=3.3cm]{images/PTIT_logo.png}
+      \vspace{0.5cm}
+
+      % Main title block (param)
+      #1
+
+      \vspace{0.5cm}
+      % Topic section
+      \newcommand{\autotopic}[1]{ \StrLen{#1}[\titlelen]
+        \ifthenelse{\titlelen < 25}{ \fontsize{30}{36}\selectfont
+        }{ \ifthenelse{\titlelen < 50}{
+            \fontsize{24}{30}\selectfont % Tiêu đề trung bình: font 24
+          }{
+            \ifthenelse{\titlelen < 75}{ \fontsize{20}{24}\selectfont%
+              % Tiêu đề dài: font 20
+      }{ \fontsize{16}{20}\selectfont } }}\textbf{#1} }
+      \begin{center}
+        \textbf{Topic:} ``\autotopic{\reporttitle}''
+      \end{center}
+      \vspace{1cm}
+      % Student information section
+      % Student information section - CENTERED TABLE
+      \begin{center}
+        \renewcommand{\arraystretch}{1.5}
+        \newcommand{\uppername}[1]{\textbf{\MakeUppercase{#1}}}
+        \begin{tabularx}{\textwidth}{p{4cm}X}
+          \textbf{Supervisor:}    & \uppername{\supervisorname} \\
+          \textbf{Students Name:} & \uppername{\studentnameone} \\ & \uppername{\studentnametwo} \\
+          % \textbf{Student IDs:} & \studentidone \\ & \studentidtwo  \\
+          \textbf{Class:}         & \textbf{\classname}         \\
+          \textbf{Major:}         & \textbf{\majorname}         \\
+          \textbf{Semester:}      & \textbf{\semestername}      \\
+          \textbf{Program Type:}  & \textbf{\programtype}
+        \end{tabularx}
+      \end{center}
+      \vspace{9mm}      % thêm khoảng cách tối thiểu giữa bảng và dòng ngày/địa điểm
+      \vfill    % push date down if room remains
+      \textbf{#2}
+    \end{center}
+    \restoregeometry
+  \end{titlepage}
+}
+
+
+% ----------------- Public wrappers -----------------
+% Main cover (bìa chính)
+\newcommand{\PTITTitlePage}[1]{%
+  \PTITCommonCover{%
+    {\fontsize{32}{38}\selectfont\bfseries
+      INTERNSHIP\\[0.3cm]
+    GRADUATION REPORT}%
+  }{#1}%
+}
+
+% Inner cover (bìa phụ) — show \reporttitle as the big heading, no small subtitle
+\newcommand{\PTITInnerTitlePage}[1]{%
+  \PTITCommonCover{%
+    {\fontsize{32}{38}\selectfont\bfseries
+      INTERNSHIP\\[0.3cm]
+    GRADUATION REPORT}%
+  }{#1}%
+}
