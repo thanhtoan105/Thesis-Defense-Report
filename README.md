@@ -1,44 +1,48 @@
-# PTIT Internship Graduation Report
+# PTIT Graduation Thesis Report
 
-## AI-Based Mobile System for Plant Disease Detection and Monitoring
+## AI-Integrated Accounting ERP System with RAG Technology
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![LaTeX](https://img.shields.io/badge/LaTeX-008080?logo=latex&logoColor=white)](https://www.latex-project.org/)
 [![Vietnamese](https://img.shields.io/badge/Language-Vietnamese-red)](https://vi.wikipedia.org/wiki/Ti%E1%BA%BFng_Vi%E1%BB%87t)
 
-This repository contains the graduation report for the internship project at **Posts and Telecommunications Institute of Technology (PTIT)**, focusing on developing an AI-based mobile system for plant disease detection and monitoring.
+This repository contains the graduation thesis report for the **Posts and Telecommunications Institute of Technology (PTIT)**, focusing on developing an AI-integrated accounting module within an ERP system using Retrieval-Augmented Generation (RAG) technology.
 
 ## 📋 Project Information
 
-- **Title**: AI-Based Mobile System for Plant Disease Detection and Monitoring
-- **Students**: 
-  - Tran Nguyen Phi Hung (N21DCCN036)
-  - Duong Thanh Toan (N21DCCN085)
+- **Title**: Building an AI Application to Support the Accounting Module in an ERP System (Xây dựng ứng dụng AI hỗ trợ phân hệ kế toán trong hệ thống ERP)
+- **Student**: Duong Thanh Toan (N21DCCN085)
 - **Class**: E21CQCNTT01-N
-- **Major**: Artificial Intelligence
+- **Major**: Information Technology
 - **Program**: High-Quality Program
-- **Supervisor**: PhD. Nguyen Minh Tuan
-- **Academic Year**: 2021
+- **Academic Year**: 2021-2026
 
 ## 🎯 Project Objectives
 
-This study aims to develop an intelligent mobile application system that can:
+This study aims to develop an intelligent ERP accounting system integrated with AI using RAG technology, providing a dual interface (traditional UI and natural language chatbot) to support efficient accounting management while complying with Vietnamese regulations.
 
-- **Automatically detect and classify plant diseases** through image analysis
-- **Provide real-time monitoring capabilities** for crop health assessment
-- **Offer accessible diagnostic tools** for farmers and agricultural professionals
-- **Deliver actionable recommendations** for disease management and treatment
+### Short-term Goals
+- Develop a core ERP platform with accounting modules (accounts receivable/payable management, financial reporting, electronic invoicing)
+- Implement a basic RAG chatbot for data queries
+- Reduce query time by up to 60%
+
+### Long-term Goals
+- Integrate advanced RAG for multi-module analysis and multi-turn conversations
+- Automate accounting period closing
+- Achieve ≥99% accuracy on test sets
+- Ensure compliance with Circular 200/2014/TT-BTC (Vietnamese Accounting Standards)
 
 ## 📖 Report Structure
 
 The report is organized into the following chapters:
 
-1. **Introduction** - Project rationale, objectives, and methodology
-2. **Chapter 1** - Literature review and theoretical background
-3. **Chapter 2** - System design and architecture
-4. **Chapter 3** - Implementation and development
-5. **Chapter 4** - Testing and evaluation
-6. **Chapter 5** - Results and conclusions
+1. **Introduction (Mở đầu)** - Project rationale, objectives, research subjects, and methodology
+2. **Chapter 1: Overview (Tổng quan)** - Current state of ERP systems, AI integration trends, and challenges in Vietnam
+3. **Chapter 2: Theoretical Foundation (Cơ sở lý thuyết)** - ERP systems, accounting principles (VAS/TT200), and technology stack
+4. **Chapter 3: RAG Overview and Model Architecture (Tổng quan RAG và kiến trúc mô hình)** - RAG fundamentals, vector databases, and system architecture
+5. **Chapter 4: System Analysis and Design (Phân tích và thiết kế hệ thống)** - Functional decomposition, use cases, and database design
+6. **Chapter 5: Application Development (Phát triển ứng dụng)** - UI implementation and system features
+7. **Chapter 6: Conclusion and Future Development (Kết luận và định hướng phát triển)** - Results, limitations, and roadmap
 
 ## 🛠️ Technical Requirements
 
@@ -67,8 +71,8 @@ The document uses the custom `ptit-report-template.sty` style file which include
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/thanhtoan105/PTIT-Intership-Graduation-Report.git
-cd PTIT-Intership-Graduation-Report
+git clone https://github.com/thanhtoan105/Thesis-Defense-Report.git
+cd Thesis-Defense-Report
 ```
 
 ### 2. Compile the Document
@@ -99,35 +103,35 @@ The compiled PDF will be available as:
 
 ```
 ├── main.tex                    # Main document file
-├── main_flat.tex              # Flattened version
-├── ptit-report-template.sty   # Custom PTIT template
-├── ref.bib                    # Bibliography database
-├── content/                   # Document content
-│   ├── title.tex             # Title page
-│   ├── inner_title.tex       # Inner title page
-│   ├── acknowlegement.tex    # Acknowledgements
-│   ├── introduction.tex      # Introduction
-│   ├── acronyms.tex          # Acronyms and abbreviations
-│   └── chapters/             # Main chapters
-│       ├── chapter_1.tex
-│       ├── chapter_2.tex
-│       ├── chapter_3.tex
-│       ├── chapter_4.tex
-│       └── chapter_5.tex
-├── images/                   # Images and figures
+├── cover.pdf                   # Cover page (imported as PDF)
+├── ptit-report-template.sty    # Custom PTIT LaTeX template
+├── references.bib              # Bibliography database
+├── content/                    # Document content
+│   ├── title.tex               # Title page
+│   ├── title-block.tex         # Title block formatting
+│   ├── acknowlegement.tex      # Acknowledgements
+│   ├── introduction.tex        # Introduction (Mở đầu)
+│   ├── abbreviation.tex        # Abbreviations definitions
+│   ├── list_of_symbols_abberivation.tex  # List of symbols
+│   ├── appendix.tex            # Appendices
+│   └── chapters/               # Main chapters
+│       ├── chapter_1.tex       # Overview (Tổng quan)
+│       ├── chapter_2.tex       # Theoretical Foundation
+│       ├── chapter_3.tex       # RAG Overview & Architecture
+│       ├── chapter_4.tex       # System Analysis & Design
+│       ├── chapter_5.tex       # Application Development
+│       └── chapter_6.tex       # Conclusion & Future Work
+├── images/                     # Images and figures
 │   ├── PTIT_logo.png
-│   ├── chapter_1/
-│   ├── chapter_2/
-│   ├── chapter_3/
-│   ├── chapter_4/
-│   └── chapter_5/
-├── code/                     # Code examples
+│   ├── chapter_2/              # ERP, PostgreSQL, Spring Boot diagrams
+│   ├── chapter_3/              # RAG architecture diagrams
+│   ├── chapter_4/              # System design diagrams
+│   └── chapter_5/              # Application screenshots
+├── code/                       # Code examples
 │   ├── example.py
 │   ├── example.cpp
 │   └── example-vietnamese.py
-├── appendix/                 # Appendices
-│   └── appendix.tex
-└── output/                   # Compiled output files
+└── output/                     # Compiled output files
     └── main.pdf
 ```
 
@@ -135,21 +139,27 @@ The compiled PDF will be available as:
 
 ### Modifying Student Information
 
-Edit the following commands in `main.tex`:
+Student and project information can be configured in the `main.tex` file or `content/title.tex`. The template uses commands like:
 
 ```latex
-\newcommand{\supervisorname}{PhD. Nguyen Minh Tuan}
-\newcommand{\studentnameone}{Your Name - Student ID}
-\newcommand{\studentnametwo}{Partner Name - Student ID}
+\newcommand{\supervisorname}{Your Supervisor Name}
+\newcommand{\studentnameone}{Student Name - Student ID}
 \newcommand{\classname}{Your Class}
-\newcommand{\majorname}{Your Major}
 \newcommand{\reporttitle}{Your Report Title}
 ```
 
 ### Adding New Chapters
 
 1. Create a new `.tex` file in `content/chapters/`
-2. Add the chapter to `main.tex`:
+2. Use the subfile document class:
+   ```latex
+   \documentclass[../../main.tex]{subfiles}
+   \begin{document}
+   \chapter{Your Chapter Title}
+   % Chapter content
+   \end{document}
+   ```
+3. Include it in `main.tex`:
    ```latex
    \subfile{content/chapters/your_new_chapter}
    ```
@@ -176,21 +186,30 @@ This is an academic project, but suggestions and improvements are welcome:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🔑 Key Technologies Covered
+
+- **ERP Systems** - Enterprise Resource Planning architecture and accounting modules
+- **RAG (Retrieval-Augmented Generation)** - AI technique combining retrieval and generation
+- **Large Language Models (LLMs)** - GPT/Claude integration for natural language processing
+- **Vector Databases** - FAISS/Pinecone/Supabase Vector for semantic search
+- **Vietnamese Accounting Standards** - VAS and Circular 200/2014/TT-BTC compliance
+- **Spring Boot** - Backend framework for ERP system
+- **ReactJS** - Frontend framework for user interface
+- **PostgreSQL** - Relational database for accounting data
+
 ## 🙏 Acknowledgments
 
 - **Posts and Telecommunications Institute of Technology (PTIT)** for providing the academic framework
-- **PhD. Nguyen Minh Tuan** for supervision and guidance
-- The **Artificial Intelligence Department** for technical support
+- The **Information Technology Department** for technical support
 - All contributors to the open-source LaTeX packages used in this project
 
 ## 📞 Contact
 
 For questions or collaboration opportunities:
 
-- **Tran Nguyen Phi Hung**: [Contact information]
-- **Duong Thanh Toan**: [Contact information]
-- **Project Repository**: [https://github.com/thanhtoan105/PTIT-Intership-Graduation-Report](https://github.com/thanhtoan105/PTIT-Intership-Graduation-Report)
+- **Duong Thanh Toan**: thanhtoan105
+- **Project Repository**: [https://github.com/thanhtoan105/Thesis-Defense-Report](https://github.com/thanhtoan105/Thesis-Defense-Report)
 
 ---
 
-**Note**: This document is written primarily in Vietnamese as per academic requirements. The README is provided in English for broader accessibility.
+**Note**: This thesis document is written primarily in Vietnamese as per academic requirements at PTIT. The README is provided in English for broader accessibility.
